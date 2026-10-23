@@ -1,0 +1,23 @@
+{
+  "results": [
+    {
+      "check": "plan",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 42
+    },
+    {
+      "check": "release",
+      "exitCode": 1,
+      "errors": 330,
+      "warnings": 42
+    },
+    {
+      "check": "coverage",
+      "exitCode": 0
+    }
+  ],
+  "originalFindingsUnchanged": true,
+  "allCurrentDevelopmentPassesDone": true,
+  "localObservationsBanked": 2
+}

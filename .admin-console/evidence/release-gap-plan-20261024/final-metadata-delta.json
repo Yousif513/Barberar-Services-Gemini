@@ -1,0 +1,31 @@
+{
+  "reviewedManifestSha256": "dbd44204f125ca1c367d4a8cdf741b2730ca146cea6f27fb343cf2255ca774df",
+  "reviewedSnapshot": "reviewed-manifest.zip:manifest.json",
+  "finalManifestSha256": "8f40bce5c3e9345751d65e09c5398a190367e14f13355e6d75b848cd06d88985",
+  "onlyAuditMetadataChanged": true,
+  "changes": [
+    {
+      "kind": "feedback",
+      "id": "fb-release-gap-finding-cascades",
+      "action": "added-local-audit-metadata"
+    },
+    {
+      "kind": "feedback",
+      "id": "fb-release-gap-no-final-bucket",
+      "action": "added-local-audit-metadata"
+    },
+    {
+      "kind": "agent-status",
+      "id": "qa-release-gap-plan",
+      "from": "active",
+      "to": "done"
+    },
+    {
+      "kind": "agents",
+      "id": "harvest-release-gap-plan",
+      "action": "added-local-audit-metadata"
+    }
+  ],
+  "businessAndCapabilityRecordsUnchanged": true,
+  "originalReviewPinPreserved": true
+}

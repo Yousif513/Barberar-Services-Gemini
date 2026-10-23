@@ -1,0 +1,10 @@
+{
+  "exactFindingPreservation": 372,
+  "backlogItems": 48,
+  "uniqueFindingIds": 372,
+  "dependencyGraphAcyclic": true,
+  "finalAcceptanceTaskOwnsNoUnresolvedBucket": true,
+  "jsonAndUtf8Valid": true,
+  "knownTokenShapeMatches": 0,
+  "limitation": "Known shape scan does not prove arbitrary-secret DLP."
+}

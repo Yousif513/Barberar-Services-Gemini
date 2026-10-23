@@ -1,0 +1,148 @@
+{
+  "format": "release-gap-plan-independent-review-1",
+  "reviewer": "qa-release-gap-plan",
+  "at": "2026-10-23T21:37:41.131475+00:00",
+  "disposition": "accepted-plan-only",
+  "findings": [
+    {
+      "id": "QA-PLAN-01",
+      "severity": "high",
+      "status": "resolved-before-acceptance",
+      "issue": "97 unresolved capability/queue statuses lacked bounded pre-final closure work.",
+      "resolution": "32 max3-finding RG-15 slices own91; RG-16 owns3 booking findings; RG-08 owns2 checkout statuses; RG-10 owns audit.emit. Final RG-13 has zero direct findings and depends on all47 other items."
+    },
+    {
+      "id": "QA-PLAN-02",
+      "severity": "high",
+      "status": "resolved-before-acceptance",
+      "issue": "Booking detail/list/hold release acceptance was missing from checkout recovery scope; manifest records incomplete detail/history/audit bindings.",
+      "resolution": "RG-16 explicitly covers all3 capabilities, scoped/audited detail/history, atomic idempotent hold release, negative/concurrency tests and separate review."
+    }
+  ],
+  "unresolvedPlanFindings": [],
+  "checks": {
+    "exactUniqueOriginalFindingsAndIds": 372,
+    "originalOrderAndMessagesPreserved": true,
+    "errors": 330,
+    "warnings": 42,
+    "triageCounts": {
+      "verification-or-implementation-gap": 228,
+      "unapproved-assumption": 16,
+      "confirmed-scanner-context": 72,
+      "blocked-high-gap": 12,
+      "confirmed-security-incident": 1,
+      "historical-evidence-needs-reconciliation": 1,
+      "warning-needs-usage-reconciliation": 42
+    },
+    "backlogItems": 48,
+    "allOwnersCriteriaEvidencePointersValid": true,
+    "acceptanceCriteriaPerItem": "1..3",
+    "acyclicDependencies": true,
+    "finalDependsOnOtherItems": 47,
+    "markdownTaskParityAndUnchecked": true,
+    "baselineStatusFieldsRemainUnresolved": 178,
+    "scannerExactRows": 64,
+    "scannerUniqueFiles": 37,
+    "directConfirmedContexts": 63,
+    "historicalUnresolvedContext": 1,
+    "hqExactCascadeRows": 9,
+    "hqHarnessBytesAndHashVerified": 28127,
+    "existingValidatorTestDefinitionsStaticCount": 136
+  },
+  "criticalCrossChecks": [
+    "Current HQ harness matches receipt hash/size, defaults to3113, and contains the negative mocked-authorization sentence beside actual foreign/missing-seat assertions. Safe isolation before future execution is required.",
+    "Current scanner/local provenance checked; crypto identifiers, zero counters and negative assertions are bounded lexical classifications, not release acceptance. Raw archive/log provenance attributed to independent security receipt.",
+    "Prior independent SQL/security worklog records private-wire lifecycle omission and hosted multi-session/Deno/provider limits; current reproduction remains required before repair.",
+    "Adopted owner decisions and source-linked finance gap report preserve conditional refund maker/checker, zero-repeat acquisition and unresolved commercial/provider choices."
+  ],
+  "credentialMetadata": {
+    "source": "redacted credential-rotation-status.json only",
+    "secretValuesRead": false,
+    "incidentClosed": false,
+    "limits": [
+      "Reset/reconnection facts attributed to root receipt; no auth/account action repeated.",
+      "Founder private CLI success is founder-reported; this execution context remains rejected and dry-run128 is not publication proof.",
+      "401 concerns current inherited credential only; no original exposed value/fingerprint reread, issuer inference or unauthorized-use conclusion.",
+      "Connector may remain disconnected; no extra installations/permissions or repeated successful private login required."
+    ]
+  },
+  "authority": {
+    "releaseAccepted": false,
+    "releaseStillFailed": "330errors/42warnings",
+    "reviewerPromotedNoStatuses": true,
+    "nextPromptBoundedToRG01RG02WithSecureDevelopmentPublication": true,
+    "holdsRetained": "Management15 inactive; Azure/audio/original allowance deferred; real HQ/data/cookies/seat/backup/launcher, production, business grants, money/external writes and new paid services held."
+  },
+  "limitations": [
+    "Plan-only: no build/validator/auth/network/browser/database/application/service/Git operation by reviewer.",
+    "No environment/credential config/keyring, secret value, original raw tool output or archive opened.",
+    "64 classifications and archival chain rely on bounded independent security receipt, checked against original rows and selected source/provenance; no new whole-repo security acceptance.",
+    "Source revision attributed to planning provenance; no HEAD/history inspection."
+  ],
+  "pins": [
+    {
+      "path": "tasks/plan.md",
+      "sha256": "eac408ee21960aa196a144304f203619a8ecd11bb800c613dcb8c4928899a5e9"
+    },
+    {
+      "path": "tasks/todo.md",
+      "sha256": "6ffc027244686680e5ed5515d3fd93e5181f679140a8675c78f381b698fa26e4"
+    },
+    {
+      "path": ".admin-console/evidence/release-gap-plan-20261024/baseline-release.json",
+      "sha256": "b46c25f58cde01b1e5bf2d2ec4792cbd7e9d3e9cb013819a92204075c102d80d"
+    },
+    {
+      "path": ".admin-console/evidence/release-gap-plan-20261024/finding-register.json",
+      "sha256": "2650e1473a64b595eccda25489cdf35ae1a1447fcfd227ed081bf4020bdd44b6"
+    },
+    {
+      "path": ".admin-console/evidence/release-gap-plan-20261024/closure-backlog.json",
+      "sha256": "799dfdcf334a76ee2e2b13e2ffdadc079dd6585c929505e99499303535705f0b"
+    },
+    {
+      "path": ".admin-console/evidence/release-gap-plan-20261024/scanner-context-review.json",
+      "sha256": "c8c5d81367e5ad17102ead6db093b59af77997451d366398aa2e488cce92a0fa"
+    },
+    {
+      "path": ".admin-console/evidence/release-gap-plan-20261024/hq-evidence-cascade.json",
+      "sha256": "e4ea9e649d68e191b20d4c24c5446bfdd7362f3273bcd8e587760f58cca0dbc3"
+    },
+    {
+      "path": ".admin-console/evidence/release-gap-plan-20261024/credential-rotation-status.json",
+      "sha256": "ef18f9b359ad249c972c253772014e14a7188c8569529bc112a679ca37e2fb5c"
+    },
+    {
+      "path": ".admin-console/manifest.json",
+      "sha256": "dbd44204f125ca1c367d4a8cdf741b2730ca146cea6f27fb343cf2255ca774df"
+    },
+    {
+      "path": "tools/adminwright/PROVENANCE.json",
+      "sha256": "2f2fcabd0dbdb307d581d163d0db1d9d0e82ced8ec0ff0e9007c0c9e47b9081f"
+    },
+    {
+      "path": "tools/adminwright/scripts/admin_console_manifest.py",
+      "sha256": "411cc65599134fccf582f707d25fbc0c21281733e9e12434c908531ceb242215"
+    },
+    {
+      "path": "tools/adminwright/scripts/evidence_context.py",
+      "sha256": "7082801832b9c476297f6fc0e82179696aa746702e031f22a3860aa229fecd6e"
+    },
+    {
+      "path": "web_platform/tests-browser/hq-local-acceptance.mjs",
+      "sha256": "8324eed9016d4471f2e43cd1efb4be599469ef988c3b73a2bfdb3b139d29cd9a"
+    },
+    {
+      "path": "docs/legal/2026-10-10-adopted-decisions.md",
+      "sha256": "a7636e1d851d7943209f624f3e5e2817c287396142631cabd47a801acfcefa44"
+    },
+    {
+      "path": "docs/volabi-finance-refund-gaps.md",
+      "sha256": "534411daaa3ecd75eb68fe4def256045f64980b17ac2e3fc80f81ea530a6ba6f"
+    },
+    {
+      "path": ".admin-console/worklog/security-checkout-schema.md",
+      "sha256": "8bd148da64e83799aeff2fe786064d7d4a18b864319de710a9a745a4be1d4f01"
+    }
+  ]
+}

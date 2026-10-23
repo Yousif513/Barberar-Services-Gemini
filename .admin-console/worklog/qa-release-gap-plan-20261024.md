@@ -1,0 +1,13 @@
+# Independent release-gap plan review — 2026-10-24
+
+DEVELOPMENT-ONLY qa-release-gap-plan, regulated plan audit, no claims. Owned only this worklog and evidence/release-gap-plan-20261024/plan-independent-review.json. Read QA/security charters and relevant prior independent worklogs. No product, validator, manifest/status or other-worker edits.
+
+Findings first:97 generic RG-13 unresolved statuses lacked pre-final closure slices. Root replaced the bucket with32 max3-finding operational slices for91 statuses,2 checkout statuses under RG-08 and audit.emit under RG-10. Booking detail/list/hold release still lacked suitable scope; root added RG-16 for those3 findings, with scoped/audited detail/history and atomic/idempotent hold-release negative/concurrency proof. Both omissions are resolved in the pinned final plan.
+
+Read-only checks passed:372 unique exact originals/IDs in order,330errors/42warnings and matching triage;48 owned tasks with1–3 criteria, verification and holds; all finding owner/criteria/evidence bindings; acyclic dependencies; RG-13 owns zero findings and depends on all47 other tasks; Markdown parity and no checked acceptance.178 baseline status fields remain unresolved. All64 scanner rows and9 HQ cascades match baseline;63 direct contexts plus9 cascades stay distinct from one historical failed artifact.
+
+Cross-checked current28127-byte HQ harness hash/default3113/negative authorization source, scanner/local provenance,136 test definitions by static AST, prior SQL lifecycle omission/hosted limits, adopted decisions and zero-repeat/commercial-rule provenance. No tests, app, validator, browser, service, database, network, auth or Git execution. No environment/credential config/keyring, secret value, original raw output/archive read. Reader-only encoding/shape/CRLF/status-message parsing errors were corrected without artifact mutation or suppressing a finding.
+
+Credential metadata only: provider grants reappeared and founder reports private CLI success; Codex context remains rejected and dry-run is not accepted. Incident stays HIGH/open. No issuer inference, original secret/fingerprint comparison, closure or unauthorized-use conclusion.
+
+Accepted plan only; release remains330errors/42warnings. Management15 inactive; Azure/audio/original allowance, real HQ/seat/launcher/data, production, business permissions, finance/external writes and paid-service holds remain. Root owns final artifact checks, harvester, credential context and approved publication. Receipt pins final plan/todo/register/backlog and supporting sources; later corrections require reconciliation.

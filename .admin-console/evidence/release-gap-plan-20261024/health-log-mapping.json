@@ -1,0 +1,28 @@
+{
+  "archiveSha256": "b5efc22b10dcd84a9d9f5e57891f68d36c35c56a58deab26e3173e274ce5d853",
+  "entries": [
+    {
+      "archiveEntry": "web-build.txt",
+      "rawSha256": "3ef749df1d4af9f97943f9451b54ee07dacf0b256e4f634dddee1ec8cd74cc24",
+      "rawBytes": 14395,
+      "readableSha256": "eaae0856b0c8bcb1e3894a0b2d92bd09851553d52a323291f5566d55a4ddabc7",
+      "mapping": "UTF-8; split lines; rstrip each line; remove final blank lines; one final LF. No wording or result changes."
+    },
+    {
+      "archiveEntry": "mobile-typecheck.txt",
+      "rawSha256": "5ba5f82d500ce735184b16d71fdd8685b8d51c91d3e1e17360c3e21bbaf8beb1",
+      "rawBytes": 125,
+      "readableSha256": "700d07d69b099af89cc511d213cdfa7d179577393d8314530ffef5f116b19459",
+      "mapping": "UTF-8; split lines; rstrip each line; remove final blank lines; one final LF. No wording or result changes."
+    }
+  ],
+  "results": {
+    "webBuild": 0,
+    "mobileTypecheck": 0
+  },
+  "retainedWarnings": [
+    "six existing dynamic-filesystem tracing warnings",
+    "provider sitemap fetch failure warning"
+  ],
+  "limitation": "Build is local disabled mode with separate output; no hosted/provider connectivity acceptance."
+}

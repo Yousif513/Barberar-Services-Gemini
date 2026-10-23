@@ -1,0 +1,263 @@
+{
+  "profile": "regulated",
+  "profileSource": "manifest",
+  "phase": "plan",
+  "manifest": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\manifest.json",
+  "projectRoot": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini",
+  "errors": 0,
+  "warnings": 42,
+  "findings": [
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'entities[inventory-operations].lifecycleStates' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'mobile_app/src/lib/pending-package-payments.js#PENDING_PACKAGE_PAGE_SIZE' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'planning/volabi/persona-and-skills/PERSONA_REGISTRY.json' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-access/cli.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/cli.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/common.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/envelope.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/schema.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/render-volabi-voice-previews.ps1' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/start-volabi-access-fixture.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/functions/_shared/checkout-attempts.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#d4_small_cell_threshold' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#gov_exec_role_change' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_break_glass_blocked_until' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_decider_refusal' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#gov_request_payout_destination' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#queue_governance_notice' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#iban_reveal_ceiling' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_deadline_days' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_escalate_requests' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_require_contact_otp' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011210000_priv_copy_export.sql#privacy_export_record_built' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011220000_priv_deletion_engine.sql#admin_privacy_review_legal_hold' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011220000_priv_deletion_engine.sql#privacy_retention_until' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011230000_priv_health_intake.sql#health_answer_retention_days' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011230000_priv_health_intake.sql#health_reuse_consent_months' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011240000_priv_incident_register.sql#privacy_incident_json' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011310000_privfix_identity_and_copy.sql#privacy_export_download_limit' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#privacy_lookup_limit' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261022124446_held_checkout_read_queue.sql' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/scripts/vercel-ignore-build.mjs#decide' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/app/admin/reconciliation/checkouts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/held-checkout-client.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/access-client.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/access-copy.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/council-copy.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/project-copy.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server/access-controls.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server/access-schema.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server/access-storage.mjs' does not match any scanned manifest field"
+    }
+  ]
+}

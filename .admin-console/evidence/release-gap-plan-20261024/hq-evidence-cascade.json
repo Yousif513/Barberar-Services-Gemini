@@ -1,0 +1,69 @@
+{
+  "format": "release-gap-hq-evidence-cascade-1",
+  "file": "web_platform/tests-browser/hq-local-acceptance.mjs",
+  "exists": true,
+  "bytes": 28127,
+  "sha256_raw": "8324eed9016d4471f2e43cd1efb4be599469ef988c3b73a2bfdb3b139d29cd9a",
+  "actualPathState": "placeholder",
+  "reproduction": "Invoked current path_state with actual manifest EvidenceContext and expect_assertions=True; no test/browser/application execution.",
+  "relatedIndependentReview": "scanner-context-review.json: negative mocked-authorization assertion context",
+  "affectedFindings": [
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-agent].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-agents].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-command].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-decision].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-decisions].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-knowledge].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-source].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-task].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-tasks].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    }
+  ],
+  "classification": "scanner-dependent evidence rejection; file exists and is nonempty. This does not establish current browser/runtime acceptance.",
+  "recovery": "Correct verified scanner context handling with adversarial tests, retain original browser evidence and rerun validator. Do not invent replacement paths or add token-bait comments.",
+  "extraBoundary": "This historical browser harness defaults to3113. Do not run it against the active preview; future actual-browser execution requires a separate positively synthetic fixture server/profile."
+}

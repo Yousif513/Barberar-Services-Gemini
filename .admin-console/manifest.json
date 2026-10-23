@@ -16926,6 +16926,30 @@
       ],
       "status": "promoted",
       "scope": "references/security-governance.md"
+    },
+    {
+      "id": "fb-release-gap-finding-cascades",
+      "observation": "A global gate repeated a verified negative-assertion scan rejection as nine unresolvable-file errors even though the tracked test existed. Counting gate entries as independent runtime defects overstates the repair scope.",
+      "category": "new-pattern",
+      "proposedChange": "Preserve every original gate row; trace downstream evidence rejection to actual path-state logic and maintain a separate defect/evidence/context classification before prioritizing.",
+      "evidence": [
+        ".admin-console/evidence/release-gap-plan-20261024/hq-evidence-cascade.json",
+        ".admin-console/evidence/release-gap-plan-20261024/scanner-context-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/discovery.md"
+    },
+    {
+      "id": "fb-release-gap-no-final-bucket",
+      "observation": "A closure plan initially assigned many unresolved domain capabilities to a final release check, hiding their actual implementation or independent acceptance prerequisites. Independent review required bounded domain slices and separate booking operations.",
+      "category": "new-pattern",
+      "proposedChange": "Every unresolved finding needs a pre-final owner, named capability scope and meaningful acceptance contract; final verification is not an implementation backlog bucket.",
+      "evidence": [
+        ".admin-console/evidence/release-gap-plan-20261024/plan-independent-review.json",
+        "tasks/todo.md"
+      ],
+      "status": "promoted",
+      "scope": "agents/adminwright-architect.md"
     }
   ],
   "agents": [
@@ -17668,6 +17692,42 @@
       "status": "done",
       "notes": "DEVELOPMENT-ONLY final local learning pass; no capability review, business authority or global guidance adoption.",
       "worklog": ".admin-console/worklog/harvest-hq-access.md"
+    },
+    {
+      "id": "architect-release-gap-plan",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY audit/plan; no capability implementation, review-status promotion, credential reading, business authority or deployment.",
+      "worklog": ".admin-console/worklog/architect-release-gap-plan-20261024.md"
+    },
+    {
+      "id": "security-release-gap-plan",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent read-only scanner-context classification; no product edits, token values, Git/environment diagnostics or account actions.",
+      "worklog": ".admin-console/worklog/security-release-gap-plan-20261024.md"
+    },
+    {
+      "id": "qa-release-gap-plan",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent audit of closure plan/register; no product, validator, manifest/status, credential, environment, Git or service changes.",
+      "worklog": ".admin-console/worklog/qa-release-gap-plan-20261024.md"
+    },
+    {
+      "id": "harvest-release-gap-plan",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY final local harvester pass under supported architect enum; no capability acceptance, global guidance promotion, credentials or business authority.",
+      "worklog": ".admin-console/worklog/harvest-release-gap-plan-20261024.md"
     }
   ]
 }

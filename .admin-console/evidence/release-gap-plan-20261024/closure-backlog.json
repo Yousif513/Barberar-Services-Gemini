@@ -1,0 +1,1433 @@
+{
+  "format": "release-closure-backlog-1",
+  "clientDate": "2026-10-24",
+  "status": "proposed-closure-sequence-not-new-business-approval",
+  "items": [
+    {
+      "id": "RG-00",
+      "title": "Finish credential containment and verify replacement authentication",
+      "owner": "security + founder",
+      "dependencies": [],
+      "scope": [
+        "redacted incident receipt",
+        "provider authorizations"
+      ],
+      "acceptance": [
+        "All three reset authorizations verified removed; exposed credential is rejected without printing its value.",
+        "Replacement CLI identity and non-writing Git authentication succeed using secure storage.",
+        "Independent incident review records remaining limitations; no exposed value in project artifacts."
+      ],
+      "verification": [
+        "GitHub authorization lists",
+        "sanitized /user and gh status",
+        "noninteractive push --dry-run"
+      ],
+      "holds": "founder completes private sign-in; no new repository/app installation permissions",
+      "status": "containment-verified-replacement-not-yet-verified"
+    },
+    {
+      "id": "RG-01",
+      "title": "Repair bounded scanner contexts",
+      "owner": "validator implementer; different security reviewer",
+      "dependencies": [
+        "RG-00"
+      ],
+      "scope": [
+        "tools/adminwright/scripts/evidence_context.py",
+        "tools/adminwright/tests/test_evidence_context*.py"
+      ],
+      "acceptance": [
+        "Reproduce crypto identifiers, zero counters and negative assertions as false alerts before the fix.",
+        "Real fabricated release data, nonzero unfinished work, inert assertions and hostile negations still fail.",
+        "Existing136 tests remain; fresh independent adversarial acceptance and exact before/after finding delta."
+      ],
+      "verification": [
+        "python -X utf8 -m unittest discover -s tools/adminwright/tests",
+        "project-local release and coverage"
+      ],
+      "holds": "do not rename proof comments, scrub logs, blanket-allow test files or lower the regulated profile",
+      "status": "planned"
+    },
+    {
+      "id": "RG-02",
+      "title": "Reconcile historical gate and successor evidence",
+      "owner": "evidence architect + independent reviewer",
+      "dependencies": [
+        "RG-01"
+      ],
+      "scope": [
+        "held-checkout evidence bindings",
+        "tools/adminwright/PROVENANCE.json",
+        "manifest evidence metadata"
+      ],
+      "acceptance": [
+        "Keep historical failed logs and their original pins.",
+        "Resolve the one nested historical scanner finding through truthful successor evidence.",
+        "Restore missing worklog pointers only after reading actual artifacts; preserve raw versus LF distinctions."
+      ],
+      "verification": [
+        "hash/chronology checks",
+        "plan, coverage and release delta"
+      ],
+      "holds": "local synthetic only; independent acceptance before status changes",
+      "status": "planned"
+    },
+    {
+      "id": "RG-03",
+      "title": "Prove the local HQ evidence bindings safely",
+      "owner": "HQ QA; separate security reviewer",
+      "dependencies": [
+        "RG-01",
+        "RG-02"
+      ],
+      "scope": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs",
+        "HQ agent/source/Council focused tests",
+        "relevant manifest evidence bindings"
+      ],
+      "acceptance": [
+        "Prove agent-capability inspection, source knowledge and Council-record operations with actual assertions.",
+        "Nine rejected browser-test references resolve without inventing missing files.",
+        "Browser runner refuses the real preview and uses only a positively marked disposable synthetic root/profile."
+      ],
+      "verification": [
+        "separate synthetic browser acceptance",
+        "source-linked assertion inventory",
+        "release evidence delta"
+      ],
+      "holds": "never use default3113/current cookies, real HQ data, seat, launcher or live backup/restore",
+      "status": "planned"
+    },
+    {
+      "id": "RG-04",
+      "title": "Independently accept service and branch commands",
+      "owner": "admin domain QA/security",
+      "dependencies": [
+        "RG-00"
+      ],
+      "scope": [
+        "existing service and branch commands",
+        "focused synthetic database tests",
+        "capability review receipts"
+      ],
+      "acceptance": [
+        "Re-read current fixes before proposing changes; verify permitted and denied roles/object scopes.",
+        "Prove atomic transitions, honest failure/empty states and immutable audit events.",
+        "A separate reviewer accepts only named unchanged source pins and fresh tests."
+      ],
+      "verification": [
+        "local synthetic SQL/command tests",
+        "focused AR/EN browser checks"
+      ],
+      "holds": "local synthetic only; independent acceptance before status changes",
+      "status": "planned"
+    },
+    {
+      "id": "RG-05",
+      "title": "Independently accept integration, payment-method and package controls",
+      "owner": "admin domain QA/security",
+      "dependencies": [
+        "RG-04"
+      ],
+      "scope": [
+        "existing integration commands",
+        "existing payment-method commands",
+        "package list/toggle evidence"
+      ],
+      "acceptance": [
+        "Review each capability as a separate small slice; prove per-target authorization and failure rollback.",
+        "Reconcile stale integration narratives against actual source and adopted decisions.",
+        "No actual provider call, money movement, notice send or credential publication."
+      ],
+      "verification": [
+        "isolated synthetic command/negative tests",
+        "focused interface tests"
+      ],
+      "holds": "local synthetic only; independent acceptance before status changes",
+      "status": "planned"
+    },
+    {
+      "id": "RG-06",
+      "title": "Resolve the contested profile-clear capability",
+      "owner": "privacy QA + independent security",
+      "dependencies": [
+        "RG-04"
+      ],
+      "scope": [
+        "customer.clear-profile command",
+        "existing privacy/legal-hold tests",
+        "review disposition"
+      ],
+      "acceptance": [
+        "Use adopted legal decisions; prove legal holds, restricted scope and applicable maker/checker.",
+        "Denied attempts preserve data and emit appropriate audit evidence.",
+        "Do not mark the disputed capability accepted without independent source and test review."
+      ],
+      "verification": [
+        "synthetic role and legal-hold matrix"
+      ],
+      "holds": "no real erasure, legal reinterpretation or new sensitive-data permission",
+      "status": "planned"
+    },
+    {
+      "id": "RG-07",
+      "title": "Reproduce private checkout-wire lifecycle gap",
+      "owner": "privacy/security implementer + independent reviewer",
+      "dependencies": [
+        "RG-00"
+      ],
+      "scope": [
+        "durable checkout wire storage",
+        "existing privacy lifecycle commands/tests"
+      ],
+      "acceptance": [
+        "Reproduce the recorded PII lifecycle omission against current synthetic SQL.",
+        "Document actual affected fields/access and reuse already adopted lifecycle rules.",
+        "Fix only proven local defects; unresolved retention/legal choices remain explicit."
+      ],
+      "verification": [
+        "focused synthetic SQL lifecycle and access tests"
+      ],
+      "holds": "no invented retention period, hosted mutation or real customer/payment data",
+      "status": "planned"
+    },
+    {
+      "id": "RG-08",
+      "title": "Close durable/unknown checkout evidence in stages",
+      "owner": "checkout implementer + independent QA",
+      "dependencies": [
+        "RG-07"
+      ],
+      "scope": [
+        "durable attempt recovery",
+        "read-only held-checkout queue",
+        "sandbox acceptance specification"
+      ],
+      "acceptance": [
+        "Verify timeout, crash, duplicate/concurrent session and idempotent outcomes using local fixtures.",
+        "Unknown provider outcomes remain held; queue/handoff cannot initiate capture/refund/retry.",
+        "Identify exact hosted Deno/PostgREST/provider proof still needed and request a named sandbox only when required."
+      ],
+      "verification": [
+        "local multi-session/negative recovery tests",
+        "separate approved sandbox acceptance later"
+      ],
+      "holds": "no financial transaction, real gateway reconciliation, provider write or commercial-rule change",
+      "status": "planned"
+    },
+    {
+      "id": "RG-09",
+      "title": "Complete screen state, responsive and accessibility proof",
+      "owner": "UX implementer + independent UX/QA",
+      "dependencies": [
+        "RG-03",
+        "RG-04",
+        "RG-05",
+        "RG-06"
+      ],
+      "scope": [
+        "nine state metadata gaps",
+        "eight empty test bindings",
+        "22 accessibility and two responsive findings"
+      ],
+      "acceptance": [
+        "Inspect current behavior first; add honest loading/empty/error/forbidden states only where absent.",
+        "Verify keyboard, AR/EN RTL, contrast, focus and narrow viewport in synthetic accounts.",
+        "Bind meaningful tests and accept review per domain rather than bulk toggling screen status."
+      ],
+      "verification": [
+        "focused browser/a11y tests at mobile and desktop widths",
+        "component lint/build"
+      ],
+      "holds": "local synthetic only; independent acceptance before status changes",
+      "status": "planned"
+    },
+    {
+      "id": "RG-10",
+      "title": "Prove audit, observability, performance and security",
+      "owner": "platform QA + independent security",
+      "dependencies": [
+        "RG-03",
+        "RG-08"
+      ],
+      "scope": [
+        "cross-cutting audit/observability evidence",
+        "dependency reachability assessment",
+        "six failed quality gates"
+      ],
+      "acceptance": [
+        "Demonstrate actor/target/reason/result, correlation and privileged mutation coverage in synthetic traces.",
+        "Assess pinned dependency advisories and actual reachable exposure before targeted changes.",
+        "Record bounded performance/recovery/security results and remaining gaps without inferring platform-wide acceptance."
+      ],
+      "verification": [
+        "local trace/audit tests",
+        "primary-vendor advisory review",
+        "bounded performance/security checks"
+      ],
+      "holds": "no paid monitoring, external telemetry, broad forced upgrades or production job activation",
+      "status": "planned"
+    },
+    {
+      "id": "RG-11",
+      "title": "Reconcile adopted terms and prepare missing CEO decisions",
+      "owner": "product/finance/risk proposals",
+      "dependencies": [
+        "RG-02"
+      ],
+      "scope": [
+        "16 assumed decisions",
+        "12 blocked HIGH gaps",
+        "docs/legal/2026-10-10-adopted-decisions.md"
+      ],
+      "acceptance": [
+        "Recover approved source for technical/adopted rules; do not send16 routine technical questions to the CEO.",
+        "Present concrete missing acquisition terms/event, refund allocation and provider acceptance choices with options and consequences.",
+        "Keep held access, legal, notice/archive/provider dependencies separately owned with no implied approval."
+      ],
+      "verification": [
+        "decision-to-source matrix",
+        "independent business-rule consistency review"
+      ],
+      "holds": "no numeric commission/VAT invention, permission grants, legal certification or financial execution",
+      "status": "planned"
+    },
+    {
+      "id": "RG-12",
+      "title": "Prepare named hosted acceptance contracts",
+      "owner": "integration architect + QA",
+      "dependencies": [
+        "RG-08",
+        "RG-11"
+      ],
+      "scope": [
+        "environment/credential contract",
+        "auth/session settings acceptance",
+        "licensed provider sandbox requirements"
+      ],
+      "acceptance": [
+        "Specify each test environment, data boundary, exact provider operation, cleanup and expected evidence.",
+        "Request credentials securely only for the named approved integration.",
+        "Obtain separate permission for any held external write, new service, business role or financial sandbox operation."
+      ],
+      "verification": [
+        "read-only contract review; execution only after necessary explicit authorization"
+      ],
+      "holds": "Azure deferred; no global auth setting change or production/provider write",
+      "status": "planned"
+    },
+    {
+      "id": "RG-13",
+      "title": "Run final same-revision release acceptance",
+      "owner": "independent QA/security",
+      "dependencies": [
+        "RG-02",
+        "RG-03",
+        "RG-04",
+        "RG-05",
+        "RG-06",
+        "RG-07",
+        "RG-08",
+        "RG-09",
+        "RG-10",
+        "RG-11",
+        "RG-12",
+        "RG-14",
+        "RG-15-access-governance-01",
+        "RG-15-access-governance-02",
+        "RG-15-access-governance-03",
+        "RG-15-marketplace-operations-01",
+        "RG-15-marketplace-operations-02",
+        "RG-15-marketplace-operations-03",
+        "RG-15-marketplace-operations-04",
+        "RG-15-marketplace-operations-05",
+        "RG-15-marketplace-operations-06",
+        "RG-15-marketplace-operations-07",
+        "RG-15-marketplace-operations-08",
+        "RG-15-marketplace-operations-09",
+        "RG-15-marketplace-operations-10",
+        "RG-15-privacy-01",
+        "RG-15-privacy-02",
+        "RG-15-privacy-03",
+        "RG-15-privacy-04",
+        "RG-15-privacy-05",
+        "RG-15-money-controls-01",
+        "RG-15-money-controls-02",
+        "RG-15-money-controls-03",
+        "RG-15-money-controls-04",
+        "RG-15-money-controls-05",
+        "RG-15-money-controls-06",
+        "RG-15-money-controls-07",
+        "RG-15-money-controls-08",
+        "RG-15-money-controls-09",
+        "RG-15-growth-communications-01",
+        "RG-15-growth-communications-02",
+        "RG-15-growth-communications-03",
+        "RG-15-growth-communications-04",
+        "RG-15-growth-communications-05",
+        "RG-16-booking-operations"
+      ],
+      "scope": [
+        "current source and manifest",
+        "all release evidence"
+      ],
+      "acceptance": [
+        "Every original finding has source-linked disposition; no unresolved critical/high omission.",
+        "Project-local regulated release0, coverage0, build/typecheck/lint/test success and meaningful browser/quality acceptance.",
+        "Record installed-tool compatibility separately; do not claim production-ready while either required gate remains unresolved."
+      ],
+      "verification": [
+        "project-local and required installed release/coverage",
+        "npm run typecheck:mobile",
+        "npm run build --workspace=web_platform",
+        "web eslint/native tests and approved isolated browser/SQL suites"
+      ],
+      "holds": "a passing gate does not authorize production merge/deploy, real HQ migration, activation or transactions",
+      "status": "planned"
+    },
+    {
+      "id": "RG-14",
+      "title": "Reconcile unused static declarations",
+      "owner": "manifest maintainer + independent reviewer",
+      "dependencies": [
+        "RG-02"
+      ],
+      "scope": [
+        "42 declared-static-unused warnings"
+      ],
+      "acceptance": [
+        "Trace each warning to actual use and prior approver.",
+        "Remove obsolete metadata only with provenance; preserve still-required static values and approval.",
+        "Do not call warnings false positives without proof or add runtime constants merely to satisfy scanning."
+      ],
+      "verification": [
+        "manifest/static usage mapping",
+        "plan/coverage/release warning delta"
+      ],
+      "holds": "local synthetic only; independent acceptance before status changes",
+      "status": "planned"
+    },
+    {
+      "id": "RG-15-access-governance-01",
+      "title": "Accept existing access-governance slice 1",
+      "owner": "security implementer + separate security/QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02"
+      ],
+      "scope": [
+        "entities[admin-governance].capabilities[gov.approvals]",
+        "entities[admin-governance].capabilities[gov.audited-reads]",
+        "entities[admin-governance].capabilities[gov.break-glass]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real grants, second-owner activation, IBAN reveal or hosted MFA/session setting changes",
+      "status": "planned",
+      "findingIds": [
+        "F-2c6d9d83ece91264",
+        "F-b05c4ff397a1a909",
+        "F-f91981ea42397ba0"
+      ]
+    },
+    {
+      "id": "RG-15-access-governance-02",
+      "title": "Accept existing access-governance slice 2",
+      "owner": "security implementer + separate security/QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02"
+      ],
+      "scope": [
+        "entities[admin-governance].capabilities[gov.console-roles]",
+        "entities[admin-governance].capabilities[gov.iban-change]",
+        "entities[admin-governance].capabilities[gov.iban-reveal]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real grants, second-owner activation, IBAN reveal or hosted MFA/session setting changes",
+      "status": "planned",
+      "findingIds": [
+        "F-a722193f6ad1bb37",
+        "F-5e1f021731c110ff",
+        "F-5e3fd76f356ba437"
+      ]
+    },
+    {
+      "id": "RG-15-access-governance-03",
+      "title": "Accept existing access-governance slice 3",
+      "owner": "security implementer + separate security/QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02"
+      ],
+      "scope": [
+        "entities[admin-governance].capabilities[gov.mfa]",
+        "entities[role-assignment].capabilities[role.directory]",
+        "entities[role-assignment].capabilities[role.set-administrator]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real grants, second-owner activation, IBAN reveal or hosted MFA/session setting changes",
+      "status": "planned",
+      "findingIds": [
+        "F-f1f3cdf4e0ea2489",
+        "F-7e6903be0d97713b",
+        "F-38319b6d927d300b"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-01",
+      "title": "Accept existing marketplace-operations slice 1",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "entities[country].capabilities[country.configure]",
+        "entities[country].capabilities[country.list]",
+        "entities[customer].capabilities[customer.detail]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-c28d47b8158adc01",
+        "F-ef0cbb537581bb80",
+        "F-0a03218709ae8df5"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-02",
+      "title": "Accept existing marketplace-operations slice 2",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "entities[customer].capabilities[customer.list]",
+        "entities[customer].capabilities[customer.suspend]",
+        "entities[customer].capabilities[customer.verify-phone]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-38f5562fecaa68cc",
+        "F-945fc4b501880b95",
+        "F-7519fb6b8d78dc0e"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-03",
+      "title": "Accept existing marketplace-operations slice 3",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "entities[employee].capabilities[employee.list]",
+        "entities[feature-flag].capabilities[feature-flag.list]",
+        "entities[inventory-operations].capabilities[inventory.adjust]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-d85f580ea75f6879",
+        "F-34eff5ec823a9adf",
+        "F-36df18cf5a993324"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-04",
+      "title": "Accept existing marketplace-operations slice 4",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "entities[inventory-operations].capabilities[inventory.catalog]",
+        "entities[inventory-operations].capabilities[inventory.chain-read]",
+        "entities[inventory-operations].capabilities[inventory.delegation]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-85eb367c2c47bf5b",
+        "F-68b715cfe1e4d6a1",
+        "F-260a907210a362df"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-05",
+      "title": "Accept existing marketplace-operations slice 5",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "entities[inventory-operations].capabilities[inventory.supply-read]",
+        "entities[inventory-operations].capabilities[inventory.transfer]",
+        "entities[operations-dashboard].capabilities[activity.feed]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-6eabc228f3b97146",
+        "F-d07fabc6f4d0e40a",
+        "F-d835894c7e60dfa6"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-06",
+      "title": "Accept existing marketplace-operations slice 6",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "entities[platform-settings].capabilities[settings.api-limits]",
+        "entities[platform-settings].capabilities[settings.list]",
+        "entities[platform-settings].capabilities[settings.platform]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-fb0139be2a94730f",
+        "F-87c89979d9fee0a7",
+        "F-c6c07fb611b704e9"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-07",
+      "title": "Accept existing marketplace-operations slice 7",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "entities[platform-settings].capabilities[settings.vat-rate]",
+        "entities[provider].capabilities[provider.approve]",
+        "entities[provider].capabilities[provider.list]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-134eef00b9f2c5a0",
+        "F-aed32bbd970584f7",
+        "F-4919e18cd621a26d"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-08",
+      "title": "Accept existing marketplace-operations slice 8",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "entities[provider].capabilities[provider.notes]",
+        "entities[provider].capabilities[provider.reject]",
+        "entities[provider].capabilities[provider.suspend]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-25e58a7a1e997088",
+        "F-38755ab34440ce80",
+        "F-6f61437502e12e6f"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-09",
+      "title": "Accept existing marketplace-operations slice 9",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "entities[provider].capabilities[provider.vat-status]",
+        "entities[review].capabilities[review.hide]",
+        "entities[review].capabilities[review.moderate-queue]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-fc9e3917f368f479",
+        "F-d15fbb1bf0fc5dc6",
+        "F-27300c87e8bd0723"
+      ]
+    },
+    {
+      "id": "RG-15-marketplace-operations-10",
+      "title": "Accept existing marketplace-operations slice 10",
+      "owner": "marketplace implementer + separate domain QA",
+      "dependencies": [
+        "RG-02",
+        "RG-04"
+      ],
+      "scope": [
+        "workQueues[provider-onboarding]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real customer/provider mutation, sensitive-data permission or business employee activation",
+      "status": "planned",
+      "findingIds": [
+        "F-f56338692e9a7191"
+      ]
+    },
+    {
+      "id": "RG-15-privacy-01",
+      "title": "Accept existing privacy slice 1",
+      "owner": "privacy implementer + separate privacy/security QA",
+      "dependencies": [
+        "RG-02",
+        "RG-06"
+      ],
+      "scope": [
+        "entities[customer].capabilities[customer.data-request]",
+        "entities[customer].capabilities[customer.submit-data-request]",
+        "entities[privacy-incident].capabilities[incident.list]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real PII/erasure/export, retention invention or new permitted data scope",
+      "status": "planned",
+      "findingIds": [
+        "F-f26d0fe9b983e17a",
+        "F-b5e705e8ae36e2d8",
+        "F-faf887f7cf890b70"
+      ]
+    },
+    {
+      "id": "RG-15-privacy-02",
+      "title": "Accept existing privacy slice 2",
+      "owner": "privacy implementer + separate privacy/security QA",
+      "dependencies": [
+        "RG-02",
+        "RG-06"
+      ],
+      "scope": [
+        "entities[privacy-incident].capabilities[incident.register]",
+        "entities[privacy-request].capabilities[intake.health-retention-and-gate]",
+        "entities[privacy-request].capabilities[privacy.copy-export]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real PII/erasure/export, retention invention or new permitted data scope",
+      "status": "planned",
+      "findingIds": [
+        "F-a10c28c08751c85c",
+        "F-742e53d5768c43e0",
+        "F-82a9c6f28b026058"
+      ]
+    },
+    {
+      "id": "RG-15-privacy-03",
+      "title": "Accept existing privacy slice 3",
+      "owner": "privacy implementer + separate privacy/security QA",
+      "dependencies": [
+        "RG-02",
+        "RG-06"
+      ],
+      "scope": [
+        "entities[privacy-request].capabilities[privacy.correction]",
+        "entities[privacy-request].capabilities[privacy.deadline-and-refusal]",
+        "entities[privacy-request].capabilities[privacy.deletion-ledger]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real PII/erasure/export, retention invention or new permitted data scope",
+      "status": "planned",
+      "findingIds": [
+        "F-4704b66a9e4776fe",
+        "F-e7adc80fad7bfeb8",
+        "F-34be16ab75c382f1"
+      ]
+    },
+    {
+      "id": "RG-15-privacy-04",
+      "title": "Accept existing privacy slice 4",
+      "owner": "privacy implementer + separate privacy/security QA",
+      "dependencies": [
+        "RG-02",
+        "RG-06"
+      ],
+      "scope": [
+        "entities[privacy-request].capabilities[privacy.deletion]",
+        "entities[privacy-request].capabilities[privacy.legal-hold]",
+        "entities[privacy-request].capabilities[privacy.queue]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real PII/erasure/export, retention invention or new permitted data scope",
+      "status": "planned",
+      "findingIds": [
+        "F-8d8c539dbfc556b8",
+        "F-f59509a1b5718d2f",
+        "F-f5e68647ab3c6f5b"
+      ]
+    },
+    {
+      "id": "RG-15-privacy-05",
+      "title": "Accept existing privacy slice 5",
+      "owner": "privacy implementer + separate privacy/security QA",
+      "dependencies": [
+        "RG-02",
+        "RG-06"
+      ],
+      "scope": [
+        "entities[privacy-request].capabilities[privacy.request-intake]",
+        "entities[processing-register].capabilities[ropa.view]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real PII/erasure/export, retention invention or new permitted data scope",
+      "status": "planned",
+      "findingIds": [
+        "F-4e2e2db9af096131",
+        "F-1bd562fc80aca1a7"
+      ]
+    },
+    {
+      "id": "RG-15-money-controls-01",
+      "title": "Accept existing money-controls slice 1",
+      "owner": "payments implementer + separate financial-control QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[dispute].capabilities[dispute.list]",
+        "entities[dispute].capabilities[dispute.resolve]",
+        "entities[fee-rule].capabilities[fee-rule.list]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "synthetic financial records only; no provider call, payment/refund/payout, historical real reconciliation or commercial-rate changes",
+      "status": "planned",
+      "findingIds": [
+        "F-4dfbc0f3ee1cad60",
+        "F-fa0c95cc5fa2b846",
+        "F-1fbfaa6a93725b22"
+      ]
+    },
+    {
+      "id": "RG-15-money-controls-02",
+      "title": "Accept existing money-controls slice 2",
+      "owner": "payments implementer + separate financial-control QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[fee-rule].capabilities[fee-rule.save]",
+        "entities[fee-rule].capabilities[fee.effective-display]",
+        "entities[fee-rule].capabilities[money.pending-change]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "synthetic financial records only; no provider call, payment/refund/payout, historical real reconciliation or commercial-rate changes",
+      "status": "planned",
+      "findingIds": [
+        "F-34c7aa1bd0c3f7de",
+        "F-b57ef225c6e7f852",
+        "F-9b43ea9fe205f675"
+      ]
+    },
+    {
+      "id": "RG-15-money-controls-03",
+      "title": "Accept existing money-controls slice 3",
+      "owner": "payments implementer + separate financial-control QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[ledger-entry].capabilities[ledger.adjustment]",
+        "entities[ledger-entry].capabilities[ledger.export]",
+        "entities[ledger-entry].capabilities[ledger.list]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "synthetic financial records only; no provider call, payment/refund/payout, historical real reconciliation or commercial-rate changes",
+      "status": "planned",
+      "findingIds": [
+        "F-84d6e08859ca18c6",
+        "F-5934ed6dc0b66910",
+        "F-12d4c01836935307"
+      ]
+    },
+    {
+      "id": "RG-15-money-controls-04",
+      "title": "Accept existing money-controls slice 4",
+      "owner": "payments implementer + separate financial-control QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[ledger-entry].capabilities[ledger.release-payout]",
+        "entities[ledger-entry].capabilities[ledger.vat-report]",
+        "entities[ledger-entry].capabilities[money.append-only]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "synthetic financial records only; no provider call, payment/refund/payout, historical real reconciliation or commercial-rate changes",
+      "status": "planned",
+      "findingIds": [
+        "F-3eaa505441bcddc8",
+        "F-d76d9575642d405a",
+        "F-b462ffd7aa8fac94"
+      ]
+    },
+    {
+      "id": "RG-15-money-controls-05",
+      "title": "Accept existing money-controls slice 5",
+      "owner": "payments implementer + separate financial-control QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[payout-request].capabilities[payout.approve]",
+        "entities[payout-request].capabilities[payout.list]",
+        "entities[payout-request].capabilities[payout.reject]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "synthetic financial records only; no provider call, payment/refund/payout, historical real reconciliation or commercial-rate changes",
+      "status": "planned",
+      "findingIds": [
+        "F-0272fdd9093a0bc6",
+        "F-0003c38f26ba6d78",
+        "F-658bfdf0cba40b8a"
+      ]
+    },
+    {
+      "id": "RG-15-money-controls-06",
+      "title": "Accept existing money-controls slice 6",
+      "owner": "payments implementer + separate financial-control QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[reconciliation].capabilities[reconciliation.daily]",
+        "entities[reconciliation].capabilities[reconciliation.overview]",
+        "entities[reconciliation].capabilities[reconciliation.resolve-break]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "synthetic financial records only; no provider call, payment/refund/payout, historical real reconciliation or commercial-rate changes",
+      "status": "planned",
+      "findingIds": [
+        "F-16f3ed84320b7db7",
+        "F-b7eddb2842a8a2a5",
+        "F-e460e318c085a6a1"
+      ]
+    },
+    {
+      "id": "RG-15-money-controls-07",
+      "title": "Accept existing money-controls slice 7",
+      "owner": "payments implementer + separate financial-control QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[refund-request].capabilities[refund.check-with-tap]",
+        "entities[refund-request].capabilities[refund.execute]",
+        "entities[refund-request].capabilities[refund.list]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "synthetic financial records only; no provider call, payment/refund/payout, historical real reconciliation or commercial-rate changes",
+      "status": "planned",
+      "findingIds": [
+        "F-cc7156171a4d5248",
+        "F-feb9159af947a3c7",
+        "F-0ffffb8d6cb3d9be"
+      ]
+    },
+    {
+      "id": "RG-15-money-controls-08",
+      "title": "Accept existing money-controls slice 8",
+      "owner": "payments implementer + separate financial-control QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[refund-request].capabilities[refund.retry]",
+        "workQueues[failed-payment]",
+        "workQueues[payout-approval]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "synthetic financial records only; no provider call, payment/refund/payout, historical real reconciliation or commercial-rate changes",
+      "status": "planned",
+      "findingIds": [
+        "F-95fb50ee6feab9b0",
+        "F-ec430bf3eff1834c",
+        "F-e9a7c324c483f522"
+      ]
+    },
+    {
+      "id": "RG-15-money-controls-09",
+      "title": "Accept existing money-controls slice 9",
+      "owner": "payments implementer + separate financial-control QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "workQueues[refund-arbitration]",
+        "workQueues[webhook-failure]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "synthetic financial records only; no provider call, payment/refund/payout, historical real reconciliation or commercial-rate changes",
+      "status": "planned",
+      "findingIds": [
+        "F-30c4c4ac1724d0d2",
+        "F-f40112fbc1386c54"
+      ]
+    },
+    {
+      "id": "RG-15-growth-communications-01",
+      "title": "Accept existing growth-communications slice 1",
+      "owner": "operations implementer + separate QA/security",
+      "dependencies": [
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[notification-broadcast].capabilities[notification.broadcast]",
+        "entities[notification-broadcast].capabilities[notification.dispatch]",
+        "entities[notification-broadcast].capabilities[notification.log]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real message, WhatsApp/provider write, reward enablement, price change or new service",
+      "status": "planned",
+      "findingIds": [
+        "F-d0a85d6a7c867c0d",
+        "F-2f0dd33b7ceb203e",
+        "F-255a23546482f273"
+      ]
+    },
+    {
+      "id": "RG-15-growth-communications-02",
+      "title": "Accept existing growth-communications slice 2",
+      "owner": "operations implementer + separate QA/security",
+      "dependencies": [
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[promotional-code].capabilities[coupon.list]",
+        "entities[promotional-code].capabilities[coupon.toggle]",
+        "entities[promotional-code].capabilities[coupon.upsert]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real message, WhatsApp/provider write, reward enablement, price change or new service",
+      "status": "planned",
+      "findingIds": [
+        "F-baaba55a4a5d8072",
+        "F-709af93fb69d48ed",
+        "F-f4a920e8cf64ba6c"
+      ]
+    },
+    {
+      "id": "RG-15-growth-communications-03",
+      "title": "Accept existing growth-communications slice 3",
+      "owner": "operations implementer + separate QA/security",
+      "dependencies": [
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[reward-program].capabilities[reward-program.enable]",
+        "entities[reward-program].capabilities[reward-program.overview]",
+        "entities[sponsored-placement].capabilities[sponsored.configure]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real message, WhatsApp/provider write, reward enablement, price change or new service",
+      "status": "planned",
+      "findingIds": [
+        "F-17dbfc45affb3e16",
+        "F-bee7c29692f1a25d",
+        "F-abb74d0b4ec9c41a"
+      ]
+    },
+    {
+      "id": "RG-15-growth-communications-04",
+      "title": "Accept existing growth-communications slice 4",
+      "owner": "operations implementer + separate QA/security",
+      "dependencies": [
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[sponsored-placement].capabilities[sponsored.overview]",
+        "entities[sponsored-placement].capabilities[sponsored.void-attribution]",
+        "entities[support-contact].capabilities[support.contact]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real message, WhatsApp/provider write, reward enablement, price change or new service",
+      "status": "planned",
+      "findingIds": [
+        "F-e7ecb61ac8a842a5",
+        "F-39857b1aebef5d4a",
+        "F-6dda47be9316c03b"
+      ]
+    },
+    {
+      "id": "RG-15-growth-communications-05",
+      "title": "Accept existing growth-communications slice 5",
+      "owner": "operations implementer + separate QA/security",
+      "dependencies": [
+        "RG-02",
+        "RG-11"
+      ],
+      "scope": [
+        "entities[whatsapp-channel].capabilities[whatsapp.overview]",
+        "entities[whatsapp-channel].capabilities[whatsapp.verify-channel]"
+      ],
+      "acceptance": [
+        "Re-read each named capability/queue source and adopted decisions; classify code defect versus missing review/evidence without rebuilding existing fixes.",
+        "Add or run meaningful focused synthetic success/forbidden/object-scope/failure/audit tests; repair only reproduced defects with required command/idempotency/hold controls.",
+        "A different reviewer accepts exact source pins and results; blocked or deferred capability gets a truthful decision/dependency record, never a bulk implemented/reviewed promotion."
+      ],
+      "verification": [
+        "per-capability local synthetic command/DB/interface suite",
+        "source-to-test assertion matrix",
+        "independent disposition and regulated gate delta"
+      ],
+      "holds": "no real message, WhatsApp/provider write, reward enablement, price change or new service",
+      "status": "planned",
+      "findingIds": [
+        "F-382a052d069a15ef",
+        "F-caadc17fccf3e3f6"
+      ]
+    },
+    {
+      "id": "RG-16-booking-operations",
+      "title": "Accept booking detail, list and hold release",
+      "owner": "booking implementer + independent operations/security QA",
+      "dependencies": [
+        "RG-00",
+        "RG-02"
+      ],
+      "scope": [
+        "entities[booking].capabilities[booking.detail]",
+        "entities[booking].capabilities[booking.list]",
+        "entities[booking].capabilities[booking.release-holds]"
+      ],
+      "acceptance": [
+        "Inspect current booking detail/list/hold-release source against approved requirements; reproduce any unaudited invoice read, incomplete history or missing server/test/audit binding recorded in the manifest.",
+        "Prove object-scoped permitted/denied reads, truthful detail/history and audited privileged access; hold release has atomic preconditions, idempotency and negative concurrency tests.",
+        "Separate review accepts exact sources and synthetic results for each capability, with real defects and missing evidence distinguished; no real booking mutation."
+      ],
+      "verification": [
+        "focused synthetic booking read/history/hold-release tests",
+        "per-role negative and audit assertions",
+        "independent source/test binding disposition"
+      ],
+      "holds": "no real customer/invoice data, hosted hold release, financial operation or new sensitive-data permission",
+      "status": "planned",
+      "findingIds": [
+        "F-60eec41752eb178d",
+        "F-8158fe47aea21124",
+        "F-533b95ea3750a1ca"
+      ]
+    }
+  ]
+}
