@@ -1,0 +1,19 @@
+{
+  "web_platform/src/app/hq/council/[id]/page.tsx": "f08ac32d9c40ce1e581ef09bd25c6e8c599099a22883a7e75917e60e0cce3b83",
+  "web_platform/src/app/hq/council/page.tsx": "0cecc12dfb8797c91b4cc4878cf499cd7029de2c30ac56fcb847a65300ca8ef5",
+  "web_platform/src/components/hq/hq-context.tsx": "cb8ec502727680f0f5a8186c50e9d8efa9916d9d7640bc892cecf431accb35e2",
+  "web_platform/src/components/hq/hq-council.tsx": "5bf0bd2849c51432bb05207e51e17e5b21c070ae4d6e689d930e87a3f55ca44c",
+  "web_platform/src/components/hq/hq-overlays.tsx": "33879bf64eb7992c4c93723d9b98770a116a1f24ce0ccd2e8a7e9bcce56eb1c2",
+  "web_platform/src/components/hq/hq-shell.tsx": "a9f202f866735eefd80be58290371d8e503b24f822c2870ca4b1ee123b15d867",
+  "web_platform/src/components/hq/hq-workspace.tsx": "3b7e627e1e98b556b89fb5019bf6fe56d21f0add463897867ab1e9a548a86b54",
+  "web_platform/src/lib/hq/contracts.ts": "aad341b56f3d0e838577340ab06eb8c9056d06dafa60cb46a30b5327d6b60b5d",
+  "web_platform/src/lib/hq/copy.ts": "e9260acf6591d0e1caa4c85d88f98925855e4b5b3cab352f034b9d21260c3079",
+  "web_platform/src/lib/hq/council-copy.ts": "eb97a0a60f94b2a8e9792629f48f94c897b1c2412c31cf4d34910f166b124fc5",
+  "web_platform/src/lib/hq/server/council-store.mjs": "ceda6ccdf59414521571335c40d6a8ee1c1d1ce42739e71d7346c2943d4883cb",
+  "web_platform/src/lib/hq/server/handler.mjs": "50b6be58de26fefbcab7453bceb318afe6ba11337fcfa36bcc9de87fff79b384",
+  "web_platform/src/lib/hq/server/local-store.mjs": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf",
+  "web_platform/tests-browser/hq-council-independent.mjs": "fb07d386d2ba8fca844b290ed509909e16360f1e8844c12b5535848c7b00c67c",
+  "web_platform/tests-browser/hq-council-owner.mjs": "5496b25a20651d29edfbd6509e285b2566d9a6004d83aa38abc022fd479805e6",
+  "web_platform/tests/hq-council-independent.test.mjs": "28af5f4bb74db37fd11e6d7f8227a1e0f346977b36ee812ec20b049a3acc84e9",
+  "web_platform/tests/hq-council-owner.test.mjs": "f104ce92d67cf2b47cf43dca3d75814bb8c7e9f499189375762625599ed0db3e"
+}

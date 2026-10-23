@@ -1,0 +1,15 @@
+{
+  "normalization": "strict UTF8, CRLF pairs to LF, UTF8 encode",
+  "hashes": {
+    "web_platform/src/lib/hq/server/council-store.mjs": "ceda6ccdf59414521571335c40d6a8ee1c1d1ce42739e71d7346c2943d4883cb",
+    "web_platform/src/lib/hq/server/local-store.mjs": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf",
+    "web_platform/src/lib/hq/server/handler.mjs": "50b6be58de26fefbcab7453bceb318afe6ba11337fcfa36bcc9de87fff79b384",
+    "web_platform/src/lib/hq/contracts.ts": "aad341b56f3d0e838577340ab06eb8c9056d06dafa60cb46a30b5327d6b60b5d",
+    "web_platform/tests/hq-council-owner.test.mjs": "f104ce92d67cf2b47cf43dca3d75814bb8c7e9f499189375762625599ed0db3e",
+    "docs/volabi-council-contract.md": "e5b360ab57edf75359f4a626dbb788a18d3c205bdd0f40bfc0008ee65086a776"
+  },
+  "ownerTestExit": 0,
+  "focusedLintExit": 0,
+  "webTypecheckExit": 0,
+  "reviewStatus": "pending-independent; owner cannot mark reviewed"
+}

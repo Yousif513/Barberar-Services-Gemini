@@ -1,0 +1,89 @@
+ExpectError: expect(locator).toContainText(expected) failed
+
+Locator: locator('#hq-main')
+Expected substring: "No meeting briefs in this workspace"
+Received string:    "Management records onlyExecutive CouncilPrepare internal briefs and attributable meeting records. Proposed contributors remain inactive; a record is not evidence of attendance.Create meeting briefSearch this registerPreparation statusAll recordsDraftAwaiting decisionConfirmed locally · record onlySuperseded snapshotChanges requestedDeclinedCancelled; history preservedProposed inactive coordinatorAll recordsNoraAdamAlexanderSarahVictoriaEmmaMayaEthanDanielSophiaLaylaOmarOliviaLinaRayanSortRecently updatedRecently createdMeeting titleThe local store is unavailable. The save outcome needs checking; keep the same command identity.Try againCommand centerLocal preparation and recordkeeping only. No invitations, live AI deliberation, attendance assertion, recording, external sharing or execution. Agents stay inactive; Azure and all approval holds remain."
+Timeout: 5000ms
+
+Call log:
+  - Expect "to.have.text" with timeout 5000ms
+  - waiting for locator('#hq-main')
+    14 × locator resolved to <main id="hq-main" tabindex="-1" class="hq-main-inner">…</main>
+       - unexpected value "Management records onlyExecutive CouncilPrepare internal briefs and attributable meeting records. Proposed contributors remain inactive; a record is not evidence of attendance.Create meeting briefSearch this registerPreparation statusAll recordsDraftAwaiting decisionConfirmed locally · record onlySuperseded snapshotChanges requestedDeclinedCancelled; history preservedProposed inactive coordinatorAll recordsNoraAdamAlexanderSarahVictoriaEmmaMayaEthanDanielSophiaLaylaOmarOliviaLinaRayanSortRecently updatedRecently createdMeeting titleThe local store is unavailable. The save outcome needs checking; keep the same command identity.Try againCommand centerLocal preparation and recordkeeping only. No invitations, live AI deliberation, attendance assertion, recording, external sharing or execution. Agents stay inactive; Azure and all approval holds remain."
+
+    at captureRawStack (C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\node_modules\playwright-core\lib\coreBundle.js:3172:17)
+    at callMatcherAsStep (C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\node_modules\playwright\lib\matchers\expect.js:12877:57)
+    at Object.toContainText (C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\node_modules\playwright\lib\matchers\expect.js:12867:23)
+    at C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\web_platform\tests-browser\hq-council-independent.mjs:22:84 {
+  matcherResult: {
+    name: 'toContainText',
+    expected: 'No meeting briefs in this workspace',
+    message: 'expect(locator).toContainText(expected) failed\n' +
+      '\n' +
+      "Locator: locator('#hq-main')\n" +
+      'Expected substring: "No meeting briefs in this workspace"\n' +
+      'Received string:    "Management records onlyExecutive CouncilPrepare internal briefs and attributable meeting records. Proposed contributors remain inactive; a record is not evidence of attendance.Create meeting briefSearch this registerPreparation statusAll recordsDraftAwaiting decisionConfirmed locally · record onlySuperseded snapshotChanges requestedDeclinedCancelled; history preservedProposed inactive coordinatorAll recordsNoraAdamAlexanderSarahVictoriaEmmaMayaEthanDanielSophiaLaylaOmarOliviaLinaRayanSortRecently updatedRecently createdMeeting titleThe local store is unavailable. The save outcome needs checking; keep the same command identity.Try againCommand centerLocal preparation and recordkeeping only. No invitations, live AI deliberation, attendance assertion, recording, external sharing or execution. Agents stay inactive; Azure and all approval holds remain."\n' +
+      'Timeout: 5000ms\n' +
+      '\n' +
+      'Call log:\n' +
+      '  - Expect "to.have.text" with timeout 5000ms\n' +
+      "  - waiting for locator('#hq-main')\n" +
+      '    14 × locator resolved to <main id="hq-main" tabindex="-1" class="hq-main-inner">…</main>\n' +
+      '       - unexpected value "Management records onlyExecutive CouncilPrepare internal briefs and attributable meeting records. Proposed contributors remain inactive; a record is not evidence of attendance.Create meeting briefSearch this registerPreparation statusAll recordsDraftAwaiting decisionConfirmed locally · record onlySuperseded snapshotChanges requestedDeclinedCancelled; history preservedProposed inactive coordinatorAll recordsNoraAdamAlexanderSarahVictoriaEmmaMayaEthanDanielSophiaLaylaOmarOliviaLinaRayanSortRecently updatedRecently createdMeeting titleThe local store is unavailable. The save outcome needs checking; keep the same command identity.Try againCommand centerLocal preparation and recordkeeping only. No invitations, live AI deliberation, attendance assertion, recording, external sharing or execution. Agents stay inactive; Azure and all approval holds remain."\n',
+    pass: false,
+    actual: 'Management records onlyExecutive CouncilPrepare internal briefs and attributable meeting records. Proposed contributors remain inactive; a record is not evidence of attendance.Create meeting briefSearch this registerPreparation statusAll recordsDraftAwaiting decisionConfirmed locally · record onlySuperseded snapshotChanges requestedDeclinedCancelled; history preservedProposed inactive coordinatorAll recordsNoraAdamAlexanderSarahVictoriaEmmaMayaEthanDanielSophiaLaylaOmarOliviaLinaRayanSortRecently updatedRecently createdMeeting titleThe local store is unavailable. The save outcome needs checking; keep the same command identity.Try againCommand centerLocal preparation and recordkeeping only. No invitations, live AI deliberation, attendance assertion, recording, external sharing or execution. Agents stay inactive; Azure and all approval holds remain.',
+    log: [
+      '  - Expect "to.have.text" with timeout 5000ms',
+      "  - waiting for locator('#hq-main')",
+      '    14 × locator resolved to <main id="hq-main" tabindex="-1" class="hq-main-inner">…</main>',
+      '       - unexpected value "Management records onlyExecutive CouncilPrepare internal briefs and attributable meeting records. Proposed contributors remain inactive; a record is not evidence of attendance.Create meeting briefSearch this registerPreparation statusAll recordsDraftAwaiting decisionConfirmed locally · record onlySuperseded snapshotChanges requestedDeclinedCancelled; history preservedProposed inactive coordinatorAll recordsNoraAdamAlexanderSarahVictoriaEmmaMayaEthanDanielSophiaLaylaOmarOliviaLinaRayanSortRecently updatedRecently createdMeeting titleThe local store is unavailable. The save outcome needs checking; keep the same command identity.Try againCommand centerLocal preparation and recordkeeping only. No invitations, live AI deliberation, attendance assertion, recording, external sharing or execution. Agents stay inactive; Azure and all approval holds remain."'
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - paragraph: Management records only\n' +
+      '  - heading "Executive Council" [level=1]\n' +
+      '  - paragraph: Prepare internal briefs and attributable meeting records. Proposed contributors remain inactive; a record is not evidence of attendance.\n' +
+      '  - button "Create meeting brief"\n' +
+      '  - text: Search this register\n' +
+      '  - textbox "Search this register"\n' +
+      '  - text: Preparation status\n' +
+      '  - combobox "Preparation status":\n' +
+      '    - option "All records" [selected]\n' +
+      '    - option "Draft"\n' +
+      '    - option "Awaiting decision"\n' +
+      '    - option "Confirmed locally · record only"\n' +
+      '    - option "Superseded snapshot"\n' +
+      '    - option "Changes requested"\n' +
+      '    - option "Declined"\n' +
+      '    - option "Cancelled; history preserved"\n' +
+      '  - text: Proposed inactive coordinator\n' +
+      '  - combobox "Proposed inactive coordinator":\n' +
+      '    - option "All records" [selected]\n' +
+      '    - option "Nora"\n' +
+      '    - option "Adam"\n' +
+      '    - option "Alexander"\n' +
+      '    - option "Sarah"\n' +
+      '    - option "Victoria"\n' +
+      '    - option "Emma"\n' +
+      '    - option "Maya"\n' +
+      '    - option "Ethan"\n' +
+      '    - option "Daniel"\n' +
+      '    - option "Sophia"\n' +
+      '    - option "Layla"\n' +
+      '    - option "Omar"\n' +
+      '    - option "Olivia"\n' +
+      '    - option "Lina"\n' +
+      '    - option "Rayan"\n' +
+      '  - text: Sort\n' +
+      '  - combobox "Sort":\n' +
+      '    - option "Recently updated" [selected]\n' +
+      '    - option "Recently created"\n' +
+      '    - option "Meeting title"\n' +
+      '  - alert:\n' +
+      '    - paragraph: The local store is unavailable. The save outcome needs checking; keep the same command identity.\n' +
+      '    - button "Try again"\n' +
+      '    - link "Command center":\n' +
+      '      - /url: /hq\n' +
+      '  - paragraph: Local preparation and recordkeeping only. No invitations, live AI deliberation, attendance assertion, recording, external sharing or execution. Agents stay inactive; Azure and all approval holds remain.'
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "store": "C:\\Users\\Yousif's PC\\.adminwright",
+  "communityRecords": 0,
+  "candidates": [
+    {
+      "fingerprint": "2d96f776bcf6fa4b",
+      "projects": [
+        "ChocoLUX Royal Admin Control Plane",
+        "PRIMORA"
+      ],
+      "projectCount": 2,
+      "archetypes": [
+        "commerce",
+        "fintech",
+        "logistics-mobility",
+        "marketplace"
+      ],
+      "stacks": [
+        "Next.js 16.2.9 (React 19.2.4, App Router, Tailwind 4, all-client 'use client'), none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only, Supabase Postgres 15, SQL migrations in supabase/migrations",
+        "React 19.2.6 + Vite 8.0.14, Supabase Edge Functions plus Vercel Node.js Functions, Supabase Postgres"
+      ],
+      "category": "tooling",
+      "scope": "unassigned",
+      "proposedChange": "Resolve local evidence relative to the manifest project root during set, or add a project-root option to set and use it for incremental validation without weakening evidence checks.",
+      "observation": "During release QA, changing a quality gate from failed to passed with the manifest set command was refused because relative evidence paths were evaluated without the project root. The same evidence resolves during release validation when project-root is supplied, so the operator had to use allow-invalid for a truthful status transition.",
+      "evidence": [
+        ".admin-console/evidence/qa-audit-repair-release-20260904.md",
+        ".admin-console/worklog/qa-claude-release-gate.md",
+        ".admin-console/worklog/root-harvester-20260904.md"
+      ],
+      "reason": "seen on 2 projects",
+      "communityEvidence": 0
+    },
+    {
+      "fingerprint": "34640ec33a9cbf95",
+      "projects": [
+        "PRIMORA"
+      ],
+      "projectCount": 1,
+      "archetypes": [
+        "fintech",
+        "logistics-mobility",
+        "marketplace"
+      ],
+      "stacks": [
+        "Next.js 16.2.9 (React 19.2.4, App Router, Tailwind 4, all-client 'use client'), none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only, Supabase Postgres 15, SQL migrations in supabase/migrations"
+      ],
+      "category": "incorrect-guidance",
+      "scope": "unassigned",
+      "proposedChange": "Change the qa, security and ux-reviewer role files to register in agents[] and name the audited domain in the agent notes instead of claiming, and reserve claim for implementers.",
+      "observation": "The qa role file says to claim the domain being audited, but claim records the claimer as the capability owner and holds an exclusive lock, which collides with the reviewer-identity rule and blocks parallel security and UX passes. This QA pass did not claim any capability, for the same reason the UX pass gave.",
+      "evidence": [
+        ".admin-console/worklog/qa-claude-release-gate.md"
+      ],
+      "reason": "correction",
+      "communityEvidence": 0
+    },
+    {
+      "fingerprint": "62da76f9bc3ea077",
+      "projects": [
+        "PRIMORA"
+      ],
+      "projectCount": 1,
+      "archetypes": [
+        "fintech",
+        "logistics-mobility",
+        "marketplace"
+      ],
+      "stacks": [
+        "Next.js 16.2.9 (React 19.2.4, App Router, Tailwind 4, all-client 'use client'), none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only, Supabase Postgres 15, SQL migrations in supabase/migrations"
+      ],
+      "category": "incorrect-guidance",
+      "scope": "unassigned",
+      "proposedChange": "In stack-adapters.md (Supabase), state that row policies do not restrict columns; every table with a public or broad read policy needs a column-grant or view review for internal fields.",
+      "observation": "The audit decision 'rls-is-sound' and the guidance that RLS is the authorization boundary held for rows but not for columns: public row policies with default column grants exposed admin_notes, Wathq data and staff phone numbers to anonymous callers.",
+      "evidence": [
+        "supabase/migrations/20260613010000_triggers_rls.sql#L51"
+      ],
+      "reason": "correction",
+      "communityEvidence": 0
+    },
+    {
+      "fingerprint": "3447108e70ac3f1b",
+      "projects": [
+        "PRIMORA"
+      ],
+      "projectCount": 1,
+      "archetypes": [
+        "fintech",
+        "logistics-mobility",
+        "marketplace"
+      ],
+      "stacks": [
+        "Next.js 16.3.8 (React 19.2.4, App Router, Tailwind 4); versions verified from the reconciled package/lock and installed build, none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only, Supabase Postgres 15, SQL migrations in supabase/migrations"
+      ],
+      "category": "incorrect-guidance",
+      "scope": "unassigned",
+      "proposedChange": "",
+      "observation": "The architect prompt forbids setting capabilities past planned and review states, but a reconciliation of a stale manifest needs statuses corrected; used in-progress for built-and-unreviewed and left review states alone.",
+      "evidence": [],
+      "reason": "correction",
+      "communityEvidence": 0
+    },
+    {
+      "fingerprint": "98a33677a72a1e8e",
+      "projects": [
+        "PRIMORA"
+      ],
+      "projectCount": 1,
+      "archetypes": [
+        "fintech",
+        "logistics-mobility",
+        "marketplace"
+      ],
+      "stacks": [
+        "Next.js 16.3.8 (React 19.2.4, App Router, Tailwind 4); versions verified from the reconciled package/lock and installed build, none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only, Supabase Postgres 15, SQL migrations in supabase/migrations"
+      ],
+      "category": "incorrect-guidance",
+      "scope": "unassigned",
+      "proposedChange": "Exempt cryptographic generators (gen_random_bytes, gen_random_uuid, crypto.getRandomValues, randomUUID) from the placeholder pattern, or let declaredStatic register an evidence-file exemption.",
+      "observation": "The evidence placeholder scan splits identifiers and flags 'random' in extensions.gen_random_bytes, the correct primitive for generating the lookup HMAC key, so a migration that creates a secret key can never be cited as evidence without an error.",
+      "evidence": [
+        "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
+      ],
+      "reason": "correction",
+      "communityEvidence": 0
+    },
+    {
+      "fingerprint": "dd69daf70c6431bd",
+      "projects": [
+        "PRIMORA"
+      ],
+      "projectCount": 1,
+      "archetypes": [
+        "fintech",
+        "logistics-mobility",
+        "marketplace"
+      ],
+      "stacks": [
+        "Next.js 16.3.8 (React 19.2.4, App Router, Tailwind 4); versions verified from the reconciled package/lock and installed build, none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only, Supabase Postgres 15, SQL migrations in supabase/migrations"
+      ],
+      "category": "incorrect-guidance",
+      "scope": "unassigned",
+      "proposedChange": "State one rule: the implementer adds the fix evidence and leaves contested; only a reviewer clears it.",
+      "observation": "The implementer prompt says both to return reviewStatus to unreviewed after fixing a contested capability and never to clear another agent's contested; customer.clear-profile was left contested and in-progress for the reviewer.",
+      "evidence": [
+        ".admin-console/manifest.json"
+      ],
+      "reason": "correction",
+      "communityEvidence": 0
+    }
+  ]
+}

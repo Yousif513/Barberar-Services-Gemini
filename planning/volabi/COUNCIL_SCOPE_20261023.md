@@ -1,5 +1,7 @@
 # HQ-NEXT-02 - Executive Council and meeting records
 
+Current status: CEO approved local implementation; see APPROVAL_COUNCIL_20261023.md. Original proposal below preserved as plan of record.
+
 Status: PROPOSED SCOPE FOR CEO REVIEW. Prepared23October2026. No Council screens rendered or implemented; no employee activated. Existing first loop and Projects remain the implementation baseline. Approval of this packet would authorize only the bounded local module below.
 
 ## Outcome and boundary

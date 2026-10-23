@@ -1,0 +1,47 @@
+✔ independent Council: unknown/private/restricted sources fail closed for search selection and citations (44.5888ms)
+✔ independent Council: revocation immediately redacts bound material and invalidates pending confirmation (39.0879ms)
+✔ independent Council: foreign workspace objects rejected across detail preview classification and commands (24.4908ms)
+✔ independent Council: actual note actor retained and invented attendance participant fields refused (29.3237ms)
+✔ independent Council: separate exact preparation/minutes approvals and targeted correction preserve historical decisions (42.4584ms)
+✔ independent Council: material brief participant time and skill changes reject pending exact decision (121.7391ms)
+✔ independent Council: source correction invalidates classification and exact source confirmation (35.7986ms)
+✔ independent Council: cancelled/reopened records reject old approvals and handoffs without deleting history (47.2995ms)
+✔ independent Council: final audit failure rolls back meeting task project association versions and receipt (44.2604ms)
+✔ independent Council: final receipt failure rolls back entire preparation packet (27.1467ms)
+✔ independent Council: same command replay disk restart and altered-payload conflict (31.5398ms)
+✔ independent Council HTTP: missing/invalid CSRF session foreign origins and workspace IDs rejected (41.8119ms)
+✖ independent Council: restricted source text cannot be laundered through generated founder-intent source (37.7889ms)
+✔ independent Council: latest packet is determined by creation order rather than random ID order (33.8882ms)
+✔ independent Council: handoff creates one scoped task with one project association and one durable receipt (48.467ms)
+✔ independent Council: bounded stable scoped register pagination and source overflow refusal (100.1353ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 832.103
+
+✖ failing tests:
+
+test at web_platform\tests\hq-council-independent.test.mjs:35:1
+✖ independent Council: restricted source text cannot be laundered through generated founder-intent source (37.7889ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(!JSON.stringify(visible).includes('Exact local evidence and preserved dissent.'))
+
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-council-independent.test.mjs:35:389)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

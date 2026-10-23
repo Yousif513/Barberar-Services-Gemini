@@ -1,0 +1,45 @@
+{
+  "title": "Independent final gate sanity attestation",
+  "reviewer": "qa-hq-council",
+  "reviewedAt": "2026-10-23T17:01:50.982764+00:00",
+  "gatePreserved": {
+    "releaseExit": 1,
+    "errors": 303,
+    "warnings": 31,
+    "waiver": false
+  },
+  "newDiagnostics": [
+    {
+      "path": "entities[headquarters-local].capabilities[hq-local.council].evidence[2]",
+      "file": "docs/volabi-council-contract.md",
+      "assessment": "Context false positive: chronology description compares insertion order with random UUID sorting. It describes the repaired ordering invariant, not fabricated application records."
+    },
+    {
+      "path": "entities[headquarters-local].capabilities[hq-local.council].evidence[7]",
+      "file": ".admin-console/evidence/hq-council-independent/source-review.json",
+      "assessment": "Context false positive: resolved finding describes lexical random UUID chronology. Final source assertions and independent deterministic ordering execution substantiate correction."
+    },
+    {
+      "path": "entities[headquarters-local].capabilities[hq-local.council].evidence[10]",
+      "file": ".admin-console/worklog/qa-hq-council.md",
+      "assessment": "Context false positive: risk matrix prohibits fake attendance and final worklog describes UUID ordering regression. Neither is a runtime fallback record."
+    },
+    {
+      "path": "entities[headquarters-local].capabilities[hq-local.council].tests[1]",
+      "file": "web_platform/tests/hq-council-independent.test.mjs",
+      "assessment": "Context false positive: executable chronology test deliberately forces descending packet UUIDs in an isolated temporary store. It proves insertion order; no test fixture is a release data source."
+    },
+    {
+      "path": "screens[hq-council-record].tests",
+      "file": "web_platform/tests-browser/hq-council-independent.mjs",
+      "assessment": "Static route-token limitation: actual browser receives created meeting ID, visits computed /hq/council/ + id repeatedly, asserts loaded title/state, exercises all six editors and captures EN/AR375. Runtime coverage is recorded in browser-results.json; exact literal route-pattern token /hq/council/[id] is absent."
+    }
+  ],
+  "evidence": {
+    "backend": ".admin-console/evidence/hq-council-independent/backend-results.json",
+    "browser": ".admin-console/evidence/hq-council-independent/browser-results.json",
+    "source": ".admin-console/evidence/hq-council-independent/source-review.json"
+  },
+  "mutations": "Supplemental reviewer evidence only; no application, validator, manifest, test, documentation or legitimate raw log altered to remove these diagnostics.",
+  "remainingReleaseFindings": "Root retains the full failing regulated release gate and prior backlog. This attestation supplies context, not a release waiver."
+}

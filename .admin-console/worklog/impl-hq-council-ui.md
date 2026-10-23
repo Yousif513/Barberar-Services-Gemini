@@ -1,0 +1,13 @@
+# HQ-NEXT-02 UI owner implementation
+
+Development-only implementer: impl-hq-council-ui. Independent review is separate and required. Plan of record: planning/volabi/COUNCIL_SCOPE_20261023.md and APPROVAL_COUNCIL_20261023.md.
+
+Implemented two route patterns, six Council editor contracts and the existing knowledge-source detail inline classification control. Reused current ivory/obsidian/gold design, modal focus management, same-command recovery, task composer, exact decision pages, knowledge pages, profile readiness and audit timeline. All Council copy supports EN/AR; Arabic375 owner browser showed RTL with no document overflow. Riyadh local input converts to UTC and displays Asia/Riyadh.
+
+Proposed participants carry contribution and explicit skill/version/hash requirements without activation, attendance or authored opinions. Pending participant/material edits must be added or cleared before save. The materials picker and atomic task composer use corporate-internal scoped source views; the handoff existing-task picker uses the server Council-safe task view. Missing classification remains unavailable. Explicit version-bound classification is entered at existing founder knowledge detail and does not grant access. Source classification refusals preserve reason/input.
+
+Preparation and minutes preview remain separate real decision packets; exact snapshots include revisions, participants, material quotes and hashes. Notes/dissent/reporting use actual local actor attribution and append-only correction semantics. Cancellation is reasoned and blocks new submissions/handoffs while records remain readable; reopen needs a new reason. Shared composer creates an atomic Council follow-up task through council.handoff, hides microphone control for Council origin and preserves unchanged non-Council behavior.
+
+Owner validation: actual Chromium loopback-only driver web_platform/tests-browser/hq-council-owner.mjs, 11 groups passed, zero external requests and zero page errors. Receipt/version persistence, corporate classification/material quote, preparation packet, dissent, minutes, sixth-editor minutes navigation, cancellation/history and AR375 all passed. Focused ESLint exited0 with zero warnings. Web TypeScript noEmit exited0. git diff --check exited0. Root owns full repository gates, manifests, integration and commits. Independent reviewer owns acceptance.
+
+Source freeze is pinned in .admin-console/evidence/hq-council-owner/source-hashes.json. No production deployment/merge, management activation, business permission, financial transaction, external write, Azure voice/setup or new paid service occurred. Original management identities stay inactive. Live attendance, speech, calendar delivery and external sharing remain outside this slice.

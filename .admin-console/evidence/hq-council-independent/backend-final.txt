@@ -1,0 +1,26 @@
+✔ independent Council: unknown/private/restricted sources fail closed for search selection and citations (111.1076ms)
+✔ independent Council: revocation immediately redacts bound material and invalidates pending confirmation (85.6368ms)
+✔ independent Council: foreign workspace objects rejected across detail preview classification and commands (37.8293ms)
+✔ independent Council: actual note actor retained and invented attendance participant fields refused (46.7629ms)
+✔ independent Council: separate exact preparation/minutes approvals and targeted correction preserve historical decisions (56.5929ms)
+✔ independent Council: material brief participant time and skill changes reject pending exact decision (167.9289ms)
+✔ independent Council: source correction invalidates classification and exact source confirmation (36.9602ms)
+✔ independent Council: cancelled/reopened records reject old approvals and handoffs without deleting history (49.8522ms)
+✔ independent Council: final audit failure rolls back meeting task project association versions and receipt (52.0387ms)
+✔ independent Council: final receipt failure rolls back entire preparation packet (38.0789ms)
+✔ independent Council: same command replay disk restart and altered-payload conflict (38.6074ms)
+✔ independent Council HTTP: missing/invalid CSRF session foreign origins and workspace IDs rejected (49.8826ms)
+✔ independent Council: restricted source text cannot be laundered through generated founder-intent source (44.7723ms)
+✔ independent Council: latest packet is determined by creation order rather than random ID order (44.9672ms)
+✔ independent Council: handoff creates one scoped task with one project association and one durable receipt (54.5786ms)
+✔ independent Council: bounded stable scoped register pagination and source overflow refusal (113.0682ms)
+✔ independent Council: task with private material cannot attach and later revocation does not leak linked task dossier (57.2121ms)
+✔ independent Council: forged classification snapshots and corrected private history remain unavailable (32.8508ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1208.6888

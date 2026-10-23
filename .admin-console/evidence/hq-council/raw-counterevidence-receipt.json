@@ -1,0 +1,14 @@
+{
+  "archive": "raw-counterevidence.zip",
+  "note": "Exact original failure bytes preserved. Readable two logs trim terminal whitespace only; results unchanged.",
+  "files": [
+    {
+      "path": ".admin-console\\evidence\\hq-council-independent\\backend-expanded.txt",
+      "rawSHA256": "26a28f3cbfd12ec6dd96cb48690a2b5a764718b1f0702ae0d967675f58e74368"
+    },
+    {
+      "path": ".admin-console\\evidence\\hq-council-independent\\backend-first.txt",
+      "rawSHA256": "0a8343b9e3175fa22c10147ac6b5eee3ace75bc03a49e9fbff8f1bbef004fe21"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Volabi HQ - approved local development
 
-Next proposal for CEO review: [HQ-NEXT-02 Executive Council and meeting-record scope](COUNCIL_SCOPE_20261023.md), two route patterns/six overlay contracts. No Council screen rendered or built; all management identities inactive and existing holds retained.
+HQ-NEXT-02 is approved, implemented and independently accepted locally: [Council delivery](../../docs/volabi-council-delivery.md), [approved scope](COUNCIL_SCOPE_20261023.md), [execution graph](COUNCIL_EXECUTION_GRAPH_20261023.json). Two routes/six editors; all management identities inactive, no live AI attendance, Azure deferred and all holds retained.
 
 HQ-NEXT-01 is now approved, implemented and independently accepted locally: [Projects delivery](../../docs/volabi-projects-delivery.md), [approval](APPROVAL_PROJECTS_20261023.md), [surface graph](PROJECTS_DOMAIN_GRAPH.json). Two project routes/four overlays extend the original first loop; full Headquarters remains under development.
 

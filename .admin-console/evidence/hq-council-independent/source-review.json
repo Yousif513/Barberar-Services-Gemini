@@ -1,0 +1,146 @@
+{
+  "title": "SOURCE REVIEW",
+  "reviewer": "qa-hq-council",
+  "implementationOwners": [
+    "impl-hq-council-backend",
+    "impl-hq-council-ui"
+  ],
+  "scope": "CEO-approved HQ-NEXT-02 local Council preparation and meeting records, two routes and six overlay contracts",
+  "decision": "accepted_for_local_development_scope",
+  "reviewedAt": "2026-10-23T16:57:01.710935+00:00",
+  "sourceHashBasis": "Strict UTF8 decode; CRLF pairs converted to LF; UTF8 encode; no other normalization",
+  "source_assertions": [
+    {
+      "path": "web_platform/src/lib/hq/server/council-store.mjs",
+      "sha256": "ceda6ccdf59414521571335c40d6a8ee1c1d1ce42739e71d7346c2943d4883cb"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256": "50b6be58de26fefbcab7453bceb318afe6ba11337fcfa36bcc9de87fff79b384"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-council.tsx",
+      "sha256": "5bf0bd2849c51432bb05207e51e17e5b21c070ae4d6e689d930e87a3f55ca44c"
+    },
+    {
+      "path": "web_platform/src/lib/hq/council-copy.ts",
+      "sha256": "eb97a0a60f94b2a8e9792629f48f94c897b1c2412c31cf4d34910f166b124fc5"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-overlays.tsx",
+      "sha256": "33879bf64eb7992c4c93723d9b98770a116a1f24ce0ccd2e8a7e9bcce56eb1c2"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-context.tsx",
+      "sha256": "cb8ec502727680f0f5a8186c50e9d8efa9916d9d7640bc892cecf431accb35e2"
+    },
+    {
+      "path": "web_platform/src/lib/hq/contracts.ts",
+      "sha256": "aad341b56f3d0e838577340ab06eb8c9056d06dafa60cb46a30b5327d6b60b5d"
+    },
+    {
+      "path": "web_platform/src/lib/hq/copy.ts",
+      "sha256": "e9260acf6591d0e1caa4c85d88f98925855e4b5b3cab352f034b9d21260c3079"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-shell.tsx",
+      "sha256": "a9f202f866735eefd80be58290371d8e503b24f822c2870ca4b1ee123b15d867"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-workspace.tsx",
+      "sha256": "3b7e627e1e98b556b89fb5019bf6fe56d21f0add463897867ab1e9a548a86b54"
+    },
+    {
+      "path": "web_platform/src/app/hq/council/page.tsx",
+      "sha256": "0cecc12dfb8797c91b4cc4878cf499cd7029de2c30ac56fcb847a65300ca8ef5"
+    },
+    {
+      "path": "web_platform/src/app/hq/council/[id]/page.tsx",
+      "sha256": "f08ac32d9c40ce1e581ef09bd25c6e8c599099a22883a7e75917e60e0cce3b83"
+    },
+    {
+      "path": "docs/volabi-council-contract.md",
+      "sha256": "e5b360ab57edf75359f4a626dbb788a18d3c205bdd0f40bfc0008ee65086a776"
+    },
+    {
+      "path": "web_platform/tests/hq-council-independent.test.mjs",
+      "sha256": "28af5f4bb74db37fd11e6d7f8227a1e0f346977b36ee812ec20b049a3acc84e9"
+    },
+    {
+      "path": "web_platform/tests-browser/hq-council-independent.mjs",
+      "sha256": "fb07d386d2ba8fca844b290ed509909e16360f1e8844c12b5535848c7b00c67c"
+    }
+  ],
+  "tests": {
+    "storeHTTP": {
+      "command": "node --test web_platform/tests/hq-council-independent.test.mjs",
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": ".admin-console/evidence/hq-council-independent/backend-final.txt"
+    },
+    "actualBrowser": {
+      "command": "node web_platform/tests-browser/hq-council-independent.mjs",
+      "passed": 12,
+      "failed": 0,
+      "unexpectedConsoleErrors": 0,
+      "pageErrors": 0,
+      "blockedExternalRequests": 0,
+      "expectedReceiptProbeConsole": 13,
+      "evidence": ".admin-console/evidence/hq-council-independent/browser-results.json"
+    }
+  },
+  "resolvedFindings": [
+    {
+      "severity": "high",
+      "issue": "Generated corporate founder-intent snapshot exposed revoked private source text through Council picker",
+      "proof": "backend-expanded.txt",
+      "resolution": "Immutable recursive dependency pins now guard generated source selection and downstream task/material projections; regression passes."
+    },
+    {
+      "severity": "high",
+      "issue": "Latest classification lookup selected arbitrary historical UUID row; revocation could remain ineffective",
+      "proof": "Early independent source review before owner freeze; command regression now passes",
+      "resolution": "Insertion order and latest applicable classification lookup; protected-source downgrade refused across versions."
+    },
+    {
+      "severity": "medium",
+      "issue": "Current packet selected lexical random UUID rather than latest insertion",
+      "proof": "Deterministic forced descending packet UUID regression",
+      "resolution": "Insertion order determines current phase packet."
+    },
+    {
+      "severity": "medium",
+      "issue": "UI classification command and planned sort disagreed with backend contract",
+      "proof": "Early independent source review; final actual browser classification flow and scoped query inspection",
+      "resolution": "council.source.classify and title/created/updated sort match backend."
+    }
+  ],
+  "reviewObservations": [
+    "Actual session actor is separate from original15proposed identities; proposed contribution and readiness never activates employee or grants business authority.",
+    "Preparation/minutes require separate exact task/recommendation/decision packets, current source versions and immutable receipts. Minutes corrections leave unrelated preparation valid.",
+    "Corporate metadata is an explicit founder attestation bound to current source version/hash, not an automatic classifier or data-loss-prevention system. Operator-entered prose remains an attributed claim. Ordinary founder knowledge/task detail remains founder-only existing local workspace access; Council pickers use separate safe projections.",
+    "Audit/receipt exceptions roll back full command including generated records and task/project links. Test stores use isolated owned temporary directories; browser uses fresh local sessions without resetting shared SQLite.",
+    "No live AI voice, microphone/camera, invitations, calendar messages, external sharing, financial action, permission grant, employee activation or paid service is part of this slice."
+  ],
+  "limits": [
+    "Local SQLite and loopback browser acceptance only; production identity, backup/recovery/retention and full regulated-release backlog remain separate prerequisites.",
+    "18 backend/HTTP cases include rollback, disk restart, idempotency, scope, actor/CSRF, correction, private/derived sources and stale decisions. Actual browser12groups cover normal end-to-end, all six Arabic375 editors, pending participant omission guard, unknown-response recovery and cancellation. Not every theoretical failure state of every editor was individually injected.",
+    "Initial browser-first setup failed with old cached server class and503 storage_unavailable; root restarted verified local launcher preserving DB. Initial backend-first assertion incorrectly counted all search results instead of the revoked source ID; corrected backend-second. Both raw logs are retained, not acceptance evidence.",
+    "Raw passing Node logs retain zero pending-test summary; no log rewriting to appease existing failing release scanner."
+  ],
+  "unresolvedCriticalOrHighInThisSlice": [],
+  "holds": {
+    "managementAgents": "inactive",
+    "azure": "deferred",
+    "production": "held",
+    "businessPermissions": "held",
+    "externalBusinessWrites": "held",
+    "financialTransactions": "held",
+    "additionalPaidServices": "held"
+  }
+}

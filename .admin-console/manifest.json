@@ -232,6 +232,14 @@
         "appliedTo": [
           "hq-local.projects"
         ]
+      },
+      {
+        "topic": "Bundled Next16 page reference and existing SQLite transactional local-store conventions consulted for approved Council routes; async params and actual existing spine reused and tested.",
+        "url": "https://nextjs.org/docs/app/api-reference/file-conventions/page",
+        "checkedOn": "2026-10-23",
+        "appliedTo": [
+          "hq-local.council"
+        ]
       }
     ],
     "volumes": {
@@ -7565,6 +7573,80 @@
           "owner": "",
           "reviewStatus": "reviewed",
           "reviewedBy": "qa-hq-projects"
+        },
+        {
+          "id": "hq-local.council",
+          "outcome": "Prepare corporate internal Council briefs and attributable minutes with exact decisions and audited follow-up",
+          "kind": "command",
+          "roles": [
+            "local-development-reviewer"
+          ],
+          "risk": "moderate",
+          "status": "implemented",
+          "rationale": "CEO-approved local Council preparation and meeting records: two routes/six editors, corporate source classification with transitive dependency protection, exact separate preparation/minutes snapshots and decisions, actual actor notes/dissent/corrections, cancel/reopen, atomic task/project handoffs and receipts/audit. All management identities inactive and business/voice/external operations held; independent acceptance separate. Required: scoped list/search/filter/sort/page/detail/history/create/revise/cancel/reopen, proposed coordination, materials and evidence-linked commands. Archive/delete/restore/import/export/bulk/saved views/calendar/sharing/live media/automatic execution are deferred by bounded local scope; no destructive deletion introduced.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/hq/council",
+            "/hq/council/[id]"
+          ],
+          "serverOperations": [
+            "web_platform/src/lib/hq/server/council-store.mjs",
+            "web_platform/src/lib/hq/server/local-store.mjs",
+            "web_platform/src/lib/hq/server/handler.mjs"
+          ],
+          "authorizationPolicies": [
+            "web_platform/src/lib/hq/server/local-boundary.mjs"
+          ],
+          "auditEvents": [
+            "council.create",
+            "council.revise",
+            "council.participants",
+            "council.materials",
+            "council.source.classified",
+            "council.prepare",
+            "council.packet.decided",
+            "council.note",
+            "council.minutes",
+            "council.correct",
+            "council.cancel",
+            "council.reopen",
+            "council.handoff",
+            "workspace.read"
+          ],
+          "safeguards": [
+            "Loopback local session/CSRF/object scope",
+            "Exact revisions/source hashes and checked receipts",
+            "No external/financial/activation actions"
+          ],
+          "dataBinding": "sqlite:local-development-workspace",
+          "idempotency": "Existing command UUID/canonical payload receipt",
+          "concurrency": "Transactional revisions and exact evidence snapshot",
+          "recovery": "Preserve draft and query same command receipt",
+          "tests": [
+            "web_platform/tests/hq-council-owner.test.mjs",
+            "web_platform/tests/hq-council-independent.test.mjs",
+            "web_platform/tests-browser/hq-council-owner.mjs",
+            "web_platform/tests-browser/hq-council-independent.mjs"
+          ],
+          "evidence": [
+            "planning/volabi/APPROVAL_COUNCIL_20261023.md",
+            "planning/volabi/COUNCIL_EXECUTION_GRAPH_20261023.json",
+            "docs/volabi-council-contract.md",
+            ".admin-console/worklog/impl-hq-council-backend.md",
+            ".admin-console/worklog/impl-hq-council-ui.md",
+            ".admin-console/evidence/hq-council-owner/owner-result.json",
+            ".admin-console/evidence/hq-council-owner/result.json",
+            ".admin-console/evidence/hq-council-independent/source-review.json",
+            ".admin-console/evidence/hq-council-independent/backend-results.json",
+            ".admin-console/evidence/hq-council-independent/browser-results.json",
+            ".admin-console/worklog/qa-hq-council.md"
+          ],
+          "owner": "",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "qa-hq-council"
         }
       ]
     }
@@ -9626,6 +9708,74 @@
         "web_platform/tests-browser/hq-projects-owner.mjs",
         "web_platform/tests-browser/hq-projects-independent.mjs"
       ]
+    },
+    {
+      "id": "hq-council",
+      "route": "/hq/council",
+      "purpose": "Local Council preparation and meeting record",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.council"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Explicit CEO HQ-NEXT-02 scope/theme approval; independent acceptance required.",
+      "tests": [
+        "web_platform/tests-browser/hq-council-owner.mjs",
+        "web_platform/tests-browser/hq-council-independent.mjs"
+      ]
+    },
+    {
+      "id": "hq-council-record",
+      "route": "/hq/council/[id]",
+      "purpose": "Local Council preparation and meeting record",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.council"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Explicit CEO HQ-NEXT-02 scope/theme approval; independent acceptance required.",
+      "tests": [
+        "web_platform/tests-browser/hq-council-owner.mjs",
+        "web_platform/tests-browser/hq-council-independent.mjs"
+      ]
     }
   ],
   "integrations": [
@@ -11191,6 +11341,16 @@
       "reason": "Explicit current CEO approval. Management employees inactive, Azure deferred, all existing production/permission/external-write/financial/paid holds retained.",
       "evidence": [
         "planning/volabi/NEXT_HQ_ITEM_20261023.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "ceo-hq-next-02-approved",
+      "decision": "CEO explicitly approves HQ-NEXT-02 Council scope, two routes/six editors/existing design, independent tests and isolated branch commit/push.",
+      "reason": "Current human instruction preserves inactive management identities, deferred Azure and all existing holds.",
+      "evidence": [
+        "planning/volabi/COUNCIL_SCOPE_20261023.md"
       ],
       "status": "confirmed",
       "appliesTo": []
@@ -14620,11 +14780,12 @@
     {
       "id": "hq-projects-test-transcript-context",
       "severity": "medium",
-      "description": "Evidence scanner rejects the retained passing Node test transcript zero pending-test summary. Executable independent tests and source/browser acceptance pass. Raw transcript preserved; no release gate override.",
+      "description": "HQ evidence-context scanner still rejects passing transcripts, truthful chronology/denial descriptions and computed detail-route evidence. Executable tests and independent runtime/source acceptance pass. Raw evidence and failed release gate preserved.",
       "status": "open",
-      "rationale": "Future independently tested transcript-context tooling repair; separate from operational project module. Do not modify transcript or infer unfinished implementation from a zero summary.",
+      "rationale": "Future separate independent tooling repair; includes previous zero-pending-test summary plus four Council context matches and one computed-route token linkage limitation. No test renaming, evidence obfuscation or release override.",
       "evidence": [
-        ".admin-console/evidence/hq-projects-independent/source-review.json"
+        ".admin-console/evidence/hq-projects-independent/source-review.json",
+        ".admin-console/evidence/hq-council-independent/gate-sanity.json"
       ]
     }
   ],
@@ -14930,6 +15091,16 @@
       "approvedBy": "CEO HQ-NEXT-01 approval2026-10-23 and routine technical choices",
       "evidence": [
         "planning/volabi/APPROVAL_PROJECTS_20261023.md"
+      ]
+    },
+    {
+      "id": "hq-council-static-vocabulary",
+      "path": "web_platform/src/lib/hq/council-copy.ts",
+      "value": "Bilingual Council labels, fixed local lifecycle/command vocabulary and inherited presentation; no meeting activity, attendance, opinions or business figures",
+      "reason": "Static interface contract for explicitly approved HQ-NEXT-02. All records, decisions and counters derive from scoped local authoritative records.",
+      "approvedBy": "CEO HQ-NEXT-02 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_COUNCIL_20261023.md"
       ]
     }
   ],
@@ -16154,6 +16325,28 @@
       ],
       "status": "promoted",
       "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-council-derived-source-restrictions",
+      "observation": "Independent isolated case found a generated founder-intent source still exposed a restricted parent quotation. Immutable dependency pins and recursive eligibility must survive reclassification/correction across every Council projection, picker and direct selection; ordinary founder-only historical bytes remain separate.",
+      "category": "new-pattern",
+      "proposedChange": "Preserve this adversarial case in future independently reviewed document/meeting workflows; do not infer evidence freshness from identifiers or only direct source visibility.",
+      "evidence": [
+        ".admin-console/evidence/hq-council-independent/source-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-council-chronology-not-random-identifiers",
+      "observation": "Independent cases found latest classification/decision packet selection could choose an older record when random UUID order or first historical match was used. Use authoritative insertion chronology/current snapshot and include deterministic same-time/id-order regressions.",
+      "category": "new-pattern",
+      "proposedChange": "Preserve this adversarial case in future independently reviewed document/meeting workflows; do not infer evidence freshness from identifiers or only direct source visibility.",
+      "evidence": [
+        ".admin-console/evidence/hq-council-independent/source-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
     }
   ],
   "agents": [
@@ -16743,6 +16936,51 @@
       "status": "done",
       "notes": "DEVELOPMENT-ONLY approved HQ-NEXT-01 local module; no business authority.",
       "worklog": ".admin-console/worklog/qa-hq-projects.md"
+    },
+    {
+      "id": "architect-hq-council",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY HQ-NEXT-02; no management employee activation or business authority.",
+      "worklog": ".admin-console/worklog/architect-hq-council.md"
+    },
+    {
+      "id": "impl-hq-council-backend",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY HQ-NEXT-02; no management employee activation or business authority.",
+      "worklog": ".admin-console/worklog/impl-hq-council-backend.md"
+    },
+    {
+      "id": "impl-hq-council-ui",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY HQ-NEXT-02; no management employee activation or business authority.",
+      "worklog": ".admin-console/worklog/impl-hq-council-ui.md"
+    },
+    {
+      "id": "qa-hq-council",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY HQ-NEXT-02; no management employee activation or business authority.",
+      "worklog": ".admin-console/worklog/qa-hq-council.md"
+    },
+    {
+      "id": "harvest-hq-council",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY final learning pass; no capability implementation/review or business authority.",
+      "worklog": ".admin-console/worklog/harvest-hq-council.md"
     }
   ]
 }

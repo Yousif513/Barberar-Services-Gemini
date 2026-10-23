@@ -39,7 +39,7 @@ export async function handleHq(request,options={}){
     }
     if(!session)throw new HqError("session_required",401);
     if(route==="/api/hq/state"&&method==="GET"){
-      const data=store.query(session,url.searchParams.get("view")||"overview",{id:url.searchParams.get("id"),q:url.searchParams.get("q")||"",status:url.searchParams.get("status")||"",page:url.searchParams.get("page")||0,ownerId:url.searchParams.get("ownerId")||"",sort:url.searchParams.get("sort")||"updated",milestoneId:url.searchParams.get("milestoneId")||null});
+      const data=store.query(session,url.searchParams.get("view")||"overview",{id:url.searchParams.get("id"),q:url.searchParams.get("q")||"",status:url.searchParams.get("status")||"",page:url.searchParams.get("page")||0,ownerId:url.searchParams.get("ownerId")||"",sort:url.searchParams.get("sort")||"updated",phase:url.searchParams.get("phase")||"preparation",milestoneId:url.searchParams.get("milestoneId")||null});
       return response({ok:true,data});
     }
     if(route==="/api/hq/commands"&&method==="POST"){

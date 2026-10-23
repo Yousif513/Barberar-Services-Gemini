@@ -1,0 +1,21 @@
+{
+  "classification": "Owner actual-browser evidence; independent acceptance required",
+  "checks": [
+    "Council register and scoped local session load",
+    "Brief saves real receipt and converts Riyadh time correctly",
+    "Proposed participant pending draft blocks save and persists without activation",
+    "Existing knowledge record exposes explicit version-bound classification",
+    "Corporate materials retain exact source version hash and quotation",
+    "Preparation produces separate real exact decision packet",
+    "Dissent appends authenticated actor and is preserved",
+    "Minutes persist separately from preparation and notes",
+    "Sixth editor links to distinct minutes decision preview; Escape returns focus",
+    "Reasoned cancellation blocks new handoffs and preserves dissent and packets",
+    "Arabic375 record mirrors without page overflow"
+  ],
+  "errors": [],
+  "external": [],
+  "startedAt": "2026-10-23T16:55:07.581Z",
+  "status": "passed",
+  "finishedAt": "2026-10-23T16:55:15.729Z"
+}

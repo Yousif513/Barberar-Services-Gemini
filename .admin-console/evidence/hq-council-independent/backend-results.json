@@ -1,0 +1,23 @@
+{
+  "reviewer": "qa-hq-council",
+  "kind": "Independent store and HTTP execution",
+  "command": "node --test web_platform/tests/hq-council-independent.test.mjs",
+  "tests": 18,
+  "pass": 18,
+  "fail": 0,
+  "skip": 0,
+  "log": ".admin-console/evidence/hq-council-independent/backend-final.txt",
+  "applicationHashes": {
+    "web_platform/src/lib/hq/server/council-store.mjs": "ceda6ccdf59414521571335c40d6a8ee1c1d1ce42739e71d7346c2943d4883cb",
+    "web_platform/src/lib/hq/server/local-store.mjs": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf",
+    "web_platform/src/lib/hq/server/handler.mjs": "50b6be58de26fefbcab7453bceb318afe6ba11337fcfa36bcc9de87fff79b384",
+    "web_platform/src/components/hq/hq-council.tsx": "5bf0bd2849c51432bb05207e51e17e5b21c070ae4d6e689d930e87a3f55ca44c",
+    "web_platform/src/lib/hq/council-copy.ts": "eb97a0a60f94b2a8e9792629f48f94c897b1c2412c31cf4d34910f166b124fc5",
+    "web_platform/src/components/hq/hq-overlays.tsx": "33879bf64eb7992c4c93723d9b98770a116a1f24ce0ccd2e8a7e9bcce56eb1c2",
+    "web_platform/src/components/hq/hq-context.tsx": "cb8ec502727680f0f5a8186c50e9d8efa9916d9d7640bc892cecf431accb35e2",
+    "web_platform/src/lib/hq/contracts.ts": "aad341b56f3d0e838577340ab06eb8c9056d06dafa60cb46a30b5327d6b60b5d",
+    "web_platform/src/lib/hq/copy.ts": "e9260acf6591d0e1caa4c85d88f98925855e4b5b3cab352f034b9d21260c3079"
+  },
+  "browserHashMismatches": [],
+  "ownerFreezeMismatches": []
+}

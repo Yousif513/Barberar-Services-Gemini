@@ -1,0 +1,20 @@
+✔ independent Council: unknown/private/restricted sources fail closed for search selection and citations (46.2602ms)
+✔ independent Council: revocation immediately redacts bound material and invalidates pending confirmation (43.7301ms)
+✔ independent Council: foreign workspace objects rejected across detail preview classification and commands (28.4219ms)
+✔ independent Council: actual note actor retained and invented attendance participant fields refused (33.4003ms)
+✔ independent Council: separate exact preparation/minutes approvals and targeted correction preserve historical decisions (46.5708ms)
+✔ independent Council: material brief participant time and skill changes reject pending exact decision (130.7302ms)
+✔ independent Council: source correction invalidates classification and exact source confirmation (38.6158ms)
+✔ independent Council: cancelled/reopened records reject old approvals and handoffs without deleting history (50.7243ms)
+✔ independent Council: final audit failure rolls back meeting task project association versions and receipt (45.8955ms)
+✔ independent Council: final receipt failure rolls back entire preparation packet (28.0089ms)
+✔ independent Council: same command replay disk restart and altered-payload conflict (29.0177ms)
+✔ independent Council HTTP: missing/invalid CSRF session foreign origins and workspace IDs rejected (40.921ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 691.8533

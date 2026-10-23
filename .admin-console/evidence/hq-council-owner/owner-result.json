@@ -1,0 +1,16 @@
+{
+  "command": "node --test web_platform/tests/hq-council-owner.test.mjs web_platform/tests/hq-projects-owner.test.mjs",
+  "exitCode": 0,
+  "ownerCouncilTests": 16,
+  "existingProjectTests": 8,
+  "redObservation": {
+    "phase": "first implemented candidate; not a preimplementation TDD claim",
+    "test": "corporate classification can be restricted and all historical selection denied deterministically",
+    "exitCode": 1,
+    "passed": 10,
+    "failed": 1,
+    "assertion": "Council materials total 1 !== 0 after private-founder reclassification",
+    "repair": "latest classification and packet use insertion order; historical classification cannot win"
+  },
+  "independentReview": "pending, never self-reviewed"
+}

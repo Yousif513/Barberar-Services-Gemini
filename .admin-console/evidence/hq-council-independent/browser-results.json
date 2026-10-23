@@ -1,0 +1,381 @@
+{
+  "reviewer": "qa-hq-council",
+  "kind": "independent actual browser",
+  "startedAt": "2026-10-23T16:55:32.659Z",
+  "checks": [
+    {
+      "name": "Real isolated Council register empty state and scoped route",
+      "status": "passed"
+    },
+    {
+      "name": "Brief editor persists ordered agenda and Asia/Riyadh time with actual local actor",
+      "status": "passed"
+    },
+    {
+      "name": "Participant editor refuses silent pending omission and preserves independent Adam proposal without activation",
+      "status": "passed"
+    },
+    {
+      "name": "Knowledge classification and permitted material editor bind current exact source passage without granting reader rights",
+      "status": "passed"
+    },
+    {
+      "name": "Preparation editor opens real exact CEO decision; confirmation remains a local plan only",
+      "status": "passed"
+    },
+    {
+      "name": "Notes/minutes editor preserves dissent and actual entering actor separately from proposed identities",
+      "status": "passed"
+    },
+    {
+      "name": "Minutes approval is a separate exact decision from preparation approval",
+      "status": "passed"
+    },
+    {
+      "name": "Handoff editor links one scoped permitted task with immutable meeting packet provenance",
+      "status": "passed"
+    },
+    {
+      "name": "All six Arabic375 RTL overlay contracts fit viewport and support trapped keyboard focus and Escape",
+      "status": "passed"
+    },
+    {
+      "name": "Uncertain create response recovers original receipt with one POST and no duplicate meeting",
+      "status": "passed"
+    },
+    {
+      "name": "Reasoned cancellation preserves dissent and historical packets while blocking new submissions",
+      "status": "passed"
+    },
+    {
+      "name": "All15identities remain inactive; no unexpected page/console errors or external requests",
+      "status": "passed"
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/f238e588-92d6-4ca5-a11c-ab43ba0e2fd0"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/ec1b1553-4dd2-47bf-8263-0de7a1f8b0bd"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/cd2fead7-933f-4624-a331-9a72fbf94b2f"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/f67ac2c0-0ec0-47a3-9ef4-1bacb6511f43"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/47f46aa1-868a-4639-b567-949f938bb5b2"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/19f8fae0-90ea-48c2-b284-7c5b646984e6"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/c36aeb51-95e2-4bbe-bb5f-7f747336e64f"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/3251e446-d856-49c5-8abd-3af229e7a7c2"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/0ce3f570-9612-49f4-803b-7d495f571d11"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/1b93d34a-a269-4256-ab5c-6cbe96f7f202"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/0b2978d2-a093-4f1d-8410-2a8e21ca6ea5"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/819ffde6-4368-4b95-86ee-27a722a2c2a0"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/7bc1d72c-380f-44a2-ad35-4d9e5b2fde2d"
+    }
+  ],
+  "blockedExternal": [],
+  "commands": [
+    {
+      "commandId": "f238e588-92d6-4ca5-a11c-ab43ba0e2fd0",
+      "type": "council.create",
+      "payload": {
+        "title": "INDEPENDENT Council 6c77a331",
+        "purpose": "Independently review local preparation and dissent.",
+        "questions": "Which evidence remains unresolved?",
+        "agenda": [
+          {
+            "id": "a5991c4b-038b-48bb-8048-db734dbe89ef",
+            "title": "Inspect exact evidence"
+          },
+          {
+            "id": "80601588-1f9c-4a0d-bf5c-a9ebe5f5c4f6",
+            "title": "Preserve dissent"
+          }
+        ],
+        "plannedAt": "2026-11-03T11:30:00.000Z",
+        "coordinatorId": "nora",
+        "projectId": null
+      }
+    },
+    {
+      "commandId": "ec1b1553-4dd2-47bf-8263-0de7a1f8b0bd",
+      "type": "council.participants",
+      "payload": {
+        "meetingId": "7c214254-8f33-4794-a58f-cd10f231323a",
+        "participants": [
+          {
+            "agentId": "adam",
+            "contribution": "Independent strategic challenge; no authority to execute.",
+            "skillRequirements": []
+          }
+        ]
+      },
+      "expectedRevision": 1
+    },
+    {
+      "commandId": "c9339b8e-1ef2-4378-aa21-c652681ed2cc",
+      "type": "source.add",
+      "payload": {
+        "title": "INDEPENDENT Council permitted evidence",
+        "body": "Exact evidence: local records preserve dissent and all existing holds.",
+        "provenance": {
+          "uri": "current-session:independent-council",
+          "locator": "paragraph1",
+          "authorKind": "human"
+        }
+      }
+    },
+    {
+      "commandId": "cd2fead7-933f-4624-a331-9a72fbf94b2f",
+      "type": "council.source.classify",
+      "payload": {
+        "sourceId": "38bc03b6-785a-4687-a6f6-e8efbfe64c94",
+        "version": 1,
+        "sha256": "a17629e28c50acc5aa4befc6db181e0c2b1509c8c57ba8231ae65accdff9750c",
+        "classification": "corporate-internal",
+        "reason": "Explicit corporate-internal version for Council local review only."
+      },
+      "expectedRevision": 1
+    },
+    {
+      "commandId": "f67ac2c0-0ec0-47a3-9ef4-1bacb6511f43",
+      "type": "council.materials",
+      "payload": {
+        "meetingId": "7c214254-8f33-4794-a58f-cd10f231323a",
+        "materials": [
+          {
+            "sourceId": "38bc03b6-785a-4687-a6f6-e8efbfe64c94",
+            "version": 1,
+            "sha256": "a17629e28c50acc5aa4befc6db181e0c2b1509c8c57ba8231ae65accdff9750c",
+            "agendaId": "a5991c4b-038b-48bb-8048-db734dbe89ef",
+            "start": 0,
+            "end": 70,
+            "quote": "Exact evidence: local records preserve dissent and all existing holds."
+          }
+        ]
+      },
+      "expectedRevision": 2
+    },
+    {
+      "commandId": "47f46aa1-868a-4639-b567-949f938bb5b2",
+      "type": "council.prepare",
+      "payload": {
+        "meetingId": "7c214254-8f33-4794-a58f-cd10f231323a",
+        "phase": "preparation",
+        "fingerprint": "15a3783a8784d52b1ec55aab903b052eaf02a21340fbd811383ba85fa1f24e72",
+        "reason": "Inspect exact preparation plan and material snapshot."
+      },
+      "expectedRevision": 3
+    },
+    {
+      "commandId": "19f8fae0-90ea-48c2-b284-7c5b646984e6",
+      "type": "decision.record",
+      "payload": {
+        "decisionId": "2de5d87c-4515-4e32-9dba-44be4d5476cd",
+        "recommendationHash": "ec7b29bce8ed2f2877407dd845a0eeef660fa0f7ebc9e49e5f777a138c049e92",
+        "choice": "approve",
+        "reason": "Exact local record confirmation only; all holds retained."
+      },
+      "expectedRevision": 1
+    },
+    {
+      "commandId": "c36aeb51-95e2-4bbe-bb5f-7f747336e64f",
+      "type": "council.note",
+      "payload": {
+        "meetingId": "7c214254-8f33-4794-a58f-cd10f231323a",
+        "body": "Independent dissent: more evidence is required before any business execution.",
+        "kind": "dissent",
+        "reportedBy": null,
+        "citations": []
+      },
+      "expectedRevision": 4
+    },
+    {
+      "commandId": "3251e446-d856-49c5-8abd-3af229e7a7c2",
+      "type": "council.minutes",
+      "payload": {
+        "meetingId": "7c214254-8f33-4794-a58f-cd10f231323a",
+        "body": "Local minutes preserve dissent and unresolved evidence; no AI attendance asserted.",
+        "reason": "Authenticated operator records minutes."
+      },
+      "expectedRevision": 5
+    },
+    {
+      "commandId": "0ce3f570-9612-49f4-803b-7d495f571d11",
+      "type": "council.prepare",
+      "payload": {
+        "meetingId": "7c214254-8f33-4794-a58f-cd10f231323a",
+        "phase": "minutes",
+        "fingerprint": "98c52088f78af81e90dfcd181e44d3c54c9923325788f132ffa01015a92f986a",
+        "reason": "Review exact minutes and preserved dissent."
+      },
+      "expectedRevision": 6
+    },
+    {
+      "commandId": "1b93d34a-a269-4256-ab5c-6cbe96f7f202",
+      "type": "decision.record",
+      "payload": {
+        "decisionId": "7139dfea-363b-4fa5-a856-7d5c77a248d7",
+        "recommendationHash": "24e8d9c05061ecf5b2390bc35f6b63ad4d6cab6899bf397bbc938a6850cba4f8",
+        "choice": "approve",
+        "reason": "Exact local record confirmation only; all holds retained."
+      },
+      "expectedRevision": 1
+    },
+    {
+      "commandId": "614d66eb-833b-4d59-9593-3f1ed26da491",
+      "type": "task.create",
+      "payload": {
+        "title": "INDEPENDENT Council follow-up task",
+        "request": "Inspect current evidence",
+        "outcome": "Return a factual finding",
+        "acceptance": "Source-linked local finding",
+        "limits": "Local proposed action only",
+        "sourceIds": [
+          "38bc03b6-785a-4687-a6f6-e8efbfe64c94"
+        ]
+      }
+    },
+    {
+      "commandId": "0b2978d2-a093-4f1d-8410-2a8e21ca6ea5",
+      "type": "council.handoff",
+      "payload": {
+        "meetingId": "7c214254-8f33-4794-a58f-cd10f231323a",
+        "packetId": "14658df4-d278-44fd-ac0a-c81398201bbd",
+        "taskId": "75980247-73b0-46db-a7f3-4a2901c4b87d",
+        "ownerId": "development-preparer",
+        "deadline": null,
+        "reason": "Proposed follow-up link, no business assignment."
+      },
+      "expectedRevision": 7
+    },
+    {
+      "commandId": "819ffde6-4368-4b95-86ee-27a722a2c2a0",
+      "type": "council.create",
+      "payload": {
+        "title": "INDEPENDENT lost Council 19abdac7",
+        "purpose": "Recover a local command receipt.",
+        "questions": "One effect only?",
+        "agenda": [
+          {
+            "id": "9c165995-7cbd-47a8-a127-71c9b6ab69f2",
+            "title": "Recover receipt"
+          }
+        ],
+        "plannedAt": null,
+        "coordinatorId": "nora",
+        "projectId": null
+      }
+    },
+    {
+      "commandId": "7bc1d72c-380f-44a2-ad35-4d9e5b2fde2d",
+      "type": "council.cancel",
+      "payload": {
+        "meetingId": "7c214254-8f33-4794-a58f-cd10f231323a",
+        "reason": "Await additional evidence before new handoffs."
+      },
+      "expectedRevision": 8
+    }
+  ],
+  "sourceHashes": {
+    "web_platform/src/lib/hq/server/council-store.mjs": "ceda6ccdf59414521571335c40d6a8ee1c1d1ce42739e71d7346c2943d4883cb",
+    "web_platform/src/lib/hq/server/local-store.mjs": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf",
+    "web_platform/src/lib/hq/server/handler.mjs": "50b6be58de26fefbcab7453bceb318afe6ba11337fcfa36bcc9de87fff79b384",
+    "web_platform/src/components/hq/hq-council.tsx": "5bf0bd2849c51432bb05207e51e17e5b21c070ae4d6e689d930e87a3f55ca44c",
+    "web_platform/src/lib/hq/council-copy.ts": "eb97a0a60f94b2a8e9792629f48f94c897b1c2412c31cf4d34910f166b124fc5",
+    "web_platform/src/components/hq/hq-overlays.tsx": "33879bf64eb7992c4c93723d9b98770a116a1f24ce0ccd2e8a7e9bcce56eb1c2",
+    "web_platform/src/components/hq/hq-context.tsx": "cb8ec502727680f0f5a8186c50e9d8efa9916d9d7640bc892cecf431accb35e2",
+    "web_platform/src/lib/hq/contracts.ts": "aad341b56f3d0e838577340ab06eb8c9056d06dafa60cb46a30b5327d6b60b5d",
+    "web_platform/src/lib/hq/copy.ts": "e9260acf6591d0e1caa4c85d88f98925855e4b5b3cab352f034b9d21260c3079"
+  },
+  "findings": [],
+  "expectedReceiptProbes": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/f238e588-92d6-4ca5-a11c-ab43ba0e2fd0"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/ec1b1553-4dd2-47bf-8263-0de7a1f8b0bd"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/cd2fead7-933f-4624-a331-9a72fbf94b2f"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/f67ac2c0-0ec0-47a3-9ef4-1bacb6511f43"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/47f46aa1-868a-4639-b567-949f938bb5b2"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/19f8fae0-90ea-48c2-b284-7c5b646984e6"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/c36aeb51-95e2-4bbe-bb5f-7f747336e64f"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/3251e446-d856-49c5-8abd-3af229e7a7c2"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/0ce3f570-9612-49f4-803b-7d495f571d11"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/1b93d34a-a269-4256-ab5c-6cbe96f7f202"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/0b2978d2-a093-4f1d-8410-2a8e21ca6ea5"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/819ffde6-4368-4b95-86ee-27a722a2c2a0"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/7bc1d72c-380f-44a2-ad35-4d9e5b2fde2d"
+    }
+  ],
+  "endedAt": "2026-10-23T16:55:51.108Z"
+}

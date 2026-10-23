@@ -1,0 +1,2 @@
+# Architect Council
+Mode extend; profile regulated. Approved packet is plan of record. Two routes/six editors and existing theme; original governance/roles and all holds preserved. Existing local auth/session/CSRF/audit spine reused; no production grants. Backend owns contracts/server; UI separate; independent qa reviews actual source/runtime. Cancellation blocks handoffs; corrections scope invalidation precisely.

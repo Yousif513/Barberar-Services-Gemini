@@ -1,0 +1,32 @@
+✔ corporate classification can be restricted and all historical selection denied deterministically (43.5385ms)
+✔ founder intent grounds separate preparation and minutes packets with exact decisions (46.624ms)
+✔ unknown, foreign and corrected source versions fail closed without exposing bodies (37.3941ms)
+✔ agenda and skill-pin changes stale pending approval but notes do not stale unrelated preparation (46.9171ms)
+✔ reported notes and append-only corrections retain actual actor and dissent (33.7593ms)
+✔ minutes correction supersedes only minutes packet and dependent follow-up (46.8437ms)
+✔ cancellation blocks submissions, decision and handoff; reasoned reopen needs fresh approval (42.2833ms)
+✔ atomic task, meeting and project handoff with exact replay and restart (52.9146ms)
+✔ audit and final receipt failures roll back all Council writes (37.6958ms)
+✔ scope, actor spoof, stale revision, forged participant and invalid dates are refused (24.4201ms)
+✔ server list bounded pages, actual counts, coordinator filters and stable sorting (53.5984ms)
+✔ derived intent cannot launder a later restricted parent through any Council projection (38.1919ms)
+✔ twelve-source budget includes founder intent and refuses material overflow atomically (56.4788ms)
+✔ late meeting audit failure rolls back associated project and newly created task (42.6458ms)
+✔ decline is truthful and revised local packet becomes current in insertion order (36.8755ms)
+✔ corrected notes can rebind current corporate citations while historical dissent remains immutable (41.4824ms)
+✔ projects atomically associate task creation, isolate seats and persist history (44.0354ms)
+✔ closure uses exact existing decision loop and corrected source supersedes acceptance (42.7907ms)
+✔ audit failure rolls back task and link with unchanged project revision (34.164ms)
+✔ duplicate task links, self/cyclic milestones, missing evidence and foreign targets fail (37.1209ms)
+✔ milestone acceptance then project acceptance, explicit reopen, replay and restart are durable (54.6373ms)
+✔ linked-task revision changes refuse pending closure and preserve receipt history (36.7991ms)
+✔ declared blockers prevent closure and malformed dates/fields never mutate revision (35.3536ms)
+✔ closure preview fingerprint is enforced when evidence changes before preparation (32.3522ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 757.0433

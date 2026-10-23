@@ -4,6 +4,7 @@ import path from "node:path";
 import { randomBytes, randomUUID } from "node:crypto";
 import { HqError, hash, canonical, csrfForSession } from "./local-boundary.mjs";
 import { projectCommand, projectQuery, projectDecision, projectFollowup, refreshProjects, linkTask } from "./projects-store.mjs";
+import {councilCommand,councilQuery,councilDecision,councilFollowup} from "./council-store.mjs";
 const now = () => new Date().toISOString();
 const uuid = value => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const text = (value, max = 4000, optional = false) => {
@@ -32,7 +33,7 @@ const skillRequirements = value => {
 };
 const ensureRevision = (actual, expected) => { if (!Number.isInteger(expected) || actual !== expected) throw new HqError("stale_revision", 409); };
 const scope = () => ({ environment:"local", effects:["record-only"], employeeActivation:false, businessPermissions:false, financialExecution:false });
-const allowedKinds = new Set(["task", "source", "recommendation", "decision", "followup", "project", "milestone", "project-closure"]);
+const allowedKinds = new Set(["task", "source", "recommendation", "decision", "followup", "project", "milestone", "project-closure", "meeting", "council-packet", "council-classification"]);
 export class HqStore {
   constructor({ filePath, initialSources = [], agents = [], skills = [] }) {
     mkdirSync(path.dirname(filePath), { recursive:true });
@@ -206,6 +207,7 @@ export class HqStore {
         for(const c of rec.citations){const source=this.get(session,"source",c.sourceId);if(source.version!==c.version||source.sha256!==c.sha256)throw new HqError("stale_source",409);}
         const states={approve:"approved",decline:"declined",request_changes:"changes_requested"};if(!Object.hasOwn(states,p.choice))throw new HqError("invalid_input");
         projectDecision(this,session,decision,p.choice,commandId);
+        councilDecision(this,session,decision,p.choice,commandId);
         const status=states[p.choice];this.put(session,"decision",{...decision,status,reason:text(p.reason,4000),decidedAt:now(),actorId:session.actorId});
         this.put(session,"task",{...task,status:status==="approved"?"approved_for_followup":status,updatedAt:now()});
         this.audit(session,"decision.recorded","decision",decision.id,commandId,{status,recommendationHash:rec.hash,taskRevision:task.revision,effect:"record-only"});
@@ -217,6 +219,7 @@ export class HqStore {
         if(recommendation.hash!==decision.recommendationHash)throw new HqError("stale_recommendation",409);
         for(const c of recommendation.citations){const source=this.get(session,"source",c.sourceId);if(source.version!==c.version||source.sha256!==c.sha256)throw new HqError("stale_source",409);}
         projectFollowup(this,session,decision);
+        councilFollowup(this,session,decision);
         const followup=this.put(session,"followup",{id:randomUUID(),taskId:task.id,decisionId:decision.id,note:text(p.note),nextAction:text(p.nextAction),status:"recorded",actorId:session.actorId,createdAt:now()});
         this.put(session,"task",{...task,status:"followup_recorded",updatedAt:now()});this.audit(session,"followup.recorded","task",task.id,commandId,{followupId:followup.id,decisionId:decision.id});result={entityType:"followup",entityId:followup.id,revision:task.revision,recordIds:{taskId:task.id,followupId:followup.id,decisionId:decision.id}};
       } else if(type==="source.add"){
@@ -233,7 +236,8 @@ export class HqStore {
         const task=this.createTask(session,{title,request:reason,outcome:plan,acceptance:"Review exact proposal, dependencies and limits; no employee/business execution",ownerId:p.agentId,reviewerId:"development-preparer",limits,sourceIds:p.sourceIds||[]},commandId);
         const prepared=this.preparePayload(session,task);prepared.summary=`${reason}\n\n${plan}\n\nProposed change: ${p.change||p.kind}. Version/hash: ${p.versionOrHash||"not specified"}. Limits: ${limits}. Approval records this proposal only; no binding, invitation, recording or evaluation is executed.`;
         result=this.publish(session,task,prepared,commandId,"authored-development");
-      } else if(type.startsWith("project.")||type.startsWith("milestone.")){result=projectCommand(this,session,type,p,expectedRevision,commandId);}
+      } else if(type.startsWith("council.")){result=councilCommand(this,session,type,p,expectedRevision,commandId);}
+      else if(type.startsWith("project.")||type.startsWith("milestone.")){result=projectCommand(this,session,type,p,expectedRevision,commandId);}
       else throw new HqError("invalid_input");
       refreshProjects(this,session,commandId);
       const receipt={commandId,type,...result,effect:"record-only",recordedAt:now()};
@@ -251,7 +255,8 @@ export class HqStore {
   }
   query(session,view,options={}) {
     this.assertSession(session);let data;
-    if(["projects","project","project-preview"].includes(view)){data=projectQuery(this,session,view,options);}
+    if(["council","meeting","meeting-preview","council-materials","council-tasks"].includes(view)){data=councilQuery(this,session,view,options);}
+    else if(["projects","project","project-preview"].includes(view)){data=projectQuery(this,session,view,options);}
     else if(view==="overview"){
       const tasks=this.list(session,"task",{limit:5}),decisions=this.list(session,"decision",{status:"pending",limit:5});
       data={counts:{tasks:tasks.total,pendingDecisions:decisions.total,sources:this.list(session,"source",{limit:1}).total,followups:this.list(session,"followup",{limit:1}).total},tasks:tasks.items,decisions:decisions.items,agents:this.agents,mode:"local-development"};

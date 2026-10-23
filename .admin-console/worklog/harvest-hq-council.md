@@ -1,0 +1,2 @@
+# Final Council harvester
+Mode extend; profile regulated. Two previously unrecorded findings from independent source/tests/worklogs and conversation were recorded viaCLI and banked: transitive restrictions of derived evidence; insertion chronology versus random UUID/first historical match. Harvest/read-only promote exit0. No global guidance auto-adopted, sync/export, product or authority change. Current workersdone/claimsreleased; root retains final gates/report/commit/push. All holds retained.

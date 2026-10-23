@@ -1,0 +1,76 @@
+{
+  "status": "locally-implemented-independently-reviewed",
+  "scope": "HQ-NEXT-02",
+  "routes": {
+    "/hq/council": [
+      "brief-editor",
+      "/hq/council/[id]",
+      "/hq/decisions/[id]"
+    ],
+    "/hq/council/[id]": [
+      "brief-editor",
+      "participants-readiness",
+      "permitted-materials",
+      "preparation-preview",
+      "minutes-editor",
+      "decision-action-handoff",
+      "/hq/tasks/[id]",
+      "/hq/projects/[id]",
+      "/hq/knowledge/[id]",
+      "/hq/agents/[id]",
+      "/hq/decisions/[id]"
+    ]
+  },
+  "overlays": {
+    "brief-editor": [
+      "save-local-record",
+      "cancel-with-reason"
+    ],
+    "participants-readiness": [
+      "propose-only",
+      "/hq/agents/[id]"
+    ],
+    "permitted-materials": [
+      "bind-current-sources",
+      "/hq/knowledge/[id]"
+    ],
+    "preparation-preview": [
+      "existing-recommendation-decision",
+      "/hq/decisions/[id]"
+    ],
+    "minutes-editor": [
+      "attributed-versioned-notes",
+      "minutes-review-packet"
+    ],
+    "decision-action-handoff": [
+      "existing-task-composer",
+      "atomic-task-link",
+      "/hq/tasks/[id]",
+      "/hq/decisions/[id]"
+    ]
+  },
+  "routeCount": 2,
+  "newOverlayCount": 6,
+  "acceptanceCriteria": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "theme": "existing approved Volabi design",
+  "runtimeBusinessEmployees": "inactive",
+  "azure": "deferred",
+  "externalLiveMediaAndBusinessActions": "held",
+  "screensRendered": true,
+  "approval": "planning/volabi/APPROVAL_COUNCIL_20261023.md",
+  "planOfRecord": "planning/volabi/COUNCIL_SCOPE_20261023.md",
+  "implementationEvidence": ".admin-console/evidence/hq-council-independent/source-review.json"
+}

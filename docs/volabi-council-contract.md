@@ -1,0 +1,33 @@
+# Local Council backend contract — HQ-NEXT-02
+
+Implemented only within the authenticated local development workspace. No agent runs, invitations, media, permissions, finance, deployment or external write is performed. All 15 original identities remain inactive. Nora coordinates proposals; Alexander operations, Adam independent strategy, Omar independent assurance, Layla compliance and Daniel source-linked finance retain distinct original roles. Selection records proposed contributions, never attendance or dialogue.
+
+## Views
+
+Existing `GET /api/hq/state` session boundary applies. `view=council` supports q (max200), status, ownerId (proposed coordinator), sort=title|created|updated and page (zero based; 25 rows). Counts describe local records, pending exact decisions and unresolved proposed actions. A recorded generic follow-up never proves that an action completed. `view=meeting&id=...` returns meeting, immutable versions, packets, safe source bodies, scoped task associations, audit and current installed-package/pin readiness. `view=meeting-preview&id=...&phase=preparation|minutes` returns exact snapshot/fingerprint/blockers. `council-materials` and `council-tasks` are separately scoped, paginated q pickers; founder-global source/task searches are not Council pickers.
+
+## Material policy
+
+All preexisting sources default unavailable for Council use. No source filename, actor role or selected employee implicitly classifies it. The actual founder actor may explicitly record version/hash-bound corporate-internal, restricted or private-founder metadata with a reason using `council.source.classify`; this does not add a reader, employee entitlement or business permission. Private/restricted sources cannot be downgraded through this local module, even after correction. Source correction requires fresh current-version corporate metadata where allowed. A selected quote requires exact current source version/hash and UTF16 start/end/quotation, maximum1200 characters.
+
+Generated founder-intent sources are clearly labelled records of submitted intent, not independent corroboration. They retain immutable dependency version/hash pins. Every Council projection/picker/direct material or task selection recursively enforces dependencies, fails closed on changed/restricted/missing/unknown parents, and cannot remove those pins through reclassification. Dependency cycles/depth overflow fail closed. Historical restricted/stale quotations are redacted in Council detail, packet and version views; their original bytes remain in the authenticated founder-only global history. No new audience is granted access. User-entered prose remains an attributed claim; the system does not verify external speech.
+
+## Commands
+
+Use existing `POST /api/hq/commands` with session cookie, CSRF, UUID commandId and expectedRevision. Meeting commands compare current overall meeting revision. `council.source.classify` compares source.version and explicit payload version/hash. Replays recover identical receipts; changed same-key payloads refuse. All commands share one SQLite transaction through final immutable receipt and audit write.
+
+- `council.create`: title, purpose, questions, ordered agenda `[{id,title}]`, proposed coordinatorId, optional ISO plannedAt and projectId. Timezone is Asia/Riyadh; calendar validity and source/object scope are validated.
+- `council.revise`: meetingId plus editable brief fields and reason. Existing selected agenda materials must still reference valid agenda ids.
+- `council.participants`: meetingId and participants `[{agentId,contribution,skillRequirements:[{skillId,version,sha256}]}]`. Canonical original identities only, no duplicates, no quorum/activation inference. Installed package/pin match, proposed role binding, absent behavioral evidence and absent permissions stay separate.
+- `council.materials`: meetingId and exact citations with agendaId. Eleven distinct external sources maximum because the exact founder-intent source consumes the existing twelfth source. No silent omission.
+- `council.cancel` / `council.reopen`: meetingId and reason. Cancellation rejects notes, submissions, affected decisions, handoffs and follow-up. Explicit reopen increments material revision, so old confirmation cannot authorize new work.
+- `council.note`: meetingId, kind note|dissent|question|reported, body, citations and reportedBy for reported observations. Actor is always the actual session actor. No attendance or AI utterance field exists.
+- `council.minutes`: meetingId, body and reason. `council.correct` takes body/reason, optional noteId and replacement citations. Corrections append note versions or preserve earlier minutes in immutable meeting versions. Terminal corrected notes bind current minutes snapshots; original dissent remains readable. Audit records affected packet and dependent handoff ids.
+- `council.prepare`: meetingId, phase, exact preview fingerprint and reason. Preparation and minutes each create a separate real task, source-linked recommendation, pending decision and Council packet atomically. Minutes require current approved preparation. Founder intent is grounded as founder intent. Existing authenticated decision.record records approve/decline/changes_requested on exact packet/source/task revisions; it authorizes a local record only.
+- `council.handoff`: meetingId, current approved minutes packetId, either existing taskId or new task fields, proposed ownerId, optional deadline and reason. Task creation plus meeting/project associations is atomic. Source policy applies to all existing/new task evidence. No completion or autonomous assignment is inferred. Duplicate task links refuse; exact command retry returns the old receipt.
+
+## Invalidation and persistence
+
+Core revision binds purpose, questions, ordered agenda, timing, coordinator, project, proposed contributions/skill pins and source versions/hashes. Core changes stale preparation and minutes without changing immutable historical decisions. Notes/minutes revisions stale only minutes. A new unrelated note does not stale preparation. Follow-up for a packet or a linked handoff revalidates its exact Council dependencies. A minutes correction cannot authorize old actions. Declines and change requests remain truthful and permit a fresh exact packet; the latest packet uses insertion order, never random UUID sorting.
+
+SQLite generic records are additive: meeting, council-packet, council-classification; existing immutable versions/events/commands apply. No hosted schema/production data changed. Root repository health and independent acceptance are reported separately from these owner tests. Full regulated release remains subject to its existing unresolved findings.
