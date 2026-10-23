@@ -1,0 +1,128 @@
+{
+  "title": "SOURCE REVIEW",
+  "reviewer": "qa-hq-projects",
+  "implementationOwners": [
+    "impl-hq-projects-backend",
+    "impl-hq-projects-ui"
+  ],
+  "scope": "CEO-approved HQ-NEXT-01 local only; two route patterns/four overlays; retained employee/service/financial/production holds",
+  "decision": "accepted_for_local_development_scope",
+  "reviewedAt": "2026-10-23T16:25:27.053295+00:00",
+  "sourceHashBasis": "UTF8 decode, CRLF pairs converted to LF, UTF8 encode; no other normalization",
+  "source_assertions": [
+    {
+      "path": "web_platform/src/lib/hq/server/projects-store.mjs",
+      "sha256": "e1d2eaab750ec2be8e9726fe68936412fa14c327a9c9f80defff6e9ce0285d5d"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256": "df2ee1f0f7481afefc3e90e385644d217ffe333f010e177e25694cc1c553e9da"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256": "3d09cd133032e420387ee0b5e83bb3f56618bba8667001a589f1f977de75a738"
+    },
+    {
+      "path": "web_platform/src/lib/hq/contracts.ts",
+      "sha256": "4eb20ac953c87c732c692f26ea8124e0c7bdff04b2a851ba464e6a72999c5a47"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-projects.tsx",
+      "sha256": "29a4e836f9858de2b4fdc86e45ab74528f73628a2a7ba8299e630213667ba877"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-overlays.tsx",
+      "sha256": "4f6923af7c4f760ab786c24f849fbccde37feeb28803a6d11d0d7906d9ada3a5"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-context.tsx",
+      "sha256": "dd3d4b7fdd72ca7cdb86e587dd1477f6f7e13ea44a1fb1e7b78797aaff75dbf6"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-shell.tsx",
+      "sha256": "2c52002fabad2e0da7249a824ff8136346831a28445a78e510b788d657ef6d0b"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-workspace.tsx",
+      "sha256": "d1d24438ffbfdffaca33104e5c7a043fee24ef458f5d9ed81874c78de0a20ce3"
+    },
+    {
+      "path": "web_platform/src/lib/hq/project-copy.ts",
+      "sha256": "d15fb4abe9b651446846dec4ca458e4fe34b1e382c3939b04791fdebd26e0c1e"
+    },
+    {
+      "path": "web_platform/src/lib/hq/copy.ts",
+      "sha256": "f6c660049aca7e716d0ef137c3bae698b57a64688093003f83b2dc3c67553735"
+    },
+    {
+      "path": "web_platform/src/app/hq/projects/page.tsx",
+      "sha256": "eda5e1f14ec70b02991e74914dfbe734e0308ddd7a10934fce2dbad6e0ab3de1"
+    },
+    {
+      "path": "web_platform/src/app/hq/projects/[id]/page.tsx",
+      "sha256": "e8a30f082a032b4d2100b40d73c52a091b883f74ab7d8c5d71a40c407cf054a6"
+    }
+  ],
+  "tests": {
+    "storeHTTP": {
+      "command": "node --test web_platform/tests/hq-projects-independent.test.mjs",
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": ".admin-console/evidence/hq-projects-independent/unit-final.txt"
+    },
+    "actualBrowser": {
+      "command": "node web_platform/tests-browser/hq-projects-independent.mjs",
+      "evidence": ".admin-console/evidence/hq-projects-independent/browser-results.json",
+      "passed": 14,
+      "failed": 0,
+      "expectedReceiptProbeConsole": 10,
+      "unexpectedConsoleErrors": 0,
+      "pageErrors": 0
+    }
+  },
+  "resolvedFindings": [
+    {
+      "severity": "P1",
+      "issue": "Transitive source correction left dependent milestone acceptance falsely current",
+      "proof": "transitive-red.txt",
+      "fix": "Recursive dependency qualification and transactional superseded audit; independent regression GREEN"
+    },
+    {
+      "severity": "P2",
+      "issue": "Logical project revision reused as React history key after status writes",
+      "proof": "browser-round4.txt",
+      "fix": "Unique immutable ordered history identity; fresh actual browser has no unexpected console errors"
+    },
+    {
+      "severity": "P2",
+      "issue": "Local development actor profile link had nonexistent employee target",
+      "fix": "Localized plain actor text with no profile or skills link"
+    }
+  ],
+  "review": [
+    "New scoped records and parent indexes are additive in the local store; no cloud migration or environment mutation. Existing command transaction encloses new writes, immutable events and receipts.",
+    "Object scope is derived from session. SQL list WHERE and order parameters are bounded and allowlisted; LIMIT25 OFFSET on actual workspace rows. Per-command allowed fields reject invented authority.",
+    "Dependency cycles are denied before persistence, traversal memoized; exact preview fingerprint, task revisions, source versions/hashes and current closure recommendation must remain current. Audit failure rolls back task association.",
+    "Project acceptance is a local record. Historical CEO decision remains approved while changed material supersedes current project acceptance. No inferred task completion or independent employee review.",
+    "Two routes and all four overlays link existing task, source, decision, audit and canonical agent destinations; local actor is plain text. Current UI copy is bilingual and RTL mirrors, keyboard focus and Escape verified.",
+    "Fresh runtime API reports all15 canonical employees inactive. No Azure, paid provider, microphone, production, business permission or financial executor was invoked."
+  ],
+  "limits": [
+    "Local workspace/session only; production/multi-user/backup/retention not certified",
+    "Browser demonstrates English1440 and Arabic375, not an exhaustive device/accessibility certification",
+    "Known receipt-not-found GET preflight404 console messages preserved separately; unexpected console/page errors checked",
+    "No extra full database/Edge suites; no changes to those systems"
+  ],
+  "independentTestHashes": [
+    {
+      "path": "web_platform/tests-browser/hq-projects-independent.mjs",
+      "sha256": "229492ea22d903c937bed95e72a88344395aeb76ca53b722d073e1ac0b0c5fc5"
+    },
+    {
+      "path": "web_platform/tests/hq-projects-independent.test.mjs",
+      "sha256": "f972d8db9a49bb16f1b6b0ee327ff78f3c0ee00861e955fb2ad809154f5bca3b"
+    }
+  ],
+  "testNormalization": "Only excess EOF blank lines removed after final passing runs; application source assertions unchanged."
+}

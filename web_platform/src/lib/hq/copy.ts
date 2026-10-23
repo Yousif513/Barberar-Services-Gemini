@@ -26,6 +26,8 @@ const labels = {
 export type HqCopyKey = keyof typeof labels;
 export const hqCopy = (locale: HqLocale, key: HqCopyKey): string => labels[key][locale === "ar" ? 1 : 0];
 const errors: Record<string, readonly [string,string]> = {
+  duplicate_link:["This task is already linked. Refresh the project before changing its links.","هذه المهمة مرتبطة بالفعل. حدّث المشروع قبل تغيير روابطه."], milestone_task_in_use:["A milestone still uses this task. Revise that milestone before removing the project link.","ما زالت مرحلة تستخدم هذه المهمة. راجع المرحلة قبل إزالة رابط المشروع."], invalid_link:["A selected task is not linked to this project. Review the current links.","مهمة محددة غير مرتبطة بهذا المشروع. راجع الروابط الحالية."], dependency_cycle:["These dependencies would form a cycle. Revise the dependency selection; your draft is retained.","ستشكّل هذه الاعتماديات دورة. راجع الاختيار؛ أُبقيت مسودتك."], closure_blocked:["Closure evidence has unresolved blockers. Refresh the exact preview before continuing.","تتضمن أدلة الإغلاق عوائق غير محلولة. حدّث المعاينة الدقيقة قبل المتابعة."],
+
   session_required:["The local session needs checking. Reopen the workspace, then retry your retained draft.","تحتاج الجلسة المحلية إلى التحقق. أعد فتح المساحة ثم حاول حفظ المسودة المحفوظة."],
   local_disabled:["The local workspace is not enabled in this process. No HQ records were loaded.","المساحة المحلية غير مفعّلة في هذه العملية. لم تُحمّل سجلات المقر."],
   origin_forbidden:["This request is outside the allowed local workspace origin.","هذا الطلب خارج أصل المساحة المحلية المسموح به."],csrf_failed:["The session changed. Refresh this record before retrying your retained draft.","تغيرت الجلسة. حدّث السجل قبل إعادة محاولة حفظ المسودة."],

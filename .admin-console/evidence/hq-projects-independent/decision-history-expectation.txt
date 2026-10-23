@@ -1,0 +1,49 @@
+✔ independent: project and closure IDs cannot cross workspace boundaries (35.7002ms)
+✔ independent: atomic task association rejects stale project without orphan task, event or receipt (22.7996ms)
+✔ independent: audit insert failure rolls back project, revision history, receipt and task atomically (24.4171ms)
+✔ independent: replay and restart recover exactly one project receipt; altered payload conflicts (25.3122ms)
+✔ independent: malformed values and invented owners create no projects (19.9657ms)
+✔ independent: dependency cycle, duplicate references, foreign milestones and self links are refused (35.7454ms)
+✔ independent: unresolved blockers or missing evidence cannot be accepted (28.3452ms)
+✔ independent: source correction invalidates a pending exact closure decision (27.0491ms)
+✔ independent: task revision and material project revision invalidate pending closure (56.1321ms)
+✔ independent: exact hash acceptance is record-only, follow-up stays factual, explicit reopen records history (32.6834ms)
+✔ independent HTTP: CSRF, cross-seat and absent-session project mutations fail; no secret response leakage (36.431ms)
+✔ independent: accepted milestones and parent close in order; reopening a dependency makes downstream acceptance stale (48.281ms)
+✔ independent: accepted status filters and pagination are workspace-scoped and stable (49.5357ms)
+✔ independent: transitive dependency evidence correction qualifies prior acceptance and blocks parent closure (42.2931ms)
+✔ independent: stale preview fingerprint cannot silently bind current changed source evidence (26.0908ms)
+✖ independent: modifying the closure task itself supersedes accepted project without rewriting decision history (30.8811ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 623.7956
+
+✖ failing tests:
+
+test at web_platform\tests\hq-projects-independent.test.mjs:35:1
+✖ independent: modifying the closure task itself supersedes accepted project without rewriting decision history (30.8811ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'approved'
+  - 'superseded'
+
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-projects-independent.test.mjs:35:360)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'approved',
+    expected: 'superseded',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

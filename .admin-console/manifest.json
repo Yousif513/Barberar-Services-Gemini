@@ -224,6 +224,14 @@
         "appliedTo": [
           "checkout-attempt.operator-queue"
         ]
+      },
+      {
+        "topic": "Bundled Next16 App Router page reference: async params; consulted by UI owner for project detail route. Existing NodeSQLite store idioms reused and executed locally.",
+        "url": "https://nextjs.org/docs/app/api-reference/file-conventions/page",
+        "checkedOn": "2026-10-23",
+        "appliedTo": [
+          "hq-local.projects"
+        ]
       }
     ],
     "volumes": {
@@ -7487,6 +7495,76 @@
           "owner": "",
           "reviewStatus": "reviewed",
           "reviewedBy": "security-volabi-local-server"
+        },
+        {
+          "id": "hq-local.projects",
+          "outcome": "Track local projects, milestones, dependencies and evidence-bound CEO closure/reopen history",
+          "kind": "command",
+          "roles": [
+            "local-development-reviewer"
+          ],
+          "risk": "moderate",
+          "status": "implemented",
+          "rationale": "Approved HQ-NEXT-01 local project/milestone tracking, SQLbounded search/filter/page/counts, immutable history, atomic task association, exactsource/revision closure through existing recommendation/decision/followup and reasoned reopen implemented. Independent acceptance metadata remains separate. Business execution and all explicitly deferred entity capabilities remain held.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/hq/projects",
+            "/hq/projects/[id]"
+          ],
+          "serverOperations": [
+            "web_platform/src/lib/hq/server/projects-store.mjs",
+            "web_platform/src/lib/hq/server/local-store.mjs",
+            "web_platform/src/lib/hq/server/handler.mjs"
+          ],
+          "authorizationPolicies": [
+            "web_platform/src/lib/hq/server/local-boundary.mjs"
+          ],
+          "auditEvents": [
+            "project.create",
+            "project.revise",
+            "project.start",
+            "project.task.linked",
+            "project.task.unlink",
+            "milestone.create",
+            "milestone.revise",
+            "project.closure.prepare",
+            "project.closure.decided",
+            "project.reopen",
+            "project.acceptance.superseded"
+          ],
+          "safeguards": [
+            "Loopback local session/CSRF/object scope",
+            "Exact revisions/source hashes and checked receipts",
+            "No external/financial/activation actions"
+          ],
+          "dataBinding": "sqlite:local-development-workspace",
+          "idempotency": "Existing command UUID/canonical payload receipt",
+          "concurrency": "Transactional revisions and exact evidence snapshot",
+          "recovery": "Preserve draft and query same command receipt",
+          "tests": [
+            "web_platform/tests/hq-projects-owner.test.mjs",
+            "web_platform/tests/hq-projects-independent.test.mjs",
+            "web_platform/tests-browser/hq-projects-owner.mjs",
+            "web_platform/tests-browser/hq-projects-independent.mjs"
+          ],
+          "evidence": [
+            "planning/volabi/APPROVAL_PROJECTS_20261023.md",
+            "planning/volabi/PROJECTS_DOMAIN_GRAPH.json",
+            "docs/volabi-projects-contract.md",
+            ".admin-console/worklog/impl-hq-projects-backend.md",
+            ".admin-console/worklog/impl-hq-projects-ui.md",
+            ".admin-console/worklog/qa-hq-projects.md",
+            ".admin-console/evidence/hq-projects-owner/result.json",
+            ".admin-console/evidence/hq-projects-independent/source-review.json",
+            ".admin-console/evidence/hq-projects-independent/browser-results.json",
+            ".admin-console/evidence/hq-projects-independent/unit-final.txt"
+          ],
+          "owner": "",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "qa-hq-projects"
         }
       ]
     }
@@ -9480,6 +9558,74 @@
         "web_platform/tests-browser/held-checkout-queue-independent.mjs",
         "web_platform/tests/held-checkout-client.test.mjs"
       ]
+    },
+    {
+      "id": "hq-projects",
+      "route": "/hq/projects",
+      "purpose": "Projects and initiatives register",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.projects"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Current explicit CEO scope/theme approval; independent rendered review required before closure.",
+      "tests": [
+        "web_platform/tests-browser/hq-projects-owner.mjs",
+        "web_platform/tests-browser/hq-projects-independent.mjs"
+      ]
+    },
+    {
+      "id": "hq-project",
+      "route": "/hq/projects/[id]",
+      "purpose": "Project milestones, dependencies, evidence and closure",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.projects"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Current explicit CEO scope/theme approval; independent rendered review required before closure.",
+      "tests": [
+        "web_platform/tests-browser/hq-projects-owner.mjs",
+        "web_platform/tests-browser/hq-projects-independent.mjs"
+      ]
     }
   ],
   "integrations": [
@@ -11038,6 +11184,16 @@
         "hq-local.request-review-loop",
         "checkout-attempt.operator-queue"
       ]
+    },
+    {
+      "id": "ceo-hq-next-01-approved",
+      "decision": "Build HQ-NEXT-01 local Projects and Initiatives: two routes/four overlay contracts, existing design, exact decision/evidence closure, independent tests, isolated branch commit/push.",
+      "reason": "Explicit current CEO approval. Management employees inactive, Azure deferred, all existing production/permission/external-write/financial/paid holds retained.",
+      "evidence": [
+        "planning/volabi/NEXT_HQ_ITEM_20261023.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
     }
   ],
   "gaps": [
@@ -14460,6 +14616,16 @@
         ".admin-console/evidence/validator-repair-20261023/independent-review.json",
         "tools/adminwright/PROVENANCE.json"
       ]
+    },
+    {
+      "id": "hq-projects-test-transcript-context",
+      "severity": "medium",
+      "description": "Evidence scanner rejects the retained passing Node test transcript zero pending-test summary. Executable independent tests and source/browser acceptance pass. Raw transcript preserved; no release gate override.",
+      "status": "open",
+      "rationale": "Future independently tested transcript-context tooling repair; separate from operational project module. Do not modify transcript or infer unfinished implementation from a zero summary.",
+      "evidence": [
+        ".admin-console/evidence/hq-projects-independent/source-review.json"
+      ]
     }
   ],
   "declaredStatic": [
@@ -14754,6 +14920,16 @@
       "approvedBy": "CEO authorized bounded queue and routine technical choices2026-10-22.",
       "evidence": [
         "docs/held-checkout-queue-contract.md"
+      ]
+    },
+    {
+      "id": "hq-project-static-vocabulary",
+      "path": "web_platform/src/lib/hq/project-copy.ts",
+      "value": "Bilingual Projects interface vocabulary and fixed technical command/status names; no project records, totals or completion scores",
+      "reason": "Static interface contract for CEO approved HQ-NEXT-01; all records/counts derive from scoped local SQLite.",
+      "approvedBy": "CEO HQ-NEXT-01 approval2026-10-23 and routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_PROJECTS_20261023.md"
       ]
     }
   ],
@@ -15945,6 +16121,39 @@
       ],
       "status": "promoted",
       "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-projects-transitive-freshness",
+      "observation": "Independent review reproduced accepted dependencyB remaining current after dependencyA sourcechanged. Recursively require current accepted dependency evidence; preserve immutable decisions while superseding current acceptance.",
+      "category": "new-pattern",
+      "proposedChange": "Exercise this boundary in independently reviewed local management workflow extensions. Preserve original authority and truthful evidence state.",
+      "evidence": [
+        ".admin-console/evidence/hq-projects-independent/source-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-projects-logical-history-key",
+      "observation": "Logical business revision may remain unchanged for status-only history writes. UI history identity must include immutable entry identity/order rather than business revision alone; test console after multiple transitions.",
+      "category": "new-pattern",
+      "proposedChange": "Exercise this boundary in independently reviewed local management workflow extensions. Preserve original authority and truthful evidence state.",
+      "evidence": [
+        ".admin-console/evidence/hq-projects-independent/source-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-projects-local-actor-link",
+      "observation": "API-default local development coordinator is not a canonical employee identity. Only canonical employees receive profile/skill destinations; label local actor directly and test defaultAPIcreated records.",
+      "category": "new-pattern",
+      "proposedChange": "Exercise this boundary in independently reviewed local management workflow extensions. Preserve original authority and truthful evidence state.",
+      "evidence": [
+        ".admin-console/evidence/hq-projects-independent/source-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
     }
   ],
   "agents": [
@@ -16498,6 +16707,42 @@
       "status": "done",
       "notes": "DEVELOPMENT-ONLY final learning pass; feedback/store/worklog only, no capability implementation or review.",
       "worklog": ".admin-console/worklog/harvest-validator-hq-20261023.md"
+    },
+    {
+      "id": "architect-hq-projects",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY approved HQ-NEXT-01 local module; no business authority.",
+      "worklog": ".admin-console/worklog/architect-hq-projects.md"
+    },
+    {
+      "id": "impl-hq-projects-backend",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY approved HQ-NEXT-01 local module; no business authority.",
+      "worklog": ".admin-console/worklog/impl-hq-projects-backend.md"
+    },
+    {
+      "id": "impl-hq-projects-ui",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY approved HQ-NEXT-01 local module; no business authority.",
+      "worklog": ".admin-console/worklog/impl-hq-projects-ui.md"
+    },
+    {
+      "id": "qa-hq-projects",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY approved HQ-NEXT-01 local module; no business authority.",
+      "worklog": ".admin-console/worklog/qa-hq-projects.md"
     }
   ]
 }

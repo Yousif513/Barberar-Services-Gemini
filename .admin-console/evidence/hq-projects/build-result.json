@@ -1,0 +1,1 @@
+{"command": ["npm.cmd", "run", "build", "--workspace=web_platform"], "exitCode": 0}

@@ -1,0 +1,314 @@
+{
+  "reviewer": "qa-hq-projects",
+  "kind": "independent actual browser",
+  "startedAt": "2026-10-23T16:24:36.396Z",
+  "checks": [
+    {
+      "name": "Fresh isolated local project register loads without invented projects",
+      "status": "passed"
+    },
+    {
+      "name": "Project editor persists objective and criteria and returns checked receipt to actual detail route",
+      "status": "passed"
+    },
+    {
+      "name": "Material project revision persists with reason and visible history",
+      "status": "passed"
+    },
+    {
+      "name": "Task-link overlay inspects current revision and persists existing task without copying it",
+      "status": "passed"
+    },
+    {
+      "name": "Milestone editor persists outcome, criteria, linked revision and Asia/Riyadh planning date",
+      "status": "passed"
+    },
+    {
+      "name": "Project closure preview refuses an unaccepted declared milestone",
+      "status": "passed"
+    },
+    {
+      "name": "Closure confirmation reuses source-linked recommendation and exact CEO decision; milestone accepted locally only",
+      "status": "passed"
+    },
+    {
+      "name": "Complete milestone then project acceptance survives route reload with linked immutable decision history",
+      "status": "passed"
+    },
+    {
+      "name": "Explicit reopen preserves historical decisions and records a new reasoned event",
+      "status": "passed"
+    },
+    {
+      "name": "Arabic375 RTL detail/editor have no page overflow, labelled keyboard focus and Escape closure",
+      "status": "passed"
+    },
+    {
+      "name": "All four Arabic mobile overlay contracts render within viewport and dismiss by keyboard",
+      "status": "passed"
+    },
+    {
+      "name": "Lost create response recovers original command receipt with one POST and no duplicate project",
+      "status": "passed"
+    },
+    {
+      "name": "Local development preparer has no broken employee-profile link and all15 canonical agents stay inactive",
+      "status": "passed"
+    },
+    {
+      "name": "No browser page or unexpected console errors; known receipt-not-found preflight probes retained separately",
+      "status": "passed"
+    }
+  ],
+  "consoleErrors": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/c94c1792-843d-4395-8b81-9c6a9c45a202"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/262f9c5a-1f2b-4018-b7d1-4e132d4fbdbe"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/d3d52145-e92d-4e56-a950-a3852448c3e7"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/4d1d9246-0e14-40a5-90e1-b12f8faa8835"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/f8b2c72c-badf-4c6c-8b68-9de4a9b3f8f5"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/5b4eaa91-9260-456c-9ba4-ab7860523279"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/33dd34da-2daa-446e-9a1e-18a6af3fa9be"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/45967098-94a6-4a13-b2e2-b52b9a8382ed"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/7cce2735-4b31-4ecd-81ec-10511f5a842a"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/194a153a-b24c-44c0-9242-a67ab02b4e80"
+    }
+  ],
+  "expectedReceiptProbeConsole": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/c94c1792-843d-4395-8b81-9c6a9c45a202"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/262f9c5a-1f2b-4018-b7d1-4e132d4fbdbe"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/d3d52145-e92d-4e56-a950-a3852448c3e7"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/4d1d9246-0e14-40a5-90e1-b12f8faa8835"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/f8b2c72c-badf-4c6c-8b68-9de4a9b3f8f5"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/5b4eaa91-9260-456c-9ba4-ab7860523279"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/33dd34da-2daa-446e-9a1e-18a6af3fa9be"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/45967098-94a6-4a13-b2e2-b52b9a8382ed"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/7cce2735-4b31-4ecd-81ec-10511f5a842a"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/194a153a-b24c-44c0-9242-a67ab02b4e80"
+    }
+  ],
+  "pageErrors": [],
+  "commands": [
+    {
+      "commandId": "c94c1792-843d-4395-8b81-9c6a9c45a202",
+      "type": "project.create",
+      "payload": {
+        "title": "INDEPENDENT project 403be37d",
+        "objective": "Verify an entire local item closure with exact source evidence.",
+        "acceptance": "Explicit local CEO acceptance; no independent review inferred.",
+        "ownerId": "alexander"
+      }
+    },
+    {
+      "commandId": "262f9c5a-1f2b-4018-b7d1-4e132d4fbdbe",
+      "type": "project.revise",
+      "payload": {
+        "title": "INDEPENDENT project 403be37d",
+        "objective": "Revised independent objective.",
+        "acceptance": "Explicit local CEO acceptance; no independent review inferred.",
+        "ownerId": "alexander",
+        "projectId": "e3d0ea77-dfbd-4109-b2cc-20bd2b4ad3c8",
+        "reason": "Independent material revision."
+      },
+      "expectedRevision": 1
+    },
+    {
+      "commandId": "17aa8968-253e-4d22-b522-3c646145e028",
+      "type": "source.add",
+      "payload": {
+        "title": "INDEPENDENT project source",
+        "body": "This controlled local evidence can support an acceptance recommendation; it does not execute business work.",
+        "provenance": {
+          "uri": "current-session:independent-project",
+          "locator": "paragraph1",
+          "authorKind": "human"
+        }
+      }
+    },
+    {
+      "commandId": "037919c6-88dd-4cce-b29a-27bf036f3136",
+      "type": "task.create",
+      "payload": {
+        "title": "INDEPENDENT project linked task",
+        "request": "Inspect this evidence.",
+        "outcome": "Recorded local finding.",
+        "acceptance": "Exact source cited.",
+        "limits": "Local only.",
+        "sourceIds": [
+          "5d84dfa8-0e2c-4091-9ef3-57e8b142766f"
+        ]
+      }
+    },
+    {
+      "commandId": "d3d52145-e92d-4e56-a950-a3852448c3e7",
+      "type": "project.task.link",
+      "payload": {
+        "projectId": "e3d0ea77-dfbd-4109-b2cc-20bd2b4ad3c8",
+        "taskId": "1c17e08a-cf41-4bc4-8361-bf12a9237bd2",
+        "reason": "Attach inspected current task revision."
+      },
+      "expectedRevision": 2
+    },
+    {
+      "commandId": "4d1d9246-0e14-40a5-90e1-b12f8faa8835",
+      "type": "milestone.create",
+      "payload": {
+        "projectId": "e3d0ea77-dfbd-4109-b2cc-20bd2b4ad3c8",
+        "title": "Independent milestone",
+        "outcome": "Inspect and record evidence.",
+        "acceptance": "CEO reads exact source and decision scope.",
+        "taskIds": [
+          "1c17e08a-cf41-4bc4-8361-bf12a9237bd2"
+        ],
+        "dependencyIds": [],
+        "sourceIds": [],
+        "blockers": [],
+        "dueDate": "2026-11-02"
+      },
+      "expectedRevision": 3
+    },
+    {
+      "commandId": "f8b2c72c-badf-4c6c-8b68-9de4a9b3f8f5",
+      "type": "project.closure.prepare",
+      "payload": {
+        "projectId": "e3d0ea77-dfbd-4109-b2cc-20bd2b4ad3c8",
+        "milestoneId": "fd02e53a-8129-49a4-a4c0-c1d96f2a8049",
+        "reason": "Independent source packet ready for CEO review.",
+        "fingerprint": "8961c9547a471cf7bdd1bc48a084b1a59c30ccc5a6e304f684b48db533839fcf"
+      },
+      "expectedRevision": 4
+    },
+    {
+      "commandId": "5b4eaa91-9260-456c-9ba4-ab7860523279",
+      "type": "decision.record",
+      "payload": {
+        "decisionId": "b9e863f7-98a1-4457-a553-0a594da39def",
+        "recommendationHash": "3c6c3891eced89a43bb8e8e79bf92cf5db723110799585fbd52f026b38f59f83",
+        "choice": "approve",
+        "reason": "Accept these current local records only."
+      },
+      "expectedRevision": 1
+    },
+    {
+      "commandId": "33dd34da-2daa-446e-9a1e-18a6af3fa9be",
+      "type": "project.closure.prepare",
+      "payload": {
+        "projectId": "e3d0ea77-dfbd-4109-b2cc-20bd2b4ad3c8",
+        "reason": "Parent acceptance of reviewed milestone.",
+        "fingerprint": "666c0e283dfc6d154f80ff80df675c9a41a2f41d3abd8d48ee6080361cb5d4c6"
+      },
+      "expectedRevision": 4
+    },
+    {
+      "commandId": "45967098-94a6-4a13-b2e2-b52b9a8382ed",
+      "type": "decision.record",
+      "payload": {
+        "decisionId": "dae42ae9-cbe4-4126-85c3-ca6bb861cfe9",
+        "recommendationHash": "2a459772723180434449ed9daa589618b69c6892134ff26766faa46eebb9cb8c",
+        "choice": "approve",
+        "reason": "Accept project locally with all holds retained."
+      },
+      "expectedRevision": 1
+    },
+    {
+      "commandId": "7cce2735-4b31-4ecd-81ec-10511f5a842a",
+      "type": "project.reopen",
+      "payload": {
+        "projectId": "e3d0ea77-dfbd-4109-b2cc-20bd2b4ad3c8",
+        "reason": "Additional local evidence requires review."
+      },
+      "expectedRevision": 4
+    },
+    {
+      "commandId": "194a153a-b24c-44c0-9242-a67ab02b4e80",
+      "type": "project.create",
+      "payload": {
+        "title": "INDEPENDENT lost receipt adf0f087",
+        "objective": "Recover same command after uncertain response.",
+        "acceptance": "One project, one creation receipt.",
+        "ownerId": "alexander"
+      }
+    },
+    {
+      "commandId": "46c569c4-9419-4e10-938a-d558f3c8895e",
+      "type": "project.create",
+      "payload": {
+        "title": "INDEPENDENT local preparer project",
+        "objective": "Local author is not an employee identity.",
+        "acceptance": "No nonexistent agent profile link."
+      }
+    }
+  ],
+  "blockedExternal": [],
+  "deviceCalls": [],
+  "sourceHashes": {
+    "web_platform/src/lib/hq/server/projects-store.mjs": "e1d2eaab750ec2be8e9726fe68936412fa14c327a9c9f80defff6e9ce0285d5d",
+    "web_platform/src/lib/hq/server/local-store.mjs": "df2ee1f0f7481afefc3e90e385644d217ffe333f010e177e25694cc1c553e9da",
+    "web_platform/src/lib/hq/server/handler.mjs": "3d09cd133032e420387ee0b5e83bb3f56618bba8667001a589f1f977de75a738",
+    "web_platform/src/components/hq/hq-projects.tsx": "29a4e836f9858de2b4fdc86e45ab74528f73628a2a7ba8299e630213667ba877",
+    "web_platform/src/lib/hq/project-copy.ts": "d15fb4abe9b651446846dec4ca458e4fe34b1e382c3939b04791fdebd26e0c1e",
+    "web_platform/src/components/hq/hq-overlays.tsx": "4f6923af7c4f760ab786c24f849fbccde37feeb28803a6d11d0d7906d9ada3a5",
+    "web_platform/src/components/hq/hq-context.tsx": "dd3d4b7fdd72ca7cdb86e587dd1477f6f7e13ea44a1fb1e7b78797aaff75dbf6",
+    "web_platform/src/lib/hq/contracts.ts": "4eb20ac953c87c732c692f26ea8124e0c7bdff04b2a851ba464e6a72999c5a47",
+    "web_platform/src/lib/hq/copy.ts": "f6c660049aca7e716d0ef137c3bae698b57a64688093003f83b2dc3c67553735"
+  },
+  "findings": [],
+  "endedAt": "2026-10-23T16:24:52.517Z"
+}

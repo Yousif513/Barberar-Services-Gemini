@@ -3,6 +3,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { randomBytes, randomUUID } from "node:crypto";
 import { HqError, hash, canonical, csrfForSession } from "./local-boundary.mjs";
+import { projectCommand, projectQuery, projectDecision, projectFollowup, refreshProjects, linkTask } from "./projects-store.mjs";
 const now = () => new Date().toISOString();
 const uuid = value => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const text = (value, max = 4000, optional = false) => {
@@ -31,7 +32,7 @@ const skillRequirements = value => {
 };
 const ensureRevision = (actual, expected) => { if (!Number.isInteger(expected) || actual !== expected) throw new HqError("stale_revision", 409); };
 const scope = () => ({ environment:"local", effects:["record-only"], employeeActivation:false, businessPermissions:false, financialExecution:false });
-const allowedKinds = new Set(["task", "source", "recommendation", "decision", "followup"]);
+const allowedKinds = new Set(["task", "source", "recommendation", "decision", "followup", "project", "milestone", "project-closure"]);
 export class HqStore {
   constructor({ filePath, initialSources = [], agents = [], skills = [] }) {
     mkdirSync(path.dirname(filePath), { recursive:true });
@@ -45,6 +46,7 @@ export class HqStore {
       CREATE TABLE IF NOT EXISTS commands(workspace_id TEXT NOT NULL,id TEXT NOT NULL,payload_hash TEXT NOT NULL,receipt TEXT NOT NULL,PRIMARY KEY(workspace_id,id));
       CREATE TABLE IF NOT EXISTS events(seq INTEGER PRIMARY KEY AUTOINCREMENT,id TEXT NOT NULL UNIQUE,workspace_id TEXT NOT NULL,action TEXT NOT NULL,target_type TEXT NOT NULL,target_id TEXT NOT NULL,actor_id TEXT NOT NULL,command_id TEXT,at TEXT NOT NULL,details TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS records_kind ON records(workspace_id,kind);
+      CREATE INDEX IF NOT EXISTS records_project_parent ON records(workspace_id,kind,json_extract(body,'$.projectId'));
       CREATE INDEX IF NOT EXISTS events_target ON events(workspace_id,target_type,target_id,seq);`);
     for (const table of ["record_versions", "commands", "events"]) {
       this.db.exec(`CREATE TRIGGER IF NOT EXISTS ${table}_no_update BEFORE UPDATE ON ${table} BEGIN SELECT RAISE(ABORT,'immutable history'); END;
@@ -180,7 +182,9 @@ export class HqStore {
       if(old){if(old.payload_hash!==materialHash)throw new HqError("command_conflict",409);return JSON.parse(old.receipt);}
       let result;
       if(type==="task.create"){
-        const task=this.createTask(session,p,commandId);result={entityType:"task",entityId:task.id,revision:1,recordIds:{taskId:task.id}};
+        const task=this.createTask(session,p,commandId);
+        if(p.projectId){const project=this.get(session,"project",p.projectId);ensureRevision(project.revision,p.projectRevision);linkTask(this,session,project,task.id,commandId,"Created with project");}
+        result={entityType:"task",entityId:task.id,revision:1,recordIds:{taskId:task.id}};
       } else if(type==="task.revise"){
         const task=this.get(session,"task",p.taskId);ensureRevision(task.revision,expectedRevision);
         const next={...task,revision:task.revision+1,status:"requested",currentRecommendationId:null,updatedAt:now()};
@@ -201,6 +205,7 @@ export class HqStore {
         if(decision.status!=="pending"||task.currentRecommendationId!==rec.id||rec.taskRevision!==task.revision||p.recommendationHash!==rec.hash||decision.recommendationHash!==rec.hash)throw new HqError("stale_recommendation",409);
         for(const c of rec.citations){const source=this.get(session,"source",c.sourceId);if(source.version!==c.version||source.sha256!==c.sha256)throw new HqError("stale_source",409);}
         const states={approve:"approved",decline:"declined",request_changes:"changes_requested"};if(!Object.hasOwn(states,p.choice))throw new HqError("invalid_input");
+        projectDecision(this,session,decision,p.choice,commandId);
         const status=states[p.choice];this.put(session,"decision",{...decision,status,reason:text(p.reason,4000),decidedAt:now(),actorId:session.actorId});
         this.put(session,"task",{...task,status:status==="approved"?"approved_for_followup":status,updatedAt:now()});
         this.audit(session,"decision.recorded","decision",decision.id,commandId,{status,recommendationHash:rec.hash,taskRevision:task.revision,effect:"record-only"});
@@ -211,6 +216,7 @@ export class HqStore {
         const recommendation=this.get(session,"recommendation",decision.recommendationId);
         if(recommendation.hash!==decision.recommendationHash)throw new HqError("stale_recommendation",409);
         for(const c of recommendation.citations){const source=this.get(session,"source",c.sourceId);if(source.version!==c.version||source.sha256!==c.sha256)throw new HqError("stale_source",409);}
+        projectFollowup(this,session,decision);
         const followup=this.put(session,"followup",{id:randomUUID(),taskId:task.id,decisionId:decision.id,note:text(p.note),nextAction:text(p.nextAction),status:"recorded",actorId:session.actorId,createdAt:now()});
         this.put(session,"task",{...task,status:"followup_recorded",updatedAt:now()});this.audit(session,"followup.recorded","task",task.id,commandId,{followupId:followup.id,decisionId:decision.id});result={entityType:"followup",entityId:followup.id,revision:task.revision,recordIds:{taskId:task.id,followupId:followup.id,decisionId:decision.id}};
       } else if(type==="source.add"){
@@ -227,7 +233,9 @@ export class HqStore {
         const task=this.createTask(session,{title,request:reason,outcome:plan,acceptance:"Review exact proposal, dependencies and limits; no employee/business execution",ownerId:p.agentId,reviewerId:"development-preparer",limits,sourceIds:p.sourceIds||[]},commandId);
         const prepared=this.preparePayload(session,task);prepared.summary=`${reason}\n\n${plan}\n\nProposed change: ${p.change||p.kind}. Version/hash: ${p.versionOrHash||"not specified"}. Limits: ${limits}. Approval records this proposal only; no binding, invitation, recording or evaluation is executed.`;
         result=this.publish(session,task,prepared,commandId,"authored-development");
-      } else throw new HqError("invalid_input");
+      } else if(type.startsWith("project.")||type.startsWith("milestone.")){result=projectCommand(this,session,type,p,expectedRevision,commandId);}
+      else throw new HqError("invalid_input");
+      refreshProjects(this,session,commandId);
       const receipt={commandId,type,...result,effect:"record-only",recordedAt:now()};
       this.db.prepare("INSERT INTO commands VALUES(?,?,?,?)").run(session.workspaceId,commandId,materialHash,canonical(receipt));return receipt;
     });
@@ -243,7 +251,8 @@ export class HqStore {
   }
   query(session,view,options={}) {
     this.assertSession(session);let data;
-    if(view==="overview"){
+    if(["projects","project","project-preview"].includes(view)){data=projectQuery(this,session,view,options);}
+    else if(view==="overview"){
       const tasks=this.list(session,"task",{limit:5}),decisions=this.list(session,"decision",{status:"pending",limit:5});
       data={counts:{tasks:tasks.total,pendingDecisions:decisions.total,sources:this.list(session,"source",{limit:1}).total,followups:this.list(session,"followup",{limit:1}).total},tasks:tasks.items,decisions:decisions.items,agents:this.agents,mode:"local-development"};
     } else if(["tasks","decisions","sources"].includes(view))data=this.list(session,({tasks:"task",decisions:"decision",sources:"source"})[view],options);
@@ -259,6 +268,6 @@ export class HqStore {
       const agent=this.agents.find(a=>a.id===options.id);if(!agent)throw new HqError("not_found",404);
       const tasks=this.db.prepare("SELECT body FROM records WHERE workspace_id=? AND kind='task' AND json_extract(body,'$.ownerId')=? ORDER BY json_extract(body,'$.createdAt') DESC LIMIT 25").all(session.workspaceId,agent.id).map(r=>JSON.parse(r.body));data={agent,skills:this.skills,relatedTasks:tasks,events:[]};
     } else throw new HqError("invalid_input");
-    this.audit(session,"workspace.read",["task","decision","source","agent"].includes(view)?view:"workspace",options.id||session.workspaceId,null,{view,returned:Array.isArray(data.items)?data.items.length:1});return data;
+    this.audit(session,"workspace.read",["task","decision","source","agent","project"].includes(view)?view:"workspace",options.id||session.workspaceId,null,{view,returned:Array.isArray(data.items)?data.items.length:1});return data;
   }
 }

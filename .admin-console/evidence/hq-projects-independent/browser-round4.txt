@@ -1,0 +1,71 @@
+PASS Fresh isolated local project register loads without invented projects
+PASS Project editor persists objective and criteria and returns checked receipt to actual detail route
+PASS Material project revision persists with reason and visible history
+PASS Task-link overlay inspects current revision and persists existing task without copying it
+PASS Milestone editor persists outcome, criteria, linked revision and Asia/Riyadh planning date
+PASS Project closure preview refuses an unaccepted declared milestone
+PASS Closure confirmation reuses source-linked recommendation and exact CEO decision; milestone accepted locally only
+PASS Complete milestone then project acceptance survives route reload with linked immutable decision history
+PASS Explicit reopen preserves historical decisions and records a new reasoned event
+PASS Arabic375 RTL detail/editor have no page overflow, labelled keyboard focus and Escape closure
+PASS All four Arabic mobile overlay contracts render within viewport and dismiss by keyboard
+PASS Lost create response recovers original command receipt with one POST and no duplicate project
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/9973e148-c513-4676-8ca4-2f261b0edb0b'
++   },
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/e770bc53-e138-4abf-ac51-208e4eef1486'
++   },
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/2d498dc4-fa48-4c1d-b55e-b9e5482ad8ec'
++   },
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/ffff911a-46b8-4459-89c9-6553b313ba16'
++   },
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/f9b4f0e6-4b7e-4b1c-80ae-3133819d720b'
++   },
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/8ae86858-3c85-4aba-9134-e2564600ce2d'
++   },
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/a32f242c-2473-41cd-a1e9-3c9bab8d4aff'
++   },
++   {
++     message: 'Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. 4',
++     url: 'http://127.0.0.1:3113/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js'
++   },
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/852ccc69-4b67-452d-9298-3110da7ff7d6'
++   },
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/c90ce0b4-6803-4c21-9840-d0ff418733c7'
++   },
++   {
++     message: 'Failed to load resource: the server responded with a status of 404 (Not Found)',
++     url: 'http://127.0.0.1:3113/api/hq/commands/6e83edaf-d05a-4b19-9862-a95cbc5f1d1a'
++   }
++ ]
+- []
+
+    at file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests-browser/hq-projects-independent.mjs:38:70 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

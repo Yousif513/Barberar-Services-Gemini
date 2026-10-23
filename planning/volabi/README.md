@@ -1,5 +1,7 @@
 # Volabi HQ - approved local development
 
+HQ-NEXT-01 is now approved, implemented and independently accepted locally: [Projects delivery](../../docs/volabi-projects-delivery.md), [approval](APPROVAL_PROJECTS_20261023.md), [surface graph](PROJECTS_DOMAIN_GRAPH.json). Two project routes/four overlays extend the original first loop; full Headquarters remains under development.
+
 Current item closure (23 October): [delivery report](../../docs/volabi-item-closure-20261023.md), [source-linked item ledger](ITEM_CLOSURE_20261023.json), and [next proposed Projects and Initiatives item](NEXT_HQ_ITEM_20261023.md). The approved local first loop works; the full management Headquarters remains under development. Validator and pending-citation repairs are independently accepted; full regulated release remains failed.
 
 Current vocal requirement: [Saudi male / Lebanese female direction](VOICE_ACCENT_REQUIREMENTS.json), approved by the CEO on2026-10-22. Existing English audition files remain unchanged and do not demonstrate those requested accents. Reports end with a next step and ready-to-send prompt.

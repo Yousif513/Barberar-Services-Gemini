@@ -1,0 +1,18 @@
+{
+  "archive": "raw-counterevidence.zip",
+  "note": "Exact original bytes preserved. Readable three counterlogs trim terminal whitespace only; no result changes.",
+  "files": [
+    {
+      "file": ".admin-console\\evidence\\hq-projects-independent\\decision-history-expectation.txt",
+      "originalSHA256": "7310f84f9f639ff082db65d6cbdde49c85dcd55798b72cc414e2a9ebe8d6a4e1"
+    },
+    {
+      "file": ".admin-console\\evidence\\hq-projects-independent\\initial-unit.txt",
+      "originalSHA256": "b943cf45ade5c911f11bdfad4bbb5e177b504d2424f24e3a010a543014d9c2ff"
+    },
+    {
+      "file": ".admin-console\\evidence\\hq-projects-independent\\transitive-red.txt",
+      "originalSHA256": "809c4d88a0fd5f933757294b9ffd976e9d380b4461e6478785ddc67176783e02"
+    }
+  ]
+}

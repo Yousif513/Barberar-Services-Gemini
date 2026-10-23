@@ -1,0 +1,16 @@
+{
+  "classification": "Owner browser evidence; separate independent acceptance required",
+  "checks": [
+    "Fresh local workspace has an explicit empty state",
+    "Project editor checks persisted receipt, revision and inactive coordinator",
+    "Existing task composer atomically creates and attaches one task",
+    "Milestone outcome, linked task and explicit blocker persist",
+    "Exact closure preview displays blockers and refuses acceptance; Escape closes"
+  ],
+  "errors": [],
+  "external": [],
+  "startedAt": "2026-10-23T16:19:31.975Z",
+  "status": "failed",
+  "failure": "Error: ENOENT: no such file or directory, open 'C:\\Users\\Yousif's%20PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar%20Services-Gemini\\.admin-console\\evidence\\hq-projects-owner\\arabic375.png'\n    at async open (node:internal/fs/promises:640:25)\n    at async Object.writeFile (node:internal/fs/promises:1257:14)\n    at async _Page.screenshot (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright-core\\lib\\coreBundle.js:60157:11)\n    at async file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests-browser/hq-projects-owner.mjs:28:344",
+  "finishedAt": "2026-10-23T16:19:36.306Z"
+}

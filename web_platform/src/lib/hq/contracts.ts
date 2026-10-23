@@ -1,9 +1,9 @@
 export type HqLocale = "en" | "ar";
-export type HqView = "overview" | "tasks" | "task" | "decisions" | "decision" | "sources" | "source" | "agents" | "agent";
+export type HqView = "overview" | "tasks" | "task" | "decisions" | "decision" | "sources" | "source" | "projects" | "project" | "project-preview" | "agents" | "agent";
 export interface HqSession { workspaceId: string; actorId: string; actorLabel: string; csrfToken: string; mode: "local-development"; employeesActive: false; }
-export type HqCommandType = "task.create" | "task.revise" | "recommendation.prepare" | "recommendation.publish" | "decision.record" | "followup.record" | "source.add" | "source.correct" | "proposal.create";
+export type HqCommandType = "task.create" | "task.revise" | "recommendation.prepare" | "recommendation.publish" | "decision.record" | "followup.record" | "source.add" | "source.correct" | "proposal.create" | "project.create" | "project.revise" | "project.start" | "project.reopen" | "project.task.link" | "project.task.unlink" | "milestone.create" | "milestone.revise" | "project.closure.prepare";
 export interface HqCommand { commandId: string; type: HqCommandType; expectedRevision?: number; payload: Record<string, unknown>; }
-export interface HqReceipt { commandId: string; type: HqCommandType; entityType: string; entityId: string; revision: number; recordIds: {taskId?: string; recommendationId?: string; decisionId?: string; sourceId?: string; followupId?: string}; effect: "record-only"; recordedAt: string; }
+export interface HqReceipt { commandId: string; type: HqCommandType; entityType: string; entityId: string; revision: number; recordIds: {projectId?: string; milestoneId?: string; closureId?: string; taskId?: string; recommendationId?: string; decisionId?: string; sourceId?: string; followupId?: string}; effect: "record-only"; recordedAt: string; }
 export interface HqList<T> { items: T[]; total: number; page: number; pageSize: number; }
 export interface HqSkillRequirement {skillId:string;version:string|null;sha256:string|null;}
 export interface HqTask { id: string; revision: number; title: string; request: string; outcome: string; acceptance: string; skillRequirements?: HqSkillRequirement[]; ownerId: string; reviewerId: string; limits: string; status: string; sourceIds: string[]; currentRecommendationId: string | null; createdAt: string; updatedAt: string; }
@@ -20,3 +20,10 @@ export interface HqTaskDetail { task: HqTask; recommendations: HqRecommendation[
 export interface HqDecisionDetail { decision: HqDecision; recommendation: HqRecommendation; task: HqTask; sources: HqSource[]; events: HqEvent[]; }
 export interface HqSourceDetail { source: HqSource; versions: HqSource[]; affectedTasks: HqTask[]; events: HqEvent[]; }
 export interface HqAgentDetail { agent: HqAgent; skills: HqSkill[]; relatedTasks: HqTask[]; events: HqEvent[]; }
+
+export interface HqProject {id:string;revision:number;title:string;objective:string;acceptance:string;ownerId:string;status:string;taskIds:string[];createdAt:string;updatedAt:string;}
+export interface HqMilestone {id:string;revision:number;projectId:string;title:string;outcome:string;acceptance:string;taskIds:string[];dependencyIds:string[];blockers:string[];sourceIds:string[];dueDate:string|null;status:string;createdAt:string;updatedAt:string;}
+export interface HqProjectPreview {projectId:string;milestoneId:string|null;projectRevision:number;milestoneRevision:number|null;criteria:string;tasks:{id:string;revision:number;title:string;status:string}[];sources:{id:string;version:number;sha256:string;title:string}[];milestones:{id:string;revision:number;title:string;status:string}[];blockers:string[];fingerprint:string;ready:boolean;}
+export interface HqProjectClosure {id:string;projectId:string;milestoneId:string|null;snapshot:HqProjectPreview;taskId:string;recommendationId:string;decisionId:string;createdAt:string;}
+export interface HqProjectDetail {project:HqProject;milestones:HqMilestone[];tasks:HqTask[];sources:HqSource[];closures:HqProjectClosure[];events:HqEvent[];versions:HqProject[];}
+export interface HqProjectList extends HqList<HqProject> {counts:{open:number;accepted:number};}

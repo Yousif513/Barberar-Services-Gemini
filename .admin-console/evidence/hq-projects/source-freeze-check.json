@@ -1,0 +1,9 @@
+{
+  "applicationSourceUnchangedDuringBuildLint": true,
+  "changedOnlyIndependentDrivers": [
+    "web_platform/tests-browser/hq-projects-independent.mjs",
+    "web_platform/tests/hq-projects-independent.test.mjs"
+  ],
+  "detail": "Initial all-files freeze assertion detected independent driver refinement; no application file changed. Finalweb1044passed after frozen unittest; driver acceptance is separate13browsergroups. Historicaldecision remains immutableapproved while projectacceptance supersedes.",
+  "finalWebExitCode": 0
+}

@@ -1,0 +1,29 @@
+✔ HTTP session is HttpOnly, strict, scoped, reused and does not expose the bearer in JSON (47.071ms)
+✔ HTTP denies cloud mode, cross origin and unauthenticated marketplace bearer before querying (59.143ms)
+✔ HTTP state-changing commands require the real seat CSRF and recover exact receipts (46.8351ms)
+✔ HTTP rejects caller-defined role/scope and oversized or malformed body without mutation (40.0701ms)
+✔ real repository catalog loads all15 inactive identities and authentic sources without remote requests (147.6998ms)
+✔ projects atomically associate task creation, isolate seats and persist history (67.2493ms)
+✔ closure uses exact existing decision loop and corrected source supersedes acceptance (69.5431ms)
+✔ audit failure rolls back task and link with unchanged project revision (48.5443ms)
+✔ duplicate task links, self/cyclic milestones, missing evidence and foreign targets fail (42.581ms)
+✔ milestone acceptance then project acceptance, explicit reopen, replay and restart are durable (64.9983ms)
+✔ linked-task revision changes refuse pending closure and preserve receipt history (47.6989ms)
+✔ declared blockers prevent closure and malformed dates/fields never mutate revision (36.6859ms)
+✔ closure preview fingerprint is enforced when evidence changes before preparation (30.1369ms)
+✔ persistent request, source-linked recommendation, exact decision and follow-up survive a new store process (85.5285ms)
+✔ same command replay has one effect; reused identity with changed material conflicts (49.0548ms)
+✔ foreign local seats and fake marketplace bearer identity cannot inspect or mutate another workspace (45.3047ms)
+✔ changed task revision cannot approve the old recommendation (37.8635ms)
+✔ source correction preserves old bytes and invalidates an older recommendation (37.9066ms)
+✔ forged citation and changed recommendation hash cannot become approval (41.0542ms)
+✔ no follow-up before an exact decided proposal, no business executors accepted (39.1054ms)
+✔ audit/version/receipt rows are immutable and contain minimized structural details (36.1154ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 500.1473

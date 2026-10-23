@@ -1,5 +1,7 @@
 # Next Headquarters item: Projects and Initiatives
 
+Current status: approved for local implementation by the CEO; see [approval record](APPROVAL_PROJECTS_20261023.md). The proposal text below is preserved as the approved plan of record.
+
 Prepared 23 October 2026. **Proposal only: no rendering, screen implementation, employee activation or scope approval is recorded by this packet.**
 
 Volabi / AI Headquarters remains under development. The approved six-family, nine-route local first loop provides request → persistent task → source-linked recommendation → CEO decision → recorded follow-up. Its source-linked citation repair and independent acceptance are being closed separately. This packet does not certify that work or the full Headquarters complete.

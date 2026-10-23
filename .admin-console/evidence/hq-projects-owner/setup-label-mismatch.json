@@ -1,0 +1,13 @@
+{
+  "classification": "Owner browser evidence; separate independent acceptance required",
+  "checks": [
+    "Fresh local workspace has an explicit empty state",
+    "Project editor checks persisted receipt, revision and inactive coordinator"
+  ],
+  "errors": [],
+  "external": [],
+  "startedAt": "2026-10-23T16:19:08.815Z",
+  "status": "failed",
+  "failure": "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  getByRole('dialog')\nExpected: 0\nReceived: 1\nTimeout:  5000ms\n\nCall log:\n  - Expect \"to.have.count\" with timeout 5000ms\n  - waiting for getByRole('dialog')\n    14 × locator resolved to 1 element\n       - unexpected value \"1\"\n\n    at captureRawStack (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright-core\\lib\\coreBundle.js:3172:17)\n    at callMatcherAsStep (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright\\lib\\matchers\\expect.js:12877:57)\n    at Object.toHaveCount (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright\\lib\\matchers\\expect.js:12867:23)\n    at save (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-projects-owner.mjs:16:153)\n    at async file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests-browser/hq-projects-owner.mjs:25:2",
+  "finishedAt": "2026-10-23T16:19:16.835Z"
+}

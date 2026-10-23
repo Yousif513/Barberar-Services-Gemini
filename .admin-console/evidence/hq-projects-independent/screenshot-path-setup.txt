@@ -1,0 +1,21 @@
+PASS Fresh isolated local project register loads without invented projects
+PASS Project editor persists objective and criteria and returns checked receipt to actual detail route
+PASS Material project revision persists with reason and visible history
+PASS Task-link overlay inspects current revision and persists existing task without copying it
+PASS Milestone editor persists outcome, criteria, linked revision and Asia/Riyadh planning date
+PASS Project closure preview refuses an unaccepted declared milestone
+PASS Closure confirmation reuses source-linked recommendation and exact CEO decision; milestone accepted locally only
+PASS Complete milestone then project acceptance survives route reload with linked immutable decision history
+PASS Explicit reopen preserves historical decisions and records a new reasoned event
+PASS Arabic375 RTL detail/editor have no page overflow, labelled keyboard focus and Escape closure
+Error: UNKNOWN: unknown error, open 'C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\.admin-console\evidence\hq-projects-independent\arabic-تحضير توصية الإغلاق.png'
+    at async open (node:internal/fs/promises:640:25)
+    at async Object.writeFile (node:internal/fs/promises:1257:14)
+    at async _Page.screenshot (C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\node_modules\playwright-core\lib\coreBundle.js:60157:11)
+    at async capture (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests-browser/hq-projects-independent.mjs:16:30)
+    at async file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests-browser/hq-projects-independent.mjs:34:965 {
+  errno: -4094,
+  code: 'UNKNOWN',
+  syscall: 'open',
+  path: "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\evidence\\hq-projects-independent\\arabic-تحضير توصية الإغلاق.png"
+}

@@ -1,0 +1,12 @@
+PASS Fresh isolated local project register loads without invented projects
+PASS Project editor persists objective and criteria and returns checked receipt to actual detail route
+PASS Material project revision persists with reason and visible history
+PASS Task-link overlay inspects current revision and persists existing task without copying it
+PASS Milestone editor persists outcome, criteria, linked revision and Asia/Riyadh planning date
+PASS Project closure preview refuses an unaccepted declared milestone
+PASS Closure confirmation reuses source-linked recommendation and exact CEO decision; milestone accepted locally only
+PASS Complete milestone then project acceptance survives route reload with linked immutable decision history
+PASS Explicit reopen preserves historical decisions and records a new reasoned event
+PASS Arabic375 RTL detail/editor have no page overflow, labelled keyboard focus and Escape closure
+PASS Lost create response recovers original command receipt with one POST and no duplicate project
+PASS No browser page errors

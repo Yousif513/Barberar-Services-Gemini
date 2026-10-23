@@ -1,0 +1,2 @@
+# Final harvester pass
+Mode extend; profile regulated. Three fresh observations recorded viaCLI and banked: transitive evidence freshness, logical revision versus immutable history identity, and local actor versus employee link targets. Source independentreview/worklogs/conversation. Harvest and read-only promotion exit0; no global guidance adoption, sync/export or product code changes. Root retains final release/report/commit responsibility. All holds preserved.

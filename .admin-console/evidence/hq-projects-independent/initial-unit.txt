@@ -1,0 +1,52 @@
+✔ independent: project and closure IDs cannot cross workspace boundaries (39.772ms)
+✔ independent: atomic task association rejects stale project without orphan task, event or receipt (31.161ms)
+✔ independent: audit insert failure rolls back project, revision history, receipt and task atomically (29.0957ms)
+✔ independent: replay and restart recover exactly one project receipt; altered payload conflicts (30.6043ms)
+✖ independent: malformed values and invented owners create no projects (22.8392ms)
+✔ independent: dependency cycle, duplicate references, foreign milestones and self links are refused (36.3147ms)
+✔ independent: unresolved blockers or missing evidence cannot be accepted (28.482ms)
+✔ independent: source correction invalidates a pending exact closure decision (26.6085ms)
+✔ independent: task revision and material project revision invalidate pending closure (55.7415ms)
+✔ independent: exact hash acceptance is record-only, follow-up stays factual, explicit reopen records history (31.0586ms)
+✔ independent HTTP: CSRF, cross-seat and absent-session project mutations fail; no secret response leakage (38.6542ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 10
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 445.6788
+
+✖ failing tests:
+
+test at web_platform\tests\hq-projects-independent.test.mjs:23:1
+✖ independent: malformed values and invented owners create no projects (22.8392ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+
+  Caught error:
+
+  HqError: not_found
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-projects-independent.test.mjs:23:562)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: HqError: not_found
+        at HqStore.get (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:82:53)
+        at projectCommand (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/projects-store.mjs:32:18)
+        at file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:234:84
+        at HqStore.transaction (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:58:26)
+        at HqStore.command (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:179:17)
+        at command (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-projects-independent.test.mjs:9:58)
+        at file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-projects-independent.test.mjs:23:573
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-projects-independent.test.mjs:23:562),
+    operator: 'throws',
+    diff: 'simple'
+  }

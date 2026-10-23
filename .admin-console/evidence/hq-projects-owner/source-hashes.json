@@ -1,0 +1,15 @@
+{
+  "canonicalization": "UTF8, CRLF to LF, no BOM",
+  "files": {
+    "web_platform/src/components/hq/hq-projects.tsx": "29a4e836f9858de2b4fdc86e45ab74528f73628a2a7ba8299e630213667ba877",
+    "web_platform/src/components/hq/hq-context.tsx": "dd3d4b7fdd72ca7cdb86e587dd1477f6f7e13ea44a1fb1e7b78797aaff75dbf6",
+    "web_platform/src/components/hq/hq-overlays.tsx": "4f6923af7c4f760ab786c24f849fbccde37feeb28803a6d11d0d7906d9ada3a5",
+    "web_platform/src/components/hq/hq-shell.tsx": "2c52002fabad2e0da7249a824ff8136346831a28445a78e510b788d657ef6d0b",
+    "web_platform/src/components/hq/hq-workspace.tsx": "d1d24438ffbfdffaca33104e5c7a043fee24ef458f5d9ed81874c78de0a20ce3",
+    "web_platform/src/lib/hq/project-copy.ts": "d15fb4abe9b651446846dec4ca458e4fe34b1e382c3939b04791fdebd26e0c1e",
+    "web_platform/src/lib/hq/copy.ts": "f6c660049aca7e716d0ef137c3bae698b57a64688093003f83b2dc3c67553735",
+    "web_platform/src/app/hq/projects/page.tsx": "eda5e1f14ec70b02991e74914dfbe734e0308ddd7a10934fce2dbad6e0ab3de1",
+    "web_platform/src/app/hq/projects/[id]/page.tsx": "e8a30f082a032b4d2100b40d73c52a091b883f74ab7d8c5d71a40c407cf054a6",
+    "web_platform/tests-browser/hq-projects-owner.mjs": "311eb179af73a94876e4e3bf8007648b3d2c64338b2d075dc8a8f0f09edf93db"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "classification": "Owner browser evidence; separate independent acceptance required",
+  "checks": [
+    "Fresh local workspace has an explicit empty state",
+    "Project editor checks persisted receipt, revision and inactive coordinator",
+    "Existing task composer atomically creates and attaches one task",
+    "Milestone outcome, linked task and explicit blocker persist",
+    "Exact closure preview displays blockers and refuses acceptance; Escape closes",
+    "Arabic mobile route mirrors and remains within viewport"
+  ],
+  "errors": [],
+  "external": [],
+  "startedAt": "2026-10-23T16:21:37.790Z",
+  "status": "passed",
+  "finishedAt": "2026-10-23T16:21:44.416Z"
+}

@@ -1,0 +1,62 @@
+{
+  "status": "CEO_APPROVED_HQ_NEXT_01",
+  "plan": "planning/volabi/NEXT_HQ_ITEM_20261023.md",
+  "theme": "existing approved obsidian/ivory/gold",
+  "routes": [
+    "/hq/projects",
+    "/hq/projects/[id]"
+  ],
+  "overlays": [
+    "project-editor",
+    "task-link",
+    "milestone-editor",
+    "closure-reopen-confirmation"
+  ],
+  "reuses": [
+    "task-composer",
+    "source",
+    "recommendation",
+    "decision",
+    "audit"
+  ],
+  "states": [
+    "loading",
+    "empty",
+    "filtered-empty",
+    "populated",
+    "error",
+    "forbidden",
+    "missing",
+    "stale",
+    "validation",
+    "submitting",
+    "conflict",
+    "uncertain-receipt",
+    "success"
+  ],
+  "edges": {
+    "project-register": [
+      "project-editor",
+      "project-detail"
+    ],
+    "project-detail": [
+      "project-editor",
+      "task-link",
+      "milestone-editor",
+      "closure-reopen-confirmation",
+      "/hq/tasks/[id]",
+      "/hq/knowledge/[id]",
+      "/hq/decisions/[id]",
+      "/hq/agents/[id]"
+    ],
+    "task-link": [
+      "task-composer"
+    ],
+    "closure-reopen-confirmation": [
+      "recommendation",
+      "decision",
+      "audit"
+    ]
+  },
+  "holds": "All existing holds; inactive management identities; Azure deferred"
+}

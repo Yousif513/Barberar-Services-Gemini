@@ -8,14 +8,14 @@
     "Agent profile and task readiness",
     "Work register and detail",
     "Decisions and approval detail",
-    "Knowledge and evidence"
+    "Knowledge and evidence",
+    "Projects and Initiatives"
   ],
-  "scopeFamilies": 6,
-  "routePatterns": 9,
-  "sharedOverlays": 15,
+  "scopeFamilies": 7,
+  "routePatterns": 11,
+  "sharedOverlays": 19,
   "currentAuthorizedClosures": [
-    "TOOL-01",
-    "HQ-03"
+    "HQ-NEXT-01"
   ],
   "items": [
     {
@@ -50,7 +50,7 @@
       "evidence": [
         {
           "path": "web_platform/src/components/hq/hq-workspace.tsx",
-          "sha256_utf8_lf": "b7cd3de90bd9d293c55b71710abe0de39d661086041447d4468bf6cb275a77af"
+          "sha256_utf8_lf": "d1d24438ffbfdffaca33104e5c7a043fee24ef458f5d9ed81874c78de0a20ce3"
         },
         {
           "path": ".admin-console/evidence/volabi-first-loop/independent-frontend.json",
@@ -66,7 +66,7 @@
       "evidence": [
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+          "sha256_utf8_lf": "df2ee1f0f7481afefc3e90e385644d217ffe333f010e177e25694cc1c553e9da"
         },
         {
           "path": ".admin-console/evidence/volabi-local/server-independent-review.json",
@@ -82,11 +82,11 @@
       "evidence": [
         {
           "path": "web_platform/src/components/hq/hq-overlays.tsx",
-          "sha256_utf8_lf": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4"
+          "sha256_utf8_lf": "4f6923af7c4f760ab786c24f849fbccde37feeb28803a6d11d0d7906d9ada3a5"
         },
         {
           "path": "web_platform/src/lib/hq/copy.ts",
-          "sha256_utf8_lf": "515530b6139b51c3edd10bdfed910355f581c7ec3505fb94b5204cc30f59c53d"
+          "sha256_utf8_lf": "f6c660049aca7e716d0ef137c3bae698b57a64688093003f83b2dc3c67553735"
         },
         {
           "path": ".admin-console/evidence/hq-citation-draft-owner/green.json",
@@ -110,7 +110,7 @@
       "evidence": [
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+          "sha256_utf8_lf": "df2ee1f0f7481afefc3e90e385644d217ffe333f010e177e25694cc1c553e9da"
         },
         {
           "path": "web_platform/tests/hq-independent-review.test.mjs",
@@ -142,11 +142,11 @@
       "evidence": [
         {
           "path": "web_platform/src/components/hq/hq-workspace.tsx",
-          "sha256_utf8_lf": "b7cd3de90bd9d293c55b71710abe0de39d661086041447d4468bf6cb275a77af"
+          "sha256_utf8_lf": "d1d24438ffbfdffaca33104e5c7a043fee24ef458f5d9ed81874c78de0a20ce3"
         },
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+          "sha256_utf8_lf": "df2ee1f0f7481afefc3e90e385644d217ffe333f010e177e25694cc1c553e9da"
         },
         {
           "path": ".admin-console/evidence/volabi-first-loop/independent-frontend.json",
@@ -194,11 +194,11 @@
       "evidence": [
         {
           "path": "web_platform/src/components/hq/hq-overlays.tsx",
-          "sha256_utf8_lf": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4"
+          "sha256_utf8_lf": "4f6923af7c4f760ab786c24f849fbccde37feeb28803a6d11d0d7906d9ada3a5"
         },
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+          "sha256_utf8_lf": "df2ee1f0f7481afefc3e90e385644d217ffe333f010e177e25694cc1c553e9da"
         }
       ]
     },
@@ -222,7 +222,7 @@
       "id": "HQ-11",
       "title": "Executive Council, virtual office and broader management domains",
       "status": "proposed-later-scope",
-      "boundary": "Broader twenty-template MVP and sixteen later surfaces remain inventory/planning. Detailed scope and visual approval must precede new screen families.",
+      "boundary": "Projects and Initiatives is approved and implemented as HQ-NEXT-01. Council, virtual office and other broader management domains remain later proposals; scope approval precedes their screens.",
       "evidence": [
         {
           "path": "planning/volabi/HQ_SURFACE_INVENTORY.json",
@@ -253,24 +253,49 @@
           "sha256_utf8_lf": "5fcf53db1d742b1e4af629f523cb1e015e93219eb3691ed772cd4f7700c9cb4a"
         }
       ]
+    },
+    {
+      "id": "HQ-NEXT-01",
+      "title": "Local Projects and Initiatives",
+      "status": "verified-local",
+      "boundary": "Two routes/four overlays; exact evidence-bound milestone/project acceptance, transitive supersession and reasoned reopen. No business activation or production release.",
+      "evidence": [
+        {
+          "path": "web_platform/src/lib/hq/server/projects-store.mjs",
+          "sha256_utf8_lf": "e1d2eaab750ec2be8e9726fe68936412fa14c327a9c9f80defff6e9ce0285d5d"
+        },
+        {
+          "path": "web_platform/src/components/hq/hq-projects.tsx",
+          "sha256_utf8_lf": "29a4e836f9858de2b4fdc86e45ab74528f73628a2a7ba8299e630213667ba877"
+        },
+        {
+          "path": ".admin-console/evidence/hq-projects-independent/source-review.json",
+          "sha256_utf8_lf": "85c77f3190c0cfdbecd04a504c0eb4ca4129c15b12083271ca10d8fcf30bad8b"
+        },
+        {
+          "path": ".admin-console/evidence/hq-projects-independent/browser-results.json",
+          "sha256_utf8_lf": "ccbb55879c6c86c4c02ebb4753cf3454d7d91550f2fe4431773120dc05ad816d"
+        }
+      ]
     }
   ],
   "nextProposedItem": {
     "id": "HQ-NEXT-01",
     "title": "Local Projects and Initiatives",
-    "status": "proposed-scope-awaiting-approval",
+    "status": "verified-local",
     "packet": "planning/volabi/NEXT_HQ_ITEM_20261023.md",
-    "packet_sha256_utf8_lf": "4fa09f209c6003800a6d331cd98c8f210c2e3f8185f77f91aeae27510dba6e3a",
-    "scope": "Two route patterns, four overlay contracts, existing visual direction; no screen built or business activation."
+    "packet_sha256_utf8_lf": "8e507d11d4e10741eeb6767cb791b7a04ec25b3f14b5760090daf9347339af4c",
+    "scope": "Two routes/four overlays implemented and independently accepted; local records only.",
+    "approval": "planning/volabi/APPROVAL_PROJECTS_20261023.md"
   },
   "releaseGate": {
     "profile": "regulated",
     "planExitCode": 0,
     "coverageExitCode": 0,
     "localReleaseExitCode": 1,
-    "localErrors": 297,
-    "originalErrors": 318,
-    "warningsEach": 29,
-    "comparison": ".admin-console/evidence/validator-hq-closure-20261023/final-gate-comparison.json"
+    "localErrors": 298,
+    "warnings": 30,
+    "evidence": ".admin-console/evidence/hq-projects/manifest-release.json",
+    "note": "One additional retained independent transcript zero-pending-test summary context finding. Raw evidence/gate preserved."
   }
 }

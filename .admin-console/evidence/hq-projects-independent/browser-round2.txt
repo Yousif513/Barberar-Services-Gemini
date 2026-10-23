@@ -1,0 +1,16 @@
+PASS Fresh isolated local project register loads without invented projects
+PASS Project editor persists objective and criteria and returns checked receipt to actual detail route
+PASS Material project revision persists with reason and visible history
+PASS Task-link overlay inspects current revision and persists existing task without copying it
+PASS Milestone editor persists outcome, criteria, linked revision and Asia/Riyadh planning date
+PASS Project closure preview refuses an unaccepted declared milestone
+locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByRole('dialog').getByRole('button', { name: 'Confirm and record', exact: true })
+
+    at C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\web_platform\tests-browser\hq-projects-independent.mjs:31:931 {
+  log: [
+    "  - waiting for getByRole('dialog').getByRole('button', { name: 'Confirm and record', exact: true })"
+  ],
+  name: 'TimeoutError'
+}

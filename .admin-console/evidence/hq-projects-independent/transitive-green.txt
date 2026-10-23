@@ -1,0 +1,22 @@
+✔ independent: project and closure IDs cannot cross workspace boundaries (45.8538ms)
+✔ independent: atomic task association rejects stale project without orphan task, event or receipt (27.4159ms)
+✔ independent: audit insert failure rolls back project, revision history, receipt and task atomically (29.4524ms)
+✔ independent: replay and restart recover exactly one project receipt; altered payload conflicts (29.6833ms)
+✔ independent: malformed values and invented owners create no projects (23.2097ms)
+✔ independent: dependency cycle, duplicate references, foreign milestones and self links are refused (43.0581ms)
+✔ independent: unresolved blockers or missing evidence cannot be accepted (34.8743ms)
+✔ independent: source correction invalidates a pending exact closure decision (33.4704ms)
+✔ independent: task revision and material project revision invalidate pending closure (69.7711ms)
+✔ independent: exact hash acceptance is record-only, follow-up stays factual, explicit reopen records history (42.623ms)
+✔ independent HTTP: CSRF, cross-seat and absent-session project mutations fail; no secret response leakage (46.7903ms)
+✔ independent: accepted milestones and parent close in order; reopening a dependency makes downstream acceptance stale (54.2985ms)
+✔ independent: accepted status filters and pagination are workspace-scoped and stable (52.8492ms)
+✔ independent: transitive dependency evidence correction qualifies prior acceptance and blocks parent closure (47.4562ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 669.0235

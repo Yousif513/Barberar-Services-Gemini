@@ -1,0 +1,14 @@
+PASS Fresh isolated local project register loads without invented projects
+PASS Project editor persists objective and criteria and returns checked receipt to actual detail route
+PASS Material project revision persists with reason and visible history
+PASS Task-link overlay inspects current revision and persists existing task without copying it
+locator.fill: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByRole('dialog').getByLabel('Desired outcome', { exact: true })
+
+    at C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\web_platform\tests-browser\hq-projects-independent.mjs:29:227 {
+  log: [
+    "  - waiting for getByRole('dialog').getByLabel('Desired outcome', { exact: true })"
+  ],
+  name: 'TimeoutError'
+}
