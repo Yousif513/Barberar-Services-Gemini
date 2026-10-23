@@ -1,0 +1,23 @@
+{
+  "reviewer": "council_scope_review",
+  "scope": "Independent source/requirements review for proposed packet only",
+  "disposition": "accepted_for_CEO_presentation_not_implementation_approval",
+  "findings": "No blocking role/authority/surface omission; cancellation and precise correction scope clarified; recovered P052/P160 hashes appended. No application/agent/permission change.",
+  "files": [
+    {
+      "path": "planning/volabi/COUNCIL_SCOPE_20261023.md",
+      "sha256Utf8Lf": "f503fc8ccc042014412cc715aa0966f2ce06b10d965a95df40dfeb601e76f9ee"
+    },
+    {
+      "path": "planning/volabi/COUNCIL_SCOPE_GRAPH_20261023.json",
+      "sha256Utf8Lf": "7f5c6408bc4245cb694cb62979fd4f04503ff985b8ea508d13806ccdf67872ad"
+    },
+    {
+      "path": "planning/volabi/COUNCIL_SCOPE_SOURCES_20261023.json",
+      "sha256Utf8Lf": "545fdf0729e1e7e0172148036d719b701dd246373e22810e648954a3eb8ce2b0"
+    }
+  ],
+  "screensRendered": false,
+  "agentsActivated": false,
+  "azure": "deferred"
+}

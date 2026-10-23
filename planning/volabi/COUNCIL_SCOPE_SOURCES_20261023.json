@@ -1,0 +1,50 @@
+{
+  "classification": "source inventory for proposed scope; not screen implementation or approval",
+  "hashBasis": "UTF8 CRLF-to-LF SHA256",
+  "files": [
+    {
+      "path": "planning/volabi/persona-and-skills/PERSONA_REGISTRY.json",
+      "sha256": "7bdd8e081a2527f989aedfc668317ead714cdb298c63d6055e201d50f642caf3"
+    },
+    {
+      "path": "planning/volabi/persona-and-skills/CONVERSATION_AND_MEETING_CONTRACT.json",
+      "sha256": "2f983337d0ce96c28d73dd23ddc2b6450c0855e7ef7a0af33631a79a907aa3fd"
+    },
+    {
+      "path": "planning/volabi/source/ORIGINAL_42_FUNCTIONS.json",
+      "sha256": "afe218cfbfbc54c88373eedd90c451b8abf17b34d0ba50696aad2e5838f7e783"
+    },
+    {
+      "path": "planning/volabi/LATER_SCOPE.md",
+      "sha256": "b87b7e41bed9daf588a20f353c474fb1482072cb26ec3befc81ead012b1f0446"
+    },
+    {
+      "path": "docs/volabi-local-api-contract.md",
+      "sha256": "a30fafb229ff1347c13b267467e759e321c844428729565fc1aa3ec52c6bf089"
+    },
+    {
+      "path": "docs/volabi-projects-contract.md",
+      "sha256": "580fd42b5d8848bc043de6d705c59c296c17b1f8dc85ef447158e3841d374404"
+    },
+    {
+      "path": "planning/volabi/DESIGN.md",
+      "sha256": "94c60ef30df85614adba528553d983323cb36c953392b9dca2e9e5e8d0d7c205"
+    }
+  ],
+  "recoveredExternalSources": [
+    {
+      "prompt": "P052",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\source\\prompts\\P052.md",
+      "sha256Raw": "d3e7fc0d83af164a5301bb50729c39d08002a7f7b85174785affa3ef63c32759",
+      "sha256Utf8Lf": "d3c189e949bc67bd0d3b5b0a6a99bb4f629f281f7dfe8c3e35198dd8eb646438",
+      "classification": "Recovered founder source design evidence; not current runtime activation"
+    },
+    {
+      "prompt": "P160",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\source\\prompts\\P160.md",
+      "sha256Raw": "ab05aae5e3d0ca3fec5d0c61880dbc1d2378b9f8594f9b4a869432192583e183",
+      "sha256Utf8Lf": "a3d52aef1a4666b1667bcddc45e5a3b2848e8b91db0a35f7eb6bf1b313e62266",
+      "classification": "Recovered founder source design evidence; not current runtime activation"
+    }
+  ]
+}

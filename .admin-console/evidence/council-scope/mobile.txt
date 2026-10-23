@@ -1,0 +1,3 @@
+
+> beauty-grooming-marketplace@1.0.0 typecheck:mobile
+> tsc --noEmit --incremental false --project mobile_app/tsconfig.json
