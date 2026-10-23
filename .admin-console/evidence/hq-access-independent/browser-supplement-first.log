@@ -1,0 +1,4 @@
+PASS Actual409 operation_conflict is visible, never success; cancelled competing stage leaves original session and factor valid
+PASS Browser elapsed state resolves through actual200 expired receipt, clears replacement and preserves original factor/session
+PASS Actual429 rate_limited recovery message is visible with no false success; existing session and original factor stay valid
+PASS Actual protected render error boundary offers working Access link without provider-context failure; original task restored exactly

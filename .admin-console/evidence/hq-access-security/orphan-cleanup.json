@@ -1,0 +1,26 @@
+{
+  "targets": [
+    {
+      "exactTargetAndCustodyVerified": true,
+      "path": "C:\\Users\\Yousif's PC\\AppData\\Local\\Temp\\volabi-access-security-XDh0M5",
+      "ownerMarkerSha256": "1998dfbaeef76514cdd2eb85f0c9a5ff6017c93736fb9deeee3693570cb59ce7",
+      "partialCleanupArtifactOnly": false,
+      "removed": true
+    },
+    {
+      "exactTargetAndCustodyVerified": true,
+      "path": "C:\\Users\\Yousif's PC\\AppData\\Local\\Temp\\volabi-access-security-ztEEuW",
+      "ownerMarkerSha256": "3248d16e1b24dbf6332a52db1cb05a75797e030ce9087244611cbb1dd89adf6d",
+      "partialCleanupArtifactOnly": true,
+      "removed": true
+    }
+  ],
+  "databaseContentsRead": false,
+  "realPreviewTouched": false,
+  "validationFailuresBeforeRemoval": [
+    "Two unavailable legacy ACL method checks refused before removal; host FileSystemAclExtensions verified",
+    "Partially cleaned old fixture lacked child synthetic marker; exact remaining inventory was legacy/hq.sqlite only under externally hash-verified owner root"
+  ],
+  "checkedAt": "2026-10-23T20:32:15.3434388Z",
+  "classification": "Only two exact externally owner-marker-hash verified synthetic security-suite orphans; active fixtures untouched"
+}

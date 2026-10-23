@@ -1,0 +1,188 @@
+{
+  "format": "volabi-access-independent-browser-supplement-1",
+  "capabilities": [
+    "hq-local.access",
+    "hq-local.access-controls"
+  ],
+  "scope": "Actual guarded browser expiry, rate limit, conflict and protected render-boundary link",
+  "startedAt": "2026-10-23T20:39:13.832Z",
+  "checks": [
+    "Actual409 operation_conflict is visible, never success; cancelled competing stage leaves original session and factor valid",
+    "Browser elapsed state resolves through actual200 expired receipt, clears replacement and preserves original factor/session",
+    "Actual429 rate_limited recovery message is visible with no false success; existing session and original factor stay valid",
+    "Actual protected render error boundary offers working Access link without provider-context failure; original task restored exactly"
+  ],
+  "responses": [
+    {
+      "path": "/api/hq/access/stage",
+      "status": 200
+    },
+    {
+      "path": "/api/hq/access/stage",
+      "status": 409,
+      "code": "operation_conflict"
+    },
+    {
+      "path": "/api/hq/access/stage",
+      "status": 200
+    },
+    {
+      "path": "/api/hq/access/receipt",
+      "status": 200,
+      "receiptState": "expired"
+    },
+    {
+      "path": "/api/hq/access/challenge",
+      "status": 429,
+      "code": "rate_limited"
+    }
+  ],
+  "fixtureSeams": [
+    "Owned pending operation expiry set to past; no seat/session/verifier change",
+    "Owned instance invalid-attempt budget filled30 within current15minute window",
+    "Owned instance invalid-attempt seam cleared after429 assertion",
+    "Temporary malformed synthetic task title only, exact original body restored after boundary assertion"
+  ],
+  "externalRequests": 0,
+  "unexpectedConsoleErrors": 0,
+  "unexpectedPageErrors": 0,
+  "expectedRenderConsoleErrors": 1,
+  "expectedRenderPageErrors": 0,
+  "ownedLauncherPid": 55908,
+  "status": "passed",
+  "cleanup": "owned fixture removed",
+  "sourcePins": [
+    {
+      "file": "web_platform/src/lib/hq/server/access-schema.mjs",
+      "sha256": "489ebde46eb28eb0e7cac9a54550ade01859ad35e34752631695e1692615e34c",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-storage.mjs",
+      "sha256": "6c314daa17d148da70762c1451508442605efa2605713f8c2c28a84cb5ff18cf",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-controls.mjs",
+      "sha256": "aeb1e8cfc65a66d654245701edf69cfbc730d731f4eae0feda81390f52d528d5",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-handler.mjs",
+      "sha256": "1e2a2dcc99005f9a94bb3ef1d5c98a90358a30e0d535da1623e568febc56a69c",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256": "4b3ccb15d5f35637f8c0d88831c0de11861eacfcdde03a028d67ec4387d9cc1f",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/local-boundary.mjs",
+      "sha256": "e6128d6241f04a2ff53e5ef1b0dcbf62a802e7ca00240bef6bb560d235be3ff0",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256": "6e399668235eecdd4f97cd9a6aead27281771756c77e393c0d316f64aa826ee9",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "scripts/hq-access/index.mjs",
+      "sha256": "9df85d4fcc4356f63ce4467ad98a0d380bb56081c594af6cf0bdd246985dc079",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "scripts/hq-access/cli.mjs",
+      "sha256": "759e8363fa3bbf9abe3f6d4d9b9b86ff7bade925d225ed2aa09ad4d654729582",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "docs/volabi-access-contract.md",
+      "sha256": "3df9fd23dcb7d058ac27ed2b0e5767366571da7a4c601d76bed1142c661287cb",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "docs/volabi-access-api.json",
+      "sha256": "b3f90fbe33b90dfcace60c5e1d5eb1e0138638145a87473426d216ac1e2c2441",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/app/hq/access/page.tsx",
+      "sha256": "fbe6e86bb83e2186f7f82863d6b1971acf84d8867041dbb9d1c524b87a192355",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/app/hq/error.tsx",
+      "sha256": "49167a3bc043644a1f90aef8035f56bb06e4296410812e959e97182770ee50f3",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/app/hq/hq.css",
+      "sha256": "9a5c21091c184570212e2e6304b7ceec2c41879b8150277908b2f31adcbec148",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/components/hq/hq-access.tsx",
+      "sha256": "68678fad3a0c04d693f35e62dce73adf9f14ad9a7397236f446903f7c4829bd7",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/components/hq/hq-access-dialog.tsx",
+      "sha256": "561461a0a734a6258053a8dabb65faebbea3a2e886f49308d9a722607396768d",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/components/hq/hq-access-fields.tsx",
+      "sha256": "33e3afe9e5655cb4bb9835df8764fe85b50b3b72696e5adc7bd55050d93a1575",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/components/hq/hq-context.tsx",
+      "sha256": "4cd15f8fc5487b8d494c7f6fa4baca90fa607d275a0fc9e4f3f5206c8ac5022e",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/components/hq/hq-shell.tsx",
+      "sha256": "83402cd22603b95d3dc0bc2397aac6aae972a71fdd1c0c648105a37b0103a57d",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/components/hq/hq-common.tsx",
+      "sha256": "99b5797f53102d378ee73525162297ee695de13285fd8a6100ea9699ec720761",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/lib/hq/access-client.ts",
+      "sha256": "893957c4c2c0146b21b1ffa55988b3655bc22c4043725b73905c6ca00f6864a1",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/src/lib/hq/access-copy.ts",
+      "sha256": "00e01f5f5d7e9a42eeee26228dbad167830bc33d0734d947c40bc9cc54c4bbdb",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "scripts/start-volabi-access-fixture.mjs",
+      "sha256": "15801a685671f3e0deaebbf8e4449a3e62667d059dbe8a5e69e619d1f3a27bad",
+      "previousReviewedPinMatches": true
+    },
+    {
+      "file": "web_platform/tests-browser/hq-access-independent-supplement.mjs",
+      "sha256": "34f359e4eb8caf30391dd648467dec02d925e027a32545beb118605eaaf75aba"
+    },
+    {
+      "file": "web_platform/src/components/hq/hq-workspace.tsx",
+      "sha256": "7e13cf7987e7c11aa5c297b5bca081f2ae39ef52d72fbbb924d88dec57747e3e"
+    },
+    {
+      "file": "web_platform/src/app/hq/error.tsx",
+      "sha256": "49167a3bc043644a1f90aef8035f56bb06e4296410812e959e97182770ee50f3"
+    },
+    {
+      "file": "web_platform/src/lib/hq/client.ts",
+      "sha256": "22e3c789c329b489e25aff0f616894dea0546ed696adfee746c1c931ee6f69b6"
+    }
+  ],
+  "finishedAt": "2026-10-23T20:41:18.572Z"
+}

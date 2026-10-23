@@ -1,0 +1,10 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 743.3022451000288,
+  "file_count": 3,
+  "files": [
+    "web_platform/tests/hq-recovery-independent.test.mjs",
+    "web_platform/tests/hq-recovery-owner.test.mjs",
+    "web_platform/tests/hq-recovery-security.test.mjs"
+  ]
+}

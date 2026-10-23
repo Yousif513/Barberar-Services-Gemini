@@ -1,5 +1,9 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { accessCopy } from "@/lib/hq/access-copy";
+import { safeHqReturn } from "@/lib/hq/access-client";
 import { usePageLocale } from "@/lib/use-page-locale";
 import { HqApiError, loadHqState, openHqSession, submitHqCommand } from "@/lib/hq/client";
 import type { HqCommand, HqCommandType, HqEvent, HqLocale, HqReceipt, HqSession, HqSkill, HqView } from "@/lib/hq/contracts";
@@ -45,4 +49,4 @@ export function useHqCommand(scope: string) {
   };
   return {pending,saving,error,receipt,loaded,run};
 }
-export function HqSessionBoundary({children}:{children:React.ReactNode}){const {locale,session,starting,sessionError,start}=useHq();if(starting)return <div className="hq-loading" role="status"><span className="hq-spinner"/>{hqCopy(locale,"loading")}</div>;if(!session||sessionError)return <div className="hq-message hq-message-error" role="alert"><p>{hqError(sessionError,locale)}</p><button className="hq-button" onClick={start}>{hqCopy(locale,"retry")}</button></div>;return children;}
+export function HqSessionBoundary({children}:{children:React.ReactNode}){const {locale,session,starting,sessionError,start}=useHq();const path=usePathname();if(starting)return <div className="hq-loading" role="status"><span className="hq-spinner"/>{hqCopy(locale,"loading")}</div>;if(!session||sessionError)return <div className="hq-message hq-message-error" role="alert"><p>{hqError(sessionError,locale)}</p><div className="hq-actions"><button className="hq-button" onClick={start}>{hqCopy(locale,"retry")}</button><Link className="hq-button" prefetch={false} href={`/hq/access?returnTo=${encodeURIComponent(safeHqReturn(path)??"/hq")}`}>{accessCopy(locale,"access")}</Link></div></div>;return children;}

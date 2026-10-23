@@ -1,0 +1,9 @@
+{
+  "reason": "Final staged whitespace check found exactly one extra blank EOF line. Narrow removal of final LF only; no code token changed.",
+  "file": "web_platform/src/components/hq/hq-access-fields.tsx",
+  "beforeRawSha256": "33e3afe9e5655cb4bb9835df8764fe85b50b3b72696e5adc7bd55050d93a1575",
+  "afterRawSha256": "a3bc214054aeaf02c54da46c95fde54f93ebc2724f82e58d70af88c441af5d2f",
+  "removedBytes": 1,
+  "independentReview": ".admin-console/evidence/hq-access-independent/final-format-review.json",
+  "accepted": true
+}

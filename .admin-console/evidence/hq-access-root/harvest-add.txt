@@ -1,0 +1,1 @@
+Added agent 'harvest-hq-access' to C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\.admin-console\manifest.json

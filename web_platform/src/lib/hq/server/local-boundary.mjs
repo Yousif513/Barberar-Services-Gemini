@@ -3,6 +3,8 @@ import { createHash, timingSafeEqual } from "node:crypto";
 export class HqError extends Error {
   constructor(code, status = 400) { super(code); this.name = "HqError"; this.code = code; this.status = status; }
 }
+// Next development HMR can retain a store whose errors were constructed by an earlier module instance.
+export function isHqError(error){return error instanceof HqError||error instanceof Error&&error.name==='HqError'&&typeof error.code==='string'&&/^[a-z_]{1,80}$/.test(error.code)&&error.message===error.code&&[400,401,403,404,405,409,413,429,503].includes(error.status);}
 const loopback = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 export function checkLocalRequest(request, env = process.env) {
   if (env.VOLABI_LOCAL_MODE !== "enabled" || env.VERCEL) throw new HqError("local_disabled", 403);

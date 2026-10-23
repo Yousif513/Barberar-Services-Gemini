@@ -1,0 +1,18 @@
+{
+  "classification": "Owner implementation freeze; independent review required",
+  "files": {
+    "web_platform/src/app/hq/access/page.tsx": "fbe6e86bb83e2186f7f82863d6b1971acf84d8867041dbb9d1c524b87a192355",
+    "web_platform/src/app/hq/error.tsx": "49167a3bc043644a1f90aef8035f56bb06e4296410812e959e97182770ee50f3",
+    "web_platform/src/app/hq/hq.css": "9a5c21091c184570212e2e6304b7ceec2c41879b8150277908b2f31adcbec148",
+    "web_platform/src/components/hq/hq-access.tsx": "68678fad3a0c04d693f35e62dce73adf9f14ad9a7397236f446903f7c4829bd7",
+    "web_platform/src/components/hq/hq-access-dialog.tsx": "561461a0a734a6258053a8dabb65faebbea3a2e886f49308d9a722607396768d",
+    "web_platform/src/components/hq/hq-access-fields.tsx": "33e3afe9e5655cb4bb9835df8764fe85b50b3b72696e5adc7bd55050d93a1575",
+    "web_platform/src/components/hq/hq-context.tsx": "4cd15f8fc5487b8d494c7f6fa4baca90fa607d275a0fc9e4f3f5206c8ac5022e",
+    "web_platform/src/components/hq/hq-shell.tsx": "83402cd22603b95d3dc0bc2397aac6aae972a71fdd1c0c648105a37b0103a57d",
+    "web_platform/src/components/hq/hq-common.tsx": "99b5797f53102d378ee73525162297ee695de13285fd8a6100ea9699ec720761",
+    "web_platform/src/lib/hq/access-client.ts": "893957c4c2c0146b21b1ffa55988b3655bc22c4043725b73905c6ca00f6864a1",
+    "web_platform/src/lib/hq/access-copy.ts": "00e01f5f5d7e9a42eeee26228dbad167830bc33d0734d947c40bc9cc54c4bbdb",
+    "web_platform/tests/hq-access-client.test.mjs": "fe2e665cdaefdcf4955e53a5f9fe6ae876bde929459bd025dd8639ac454aba16",
+    "web_platform/tests-browser/hq-access-owner.mjs": "890027ebbaccbfa0656754875ee953c14412faa6992f5c640c44cf7281d8ca46"
+  }
+}

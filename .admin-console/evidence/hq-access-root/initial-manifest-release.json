@@ -1,0 +1,2243 @@
+{
+  "profile": "regulated",
+  "profileSource": "manifest",
+  "phase": "release",
+  "manifest": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\manifest.json",
+  "projectRoot": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini",
+  "errors": 330,
+  "warnings": 42,
+  "findings": [
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.audit.capturesActorTargetReasonResult",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.audit.privilegedMutations",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.data.releaseUsesRealSources",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.data.retentionDefined",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.experience.keyboardCriticalFlowsTested",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.experience.localizationRequirementsHandled",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.experience.responsiveCriticalFlowsTested",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.observability.adminApiInstrumented",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.observability.correlationIdsExposedSafely",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-evidence",
+      "severity": "error",
+      "path": "crossCutting.observability.evidence",
+      "message": "a boolean is not evidence; record at least one artifact that proves this section"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.observability.highRiskActionsDetectable",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.observability.jobsAndIntegrationsMonitored",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "crosscutting-flag",
+      "severity": "error",
+      "path": "crossCutting.safety.recoveryDefined",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[dbsec2-booking-hold-limits].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[dbsec2-chat-server-commands].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[dbsec2-operations-grant-second-owner].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[dbsec2-promo-consumed-at-payment].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[dbsec2-reserved-promo-names].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[dbsec2-session-state-retry].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[dbsec2-whatsapp-verified-claims].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[paywave2-membership-member-list-staff].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[paywave2-membership-refund-rule].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[paywave2-prepaid-earned-as-delivered].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[paywave2-unknown-refund-resolution].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[qafix-console-commands-raise-and-name-the-permission].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[qafix-console-main-panel-focusable].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[qafix-integration-key-fixed].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[qafix-one-default-payment-method-per-audience].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "decision-assumed",
+      "severity": "error",
+      "path": "decisions[qafix-reasons-and-step-up-by-risk].status",
+      "message": "is still assumed at release; confirm it with the owner or record it as a gap"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[admin-governance].capabilities[gov.approvals].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[admin-governance].capabilities[gov.audited-reads].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[admin-governance].capabilities[gov.break-glass].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[admin-governance].capabilities[gov.console-roles].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[admin-governance].capabilities[gov.iban-change].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[admin-governance].capabilities[gov.iban-reveal].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[admin-governance].capabilities[gov.mfa].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[audit-event].capabilities[audit.emit].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[booking].capabilities[booking.detail].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[booking].capabilities[booking.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[booking].capabilities[booking.release-holds].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[branch].capabilities[branch.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[branch].capabilities[branch.toggle-active].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.observe].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.start].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[country].capabilities[country.configure].status",
+      "message": "is 'planned'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[country].capabilities[country.list].status",
+      "message": "is 'planned'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[customer].capabilities[customer.clear-profile].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[customer].capabilities[customer.data-request].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[customer].capabilities[customer.detail].status",
+      "message": "is 'deferred'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[customer].capabilities[customer.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[customer].capabilities[customer.submit-data-request].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[customer].capabilities[customer.suspend].status",
+      "message": "is 'deferred'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[customer].capabilities[customer.verify-phone].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[dispute].capabilities[dispute.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[dispute].capabilities[dispute.resolve].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[employee].capabilities[employee.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[feature-flag].capabilities[feature-flag.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[fee-rule].capabilities[fee-rule.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[fee-rule].capabilities[fee-rule.save].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[fee-rule].capabilities[fee.effective-display].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[fee-rule].capabilities[money.pending-change].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[10]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-access-security/verified-auth.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[11]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-access-security/verified-storage.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[12]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-access-security/verified-portable-race-resume.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[1]",
+      "message": "evidence file contains placeholder text: planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[2]",
+      "message": "evidence file contains placeholder text: docs/volabi-access-contract.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[6]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-access-security/acceptance.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-access-owner.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-access-security.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access].evidence[1]",
+      "message": "evidence file contains placeholder text: planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access].evidence[2]",
+      "message": "evidence file contains placeholder text: docs/volabi-access-contract.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].evidence[1]",
+      "message": "evidence file contains placeholder text: docs/volabi-local-api-contract.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].evidence[2]",
+      "message": "evidence file contains placeholder text: .admin-console/worklog/review-volabi-local-server.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].evidence[4]",
+      "message": "evidence file contains placeholder text: .admin-console/worklog/review-volabi-frontend.md"
+    },
+    {
+      "rule": "evidence-token-match",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests",
+      "message": "no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[1]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-store.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[3]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-client.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[5]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-independent-review.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[6]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.council].evidence[10]",
+      "message": "evidence file contains placeholder text: .admin-console/worklog/qa-hq-council.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.council].evidence[2]",
+      "message": "evidence file contains placeholder text: docs/volabi-council-contract.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.council].evidence[7]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-council-independent/source-review.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.council].tests[1]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-council-independent.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].evidence[1]",
+      "message": "evidence file contains placeholder text: docs/volabi-local-api-contract.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].evidence[2]",
+      "message": "evidence file contains placeholder text: .admin-console/worklog/review-volabi-local-server.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].evidence[4]",
+      "message": "evidence file contains placeholder text: .admin-console/worklog/review-volabi-frontend.md"
+    },
+    {
+      "rule": "evidence-token-match",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests",
+      "message": "no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[1]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-store.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[3]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-client.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[5]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-independent-review.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[6]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.projects].evidence[9]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-projects-independent/unit-final.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[12]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-root/web-test-partition.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[1]",
+      "message": "evidence file contains placeholder text: planning/volabi/RECOVERY_SCOPE_20261023.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[2]",
+      "message": "evidence file contains placeholder text: docs/volabi-recovery-contract.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[4]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-owner/owner-tests.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[6]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-owner/sidecar-regression-red.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[7]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-owner/owner-tests-after-sidecar-fix.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[9]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-independent/qa-final.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].tests[1]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-recovery-independent.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-recovery-security.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].evidence[1]",
+      "message": "evidence file contains placeholder text: docs/volabi-local-api-contract.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].evidence[2]",
+      "message": "evidence file contains placeholder text: .admin-console/worklog/review-volabi-local-server.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].evidence[4]",
+      "message": "evidence file contains placeholder text: .admin-console/worklog/review-volabi-frontend.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[1]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-store.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[3]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-client.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[5]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-independent-review.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[6]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[integration].capabilities[integration.delete].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[integration].capabilities[integration.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[integration].capabilities[integration.toggle].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[integration].capabilities[integration.upsert].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[inventory-operations].capabilities[inventory.adjust].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[inventory-operations].capabilities[inventory.catalog].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[inventory-operations].capabilities[inventory.chain-read].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[inventory-operations].capabilities[inventory.delegation].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[inventory-operations].capabilities[inventory.supply-read].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[inventory-operations].capabilities[inventory.transfer].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[ledger-entry].capabilities[ledger.adjustment].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[ledger-entry].capabilities[ledger.export].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[ledger-entry].capabilities[ledger.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[ledger-entry].capabilities[ledger.release-payout].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[ledger-entry].capabilities[ledger.vat-report].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[ledger-entry].capabilities[money.append-only].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[notification-broadcast].capabilities[notification.broadcast].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[notification-broadcast].capabilities[notification.dispatch].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[notification-broadcast].capabilities[notification.log].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[operations-dashboard].capabilities[activity.feed].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[package].capabilities[package.list].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[package].capabilities[package.toggle].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[payment-method].capabilities[payment-method.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[payment-method].capabilities[payment-method.set-default].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[payment-method].capabilities[payment-method.toggle].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[payout-request].capabilities[payout.approve].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[payout-request].capabilities[payout.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[payout-request].capabilities[payout.reject].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[platform-settings].capabilities[settings.api-limits].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[platform-settings].capabilities[settings.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[platform-settings].capabilities[settings.platform].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[platform-settings].capabilities[settings.vat-rate].status",
+      "message": "is 'deferred'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-incident].capabilities[incident.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-incident].capabilities[incident.register].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-request].capabilities[intake.health-retention-and-gate].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-request].capabilities[privacy.copy-export].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-request].capabilities[privacy.correction].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-request].capabilities[privacy.deadline-and-refusal].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-request].capabilities[privacy.deletion-ledger].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-request].capabilities[privacy.deletion].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-request].capabilities[privacy.legal-hold].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-request].capabilities[privacy.queue].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[privacy-request].capabilities[privacy.request-intake].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[processing-register].capabilities[ropa.view].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[promotional-code].capabilities[coupon.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[promotional-code].capabilities[coupon.toggle].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[promotional-code].capabilities[coupon.upsert].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[provider].capabilities[provider.approve].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[provider].capabilities[provider.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[provider].capabilities[provider.notes].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[provider].capabilities[provider.reject].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[provider].capabilities[provider.suspend].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[provider].capabilities[provider.vat-status].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[reconciliation].capabilities[reconciliation.daily].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[reconciliation].capabilities[reconciliation.overview].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[reconciliation].capabilities[reconciliation.resolve-break].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[refund-request].capabilities[refund.check-with-tap].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[refund-request].capabilities[refund.execute].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[refund-request].capabilities[refund.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[refund-request].capabilities[refund.retry].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[review].capabilities[review.hide].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[review].capabilities[review.moderate-queue].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[reward-program].capabilities[reward-program.enable].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[reward-program].capabilities[reward-program.overview].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[role-assignment].capabilities[role.directory].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[role-assignment].capabilities[role.set-administrator].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[service].capabilities[service.delete].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[service].capabilities[service.list].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[service].capabilities[service.set-featured].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[service].capabilities[service.set-price].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[service].capabilities[service.toggle-active].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "capability-unreviewed",
+      "severity": "error",
+      "path": "entities[service].capabilities[service.upsert].reviewStatus",
+      "message": "an implemented capability must be reviewed by an agent other than its implementer"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[sponsored-placement].capabilities[sponsored.configure].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[sponsored-placement].capabilities[sponsored.overview].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[sponsored-placement].capabilities[sponsored.void-attribution].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[support-contact].capabilities[support.contact].status",
+      "message": "is 'blocked'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[whatsapp-channel].capabilities[whatsapp.overview].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "entities[whatsapp-channel].capabilities[whatsapp.verify-channel].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[checkout-durable-attempt-recovery].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[checkout-private-wire-lifecycle].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[checkout-unknown-operator-recovery].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[deletion-ledger-needs-off-database-archive].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[development-credential-diagnostic-exposure].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[governance-notice-sender-not-chosen].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[held-checkout-evidence-validator-context].evidence[0]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/manifest-release.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[held-checkout-evidence-validator-context].evidence[1]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue_independent.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[held-checkout-evidence-validator-context].evidence[2]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/validator-repair-20261023/independent-review.json"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[historical-capture-refund-reconciliation].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[hosted-auth-settings-must-match-gov1].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-interrupted-publication].evidence[0]",
+      "message": "evidence file contains placeholder text: scripts/hq-recovery/index.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-interrupted-publication].evidence[1]",
+      "message": "evidence file contains placeholder text: docs/volabi-recovery-contract.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-interrupted-publication].evidence[3]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-security/interrupted-publication-red.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-interrupted-publication].evidence[5]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-security/independent-final.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-plaintext-sidecar-cleanup].evidence[0]",
+      "message": "evidence file contains placeholder text: scripts/hq-recovery/index.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-plaintext-sidecar-cleanup].evidence[4]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-security/independent-post-sidecar.txt"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[rewards-counsel-and-tax-before-enablement].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[sole-owner-cannot-grant-approver-roles].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[volabi-acquisition-event-and-continuity].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[volabi-finance-commercial-terms].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[volabi-provider-allocation-acceptance].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[volabi-refund-allocation-contract].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[zatca-vat-number-verification-not-integrated].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "integrations[expo-push].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "integrations[sms-otp].status",
+      "message": "is 'discovered'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "integrations[tap-payments].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "gate-not-passed",
+      "severity": "error",
+      "path": "qualityGates[accessibility].status",
+      "message": "is 'failed', not passed"
+    },
+    {
+      "rule": "nonfunctional-gate-required",
+      "severity": "error",
+      "path": "qualityGates[accessibility].status",
+      "message": "the accessibility gate must pass at this profile; not-applicable is only allowed at profile internal"
+    },
+    {
+      "rule": "gate-not-passed",
+      "severity": "error",
+      "path": "qualityGates[browser].status",
+      "message": "is 'failed', not passed"
+    },
+    {
+      "rule": "gate-not-passed",
+      "severity": "error",
+      "path": "qualityGates[component-health].status",
+      "message": "is 'failed', not passed"
+    },
+    {
+      "rule": "gate-not-passed",
+      "severity": "error",
+      "path": "qualityGates[experience].status",
+      "message": "is 'failed', not passed"
+    },
+    {
+      "rule": "gate-not-passed",
+      "severity": "error",
+      "path": "qualityGates[performance].status",
+      "message": "is 'failed', not passed"
+    },
+    {
+      "rule": "nonfunctional-gate-required",
+      "severity": "error",
+      "path": "qualityGates[performance].status",
+      "message": "the performance gate must pass at this profile; not-applicable is only allowed at profile internal"
+    },
+    {
+      "rule": "gate-not-passed",
+      "severity": "error",
+      "path": "qualityGates[security].status",
+      "message": "is 'failed', not passed"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[admin-activity].states",
+      "message": "is missing: forbidden"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-activity].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "required-field-empty",
+      "severity": "error",
+      "path": "screens[admin-activity].tests",
+      "message": "must not be empty for release"
+    },
+    {
+      "rule": "screen-responsive",
+      "severity": "error",
+      "path": "screens[admin-approvals].responsive",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-approvals].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-audit-logs].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-bookings].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[admin-branches].states",
+      "message": "is missing: forbidden"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-branches].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-coupons].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[admin-coupons].states",
+      "message": "is missing: forbidden"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-coupons].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-responsive",
+      "severity": "error",
+      "path": "screens[admin-customers].responsive",
+      "message": "must be true for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-customers].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-dashboard].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-disputes].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-disputes].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-employees].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[admin-help].states",
+      "message": "is missing: loading, error, forbidden"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-help].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "required-field-empty",
+      "severity": "error",
+      "path": "screens[admin-help].tests",
+      "message": "must not be empty for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-incidents].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-integrations].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[admin-integrations].states",
+      "message": "is missing: loading, forbidden"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-integrations].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-ledger].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-notifications].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-packages].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[admin-packages].states",
+      "message": "is missing: forbidden"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-packages].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "required-field-empty",
+      "severity": "error",
+      "path": "screens[admin-packages].tests",
+      "message": "must not be empty for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-platform-rules].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-privacy].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-providers].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-reconciliation].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-reconciliation].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-refunds].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-refunds].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-reports].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-reports].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-reviews].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-reviews].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-roles].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[admin-ropa].states",
+      "message": "is missing: loading, error, forbidden"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-ropa].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-services].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[admin-services].states",
+      "message": "is missing: forbidden"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-services].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-settings].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-sponsored].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-supply].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-taxes].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-taxes].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[admin-whatsapp].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[admin-whatsapp].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[become-provider].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[become-provider].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[customer-bookings].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[customer-bookings].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "required-field-empty",
+      "severity": "error",
+      "path": "screens[customer-bookings].tests",
+      "message": "must not be empty for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[customer-memberships].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[customer-memberships].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "required-field-empty",
+      "severity": "error",
+      "path": "screens[customer-memberships].tests",
+      "message": "must not be empty for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[customer-packages].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[customer-packages].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "required-field-empty",
+      "severity": "error",
+      "path": "screens[customer-packages].tests",
+      "message": "must not be empty for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[customer-privacy-account].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[customer-privacy-account].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[customer-privacy].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[customer-privacy].states",
+      "message": "is missing: loading, forbidden"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[customer-privacy].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[customer-wallet].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[customer-wallet].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "required-field-empty",
+      "severity": "error",
+      "path": "screens[customer-wallet].tests",
+      "message": "must not be empty for release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[hq-access].states",
+      "message": "is missing: populated"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-agent].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[hq-agent].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-agents].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[hq-agents].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-command].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[hq-command].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "evidence-token-match",
+      "severity": "error",
+      "path": "screens[hq-council-record].tests",
+      "message": "no listed test file mentions the screen id or its route; the link between manifest and test is unproven"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-decision].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[hq-decision].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-decisions].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[hq-decisions].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-knowledge].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[hq-knowledge].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-source].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[hq-source].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-task].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[hq-task].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "screens[hq-tasks].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[hq-tasks].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[login-mfa].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[login-mfa].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[provider-chain].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[provider-chain].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[provider-inventory].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[provider-inventory].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[provider-pricing].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "screen-accessibility",
+      "severity": "error",
+      "path": "screens[provider-wallet].accessibilityStatus",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "screens[provider-wallet].status",
+      "message": "must be implemented for release"
+    },
+    {
+      "rule": "required-field-empty",
+      "severity": "error",
+      "path": "screens[provider-wallet].tests",
+      "message": "must not be empty for release"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "workQueues[failed-payment].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "workQueues[payout-approval].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "workQueues[provider-onboarding].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "workQueues[refund-arbitration].status",
+      "message": "is 'in-progress'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "release-status-unresolved",
+      "severity": "error",
+      "path": "workQueues[webhook-failure].status",
+      "message": "is 'discovered'; release requires implemented or not-applicable"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'entities[inventory-operations].lifecycleStates' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'mobile_app/src/lib/pending-package-payments.js#PENDING_PACKAGE_PAGE_SIZE' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'planning/volabi/persona-and-skills/PERSONA_REGISTRY.json' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-access/cli.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/cli.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/common.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/envelope.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/schema.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/render-volabi-voice-previews.ps1' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/start-volabi-access-fixture.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/functions/_shared/checkout-attempts.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#d4_small_cell_threshold' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#gov_exec_role_change' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_break_glass_blocked_until' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_decider_refusal' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#gov_request_payout_destination' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#queue_governance_notice' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#iban_reveal_ceiling' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_deadline_days' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_escalate_requests' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_require_contact_otp' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011210000_priv_copy_export.sql#privacy_export_record_built' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011220000_priv_deletion_engine.sql#admin_privacy_review_legal_hold' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011220000_priv_deletion_engine.sql#privacy_retention_until' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011230000_priv_health_intake.sql#health_answer_retention_days' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011230000_priv_health_intake.sql#health_reuse_consent_months' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011240000_priv_incident_register.sql#privacy_incident_json' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261011310000_privfix_identity_and_copy.sql#privacy_export_download_limit' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#privacy_lookup_limit' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'supabase/migrations/20261022124446_held_checkout_read_queue.sql' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/scripts/vercel-ignore-build.mjs#decide' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/app/admin/reconciliation/checkouts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/held-checkout-client.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/access-client.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/access-copy.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/council-copy.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/project-copy.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server/access-controls.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server/access-schema.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server/access-storage.mjs' does not match any scanned manifest field"
+    }
+  ]
+}

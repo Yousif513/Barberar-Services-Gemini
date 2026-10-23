@@ -1,0 +1,129 @@
+{
+  "format": "volabi-access-independent-core-freeze-1",
+  "reviewer": "sec-hq-access",
+  "at": "2026-10-23T20:19:05.571016+00:00",
+  "ownerFreezeVerified": 12,
+  "scope": "Final28 backend/storage/backup security groups. UI and fixture launcher reviewed separately after their freeze.",
+  "files": [
+    {
+      "file": "docs/volabi-access-api.json",
+      "sha256": "b3f90fbe33b90dfcace60c5e1d5eb1e0138638145a87473426d216ac1e2c2441",
+      "bytes": 3422
+    },
+    {
+      "file": "docs/volabi-access-contract.md",
+      "sha256": "3df9fd23dcb7d058ac27ed2b0e5767366571da7a4c601d76bed1142c661287cb",
+      "bytes": 6381
+    },
+    {
+      "file": "package.json",
+      "sha256": "3149ccabc8b21bf9ab0c1409997ef43abd8e539feaeaab96c61f6bb32c7ddf9a",
+      "bytes": 3214
+    },
+    {
+      "file": "planning/volabi/FOUNDER_CONTINUITY_CLOSURE_20261023.md",
+      "sha256": "717bc13cc6e763c8f134885fa0b1735f8989e37fa4ba2260336f51de69b3f263",
+      "bytes": 4594
+    },
+    {
+      "file": "planning/volabi/FOUNDER_CONTINUITY_DOMAIN_GRAPH.json",
+      "sha256": "6f1dab5cefbea294b25e97c2b09446675c4f60f5a293857cc07a8400367a4d88",
+      "bytes": 3205
+    },
+    {
+      "file": "planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md",
+      "sha256": "d0761425d8f8193df1d140481449cf2b0fc23df3126a3a94ff70f3b7ddf68857",
+      "bytes": 27310
+    },
+    {
+      "file": "scripts/hq-access/cli.mjs",
+      "sha256": "759e8363fa3bbf9abe3f6d4d9b9b86ff7bade925d225ed2aa09ad4d654729582",
+      "bytes": 5264
+    },
+    {
+      "file": "scripts/hq-access/index.mjs",
+      "sha256": "9df85d4fcc4356f63ce4467ad98a0d380bb56081c594af6cf0bdd246985dc079",
+      "bytes": 14393
+    },
+    {
+      "file": "scripts/hq-recovery/common.mjs",
+      "sha256": "8ada9b0b70992311b3205442efc31f2cfe70f82ed42dc1c638290932b48f0891",
+      "bytes": 2184
+    },
+    {
+      "file": "scripts/hq-recovery/dependencies.mjs",
+      "sha256": "f5c9ee663a70a7e0477aa9d4e98c9f0467146690c183732af267ea112d4f6e03",
+      "bytes": 6868
+    },
+    {
+      "file": "scripts/hq-recovery/envelope.mjs",
+      "sha256": "d1f7b2b0e767e64ab99a772baa8ce099549204064ec790bd7ba787ed9155806c",
+      "bytes": 3045
+    },
+    {
+      "file": "scripts/hq-recovery/index.mjs",
+      "sha256": "080bd14815971cdf7d31897d8226dbccf19eaa57e631c5dd2f080f62aa0f9085",
+      "bytes": 12452
+    },
+    {
+      "file": "scripts/hq-recovery/paths.mjs",
+      "sha256": "900b995be6ef47426dc8adfa1d4072d2f7604c14d4b72126928ca2c44000ecb1",
+      "bytes": 7637
+    },
+    {
+      "file": "scripts/hq-recovery/schema.mjs",
+      "sha256": "2b8dcf2713f83ab9e66627b617a7f2a9eaef43ee334d93f7fe26c651b39a9489",
+      "bytes": 17165
+    },
+    {
+      "file": "web_platform/next.config.ts",
+      "sha256": "c82f8a2794f4610c98aa99ca7601847d942a1a5feeebb89db49f6dd2d189e70f",
+      "bytes": 2657
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-controls.mjs",
+      "sha256": "cd4a211b5a69ea72fa4f98f71b344728ef22669a9c43aa2c9cbe9d81bd214492",
+      "bytes": 13837
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-handler.mjs",
+      "sha256": "1e2a2dcc99005f9a94bb3ef1d5c98a90358a30e0d535da1623e568febc56a69c",
+      "bytes": 3167
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-schema.mjs",
+      "sha256": "489ebde46eb28eb0e7cac9a54550ade01859ad35e34752631695e1692615e34c",
+      "bytes": 4785
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-storage.mjs",
+      "sha256": "6c314daa17d148da70762c1451508442605efa2605713f8c2c28a84cb5ff18cf",
+      "bytes": 9726
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256": "6e399668235eecdd4f97cd9a6aead27281771756c77e393c0d316f64aa826ee9",
+      "bytes": 5837
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/local-boundary.mjs",
+      "sha256": "e6128d6241f04a2ff53e5ef1b0dcbf62a802e7ca00240bef6bb560d235be3ff0",
+      "bytes": 2850
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256": "4b3ccb15d5f35637f8c0d88831c0de11861eacfcdde03a028d67ec4387d9cc1f",
+      "bytes": 29576
+    },
+    {
+      "file": "web_platform/tests/hq-access-owner.test.mjs",
+      "sha256": "575471002d673872a38933ce62abc3609390259d14033a60ca3abc85a604ed5d",
+      "bytes": 14826
+    },
+    {
+      "file": "web_platform/tests/hq-access-security.test.mjs",
+      "sha256": "0cd80a430df10f4d4d411406dd4765cef2b533fbcd9bb14476fee2e1891eab9d",
+      "bytes": 46827
+    }
+  ]
+}

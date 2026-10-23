@@ -1,0 +1,9 @@
+{
+  "reason": "Initial owner test hook order attempted remove before SQLite close; fixed close-before-cleanup. Only exact owned names from these two transcripts removed after process ended.",
+  "canonical_parent": "C:\\Users\\Yousif's PC\\AppData\\Local\\Temp",
+  "removed": [
+    "volabi-access-backup-3PAdOF",
+    "volabi-access-backup-DN84QV",
+    "volabi-access-backup-Em902U"
+  ]
+}

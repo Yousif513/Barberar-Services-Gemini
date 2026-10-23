@@ -1,0 +1,121 @@
+{
+  "baseline": ".admin-console/evidence/hq-recovery-root/manifest-release.json",
+  "current": ".admin-console/evidence/hq-access-root/manifest-release.json",
+  "added": [
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[10]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-access-security/verified-auth.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[11]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-access-security/verified-storage.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[12]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-access-security/verified-portable-race-resume.txt"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[1]",
+      "message": "evidence file contains placeholder text: planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[2]",
+      "message": "evidence file contains placeholder text: docs/volabi-access-contract.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[6]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-access-security/acceptance.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-access-owner.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access-controls].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-access-security.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access].evidence[1]",
+      "message": "evidence file contains placeholder text: planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.access].evidence[2]",
+      "message": "evidence file contains placeholder text: docs/volabi-access-contract.md"
+    },
+    {
+      "rule": "gap-unresolved",
+      "severity": "error",
+      "path": "gaps[development-credential-diagnostic-exposure].status",
+      "message": "unresolved high gap blocks release"
+    },
+    {
+      "rule": "screen-state-missing",
+      "severity": "error",
+      "path": "screens[hq-access].states",
+      "message": "is missing: populated"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-access/cli.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/start-volabi-access-fixture.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/access-client.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/access-copy.ts' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server/access-controls.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server/access-schema.mjs' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/src/lib/hq/server/access-storage.mjs' does not match any scanned manifest field"
+    }
+  ],
+  "removed": []
+}

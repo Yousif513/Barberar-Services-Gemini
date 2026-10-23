@@ -1,0 +1,12 @@
+✔ supported access schema is excluded physically while exact v1 business snapshot and inert schema remain unchanged (84.8358ms)
+✔ access schema does not permit unfamiliar tables or indexes and cannot be added to inert artifacts (88.0507ms)
+✔ missing or oversized security state refuses instead of silently discarding an unsupported control store (37.1175ms)
+✔ new dependency inventory pins access code while old v1 dependency inventories remain inspectable with explicit gaps (3564.6339ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3862.2867

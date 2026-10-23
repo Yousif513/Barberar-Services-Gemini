@@ -5,6 +5,8 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { HqError, hash, canonical, csrfForSession } from "./local-boundary.mjs";
 import { projectCommand, projectQuery, projectDecision, projectFollowup, refreshProjects, linkTask } from "./projects-store.mjs";
 import {councilCommand,councilQuery,councilDecision,councilFollowup} from "./council-store.mjs";
+import {AccessControls} from './access-controls.mjs';
+import {inspectAccessRoot,openExistingDatabase,validateOpenedAccess,recheckAccess,checkedRoot,attachAccessDiagnostic} from './access-storage.mjs';
 const now = () => new Date().toISOString();
 const uuid = value => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const text = (value, max = 4000, optional = false) => {
@@ -34,35 +36,44 @@ const skillRequirements = value => {
 const ensureRevision = (actual, expected) => { if (!Number.isInteger(expected) || actual !== expected) throw new HqError("stale_revision", 409); };
 const scope = () => ({ environment:"local", effects:["record-only"], employeeActivation:false, businessPermissions:false, financialExecution:false });
 const allowedKinds = new Set(["task", "source", "recommendation", "decision", "followup", "project", "milestone", "project-closure", "meeting", "council-packet", "council-classification"]);
+export function applyHqSchema(db) {
+  db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA busy_timeout=5000;
+    CREATE TABLE IF NOT EXISTS workspaces(id TEXT PRIMARY KEY,actor_id TEXT NOT NULL,created_at TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),actor_id TEXT NOT NULL,expires_at TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS records(workspace_id TEXT NOT NULL REFERENCES workspaces(id),kind TEXT NOT NULL,id TEXT NOT NULL,revision INTEGER NOT NULL,body TEXT NOT NULL,PRIMARY KEY(workspace_id,kind,id));
+    CREATE TABLE IF NOT EXISTS record_versions(workspace_id TEXT NOT NULL,kind TEXT NOT NULL,id TEXT NOT NULL,revision INTEGER NOT NULL,body TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,kind,id,revision));
+    CREATE TABLE IF NOT EXISTS commands(workspace_id TEXT NOT NULL,id TEXT NOT NULL,payload_hash TEXT NOT NULL,receipt TEXT NOT NULL,PRIMARY KEY(workspace_id,id));
+    CREATE TABLE IF NOT EXISTS events(seq INTEGER PRIMARY KEY AUTOINCREMENT,id TEXT NOT NULL UNIQUE,workspace_id TEXT NOT NULL,action TEXT NOT NULL,target_type TEXT NOT NULL,target_id TEXT NOT NULL,actor_id TEXT NOT NULL,command_id TEXT,at TEXT NOT NULL,details TEXT NOT NULL);
+    CREATE INDEX IF NOT EXISTS records_kind ON records(workspace_id,kind);
+    CREATE INDEX IF NOT EXISTS records_project_parent ON records(workspace_id,kind,json_extract(body,'$.projectId'));
+    CREATE INDEX IF NOT EXISTS events_target ON events(workspace_id,target_type,target_id,seq);`);
+  for(const table of ['record_versions','commands','events'])db.exec(`CREATE TRIGGER IF NOT EXISTS ${table}_no_update BEFORE UPDATE ON ${table} BEGIN SELECT RAISE(ABORT,'immutable history'); END;
+    CREATE TRIGGER IF NOT EXISTS ${table}_no_delete BEFORE DELETE ON ${table} BEGIN SELECT RAISE(ABORT,'immutable history'); END;`);
+}
 export class HqStore {
-  constructor({ filePath, initialSources = [], agents = [], skills = [] }) {
+  constructor({ filePath, initialSources = [], agents = [], skills = [], accessRoot = null }) {
+    if(accessRoot){
+      try{this.accessIdentity=inspectAccessRoot(accessRoot);this.db=openExistingDatabase(this.accessIdentity.file);validateOpenedAccess(this.db,this.accessIdentity);}
+      catch(error){if(this.db?.isOpen)this.db.close();let safe=this.accessIdentity;try{if(!safe){const {owned}=checkedRoot(accessRoot);safe={root:owned.path,owned};}}catch{}attachAccessDiagnostic(safe,error);throw error;}
+      this.agents=agents;this.skills=skills;this.initialSources=[];this.access=new AccessControls(this);
+      this.db.exec('PRAGMA foreign_keys=ON;PRAGMA synchronous=FULL;PRAGMA busy_timeout=5000');return;
+    }
     if (existsSync(path.join(path.dirname(filePath), "INERT-RESTORE.json"))) throw new HqError("inert_restore",403);
     mkdirSync(path.dirname(filePath), { recursive:true });
     this.db = new DatabaseSync(filePath);
     if (this.db.prepare("PRAGMA application_id").get().application_id === 0x56485152) { this.db.close(); throw new HqError("inert_restore",403); }
     this.agents = agents; this.skills = skills; this.initialSources = initialSources;
-    this.db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA busy_timeout=5000;
-      CREATE TABLE IF NOT EXISTS workspaces(id TEXT PRIMARY KEY,actor_id TEXT NOT NULL,created_at TEXT NOT NULL);
-      CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),actor_id TEXT NOT NULL,expires_at TEXT NOT NULL);
-      CREATE TABLE IF NOT EXISTS records(workspace_id TEXT NOT NULL REFERENCES workspaces(id),kind TEXT NOT NULL,id TEXT NOT NULL,revision INTEGER NOT NULL,body TEXT NOT NULL,PRIMARY KEY(workspace_id,kind,id));
-      CREATE TABLE IF NOT EXISTS record_versions(workspace_id TEXT NOT NULL,kind TEXT NOT NULL,id TEXT NOT NULL,revision INTEGER NOT NULL,body TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,kind,id,revision));
-      CREATE TABLE IF NOT EXISTS commands(workspace_id TEXT NOT NULL,id TEXT NOT NULL,payload_hash TEXT NOT NULL,receipt TEXT NOT NULL,PRIMARY KEY(workspace_id,id));
-      CREATE TABLE IF NOT EXISTS events(seq INTEGER PRIMARY KEY AUTOINCREMENT,id TEXT NOT NULL UNIQUE,workspace_id TEXT NOT NULL,action TEXT NOT NULL,target_type TEXT NOT NULL,target_id TEXT NOT NULL,actor_id TEXT NOT NULL,command_id TEXT,at TEXT NOT NULL,details TEXT NOT NULL);
-      CREATE INDEX IF NOT EXISTS records_kind ON records(workspace_id,kind);
-      CREATE INDEX IF NOT EXISTS records_project_parent ON records(workspace_id,kind,json_extract(body,'$.projectId'));
-      CREATE INDEX IF NOT EXISTS events_target ON events(workspace_id,target_type,target_id,seq);`);
-    for (const table of ["record_versions", "commands", "events"]) {
-      this.db.exec(`CREATE TRIGGER IF NOT EXISTS ${table}_no_update BEFORE UPDATE ON ${table} BEGIN SELECT RAISE(ABORT,'immutable history'); END;
-        CREATE TRIGGER IF NOT EXISTS ${table}_no_delete BEFORE DELETE ON ${table} BEGIN SELECT RAISE(ABORT,'immutable history'); END;`);
-    }
+    applyHqSchema(this.db);
   }
-  close() { this.db.close(); }
+  close() { if(this.db.isOpen)this.db.close(); }
   transaction(fn) {
+    if(this.access)recheckAccess(this);
     this.db.exec("BEGIN IMMEDIATE");
-    try { const result = fn(); this.db.exec("COMMIT"); return result; }
-    catch (error) { this.db.exec("ROLLBACK"); throw error; }
+    try { const result = fn(); if(this.access)recheckAccess(this);this.db.exec("COMMIT"); return result; }
+    catch (error) { if(this.db.isTransaction)this.db.exec("ROLLBACK");if(this.accessBroken)this.close();throw error; }
   }
   createSession() {
+    if(this.access)throw new HqError('access_required',401);
     const token = randomBytes(32).toString("hex"), workspaceId = randomUUID(), actorId = randomUUID();
     const expiresAt = new Date(Date.now() + 30 * 86400000).toISOString();
     this.transaction(() => {
@@ -75,14 +86,18 @@ export class HqStore {
     return { ...this.getSession(token), token };
   }
   getSession(token) {
+    if(this.access)this.access.check();
     if (typeof token !== "string" || !/^[a-f0-9]{64}$/.test(token)) return null;
     const row = this.db.prepare("SELECT * FROM sessions WHERE token_hash=? AND expires_at>?").get(hash(token),now());
-    return row ? { workspaceId:row.workspace_id, actorId:row.actor_id, actorLabel:"Local founder review", csrfToken:csrfForSession(token), mode:"local-development", employeesActive:false } : null;
+    const session=row ? { workspaceId:row.workspace_id, actorId:row.actor_id, actorLabel:"Local founder review", csrfToken:csrfForSession(token), mode:"local-development", employeesActive:false } : null;
+    return session&&this.access?this.access.attach(session,token):session;
   }
   assertSession(session) {
+    if(this.access)this.access.validateSession(session);
     if (!session || !uuid(session.workspaceId) || !uuid(session.actorId) || !this.db.prepare("SELECT 1 FROM workspaces WHERE id=? AND actor_id=?").get(session.workspaceId,session.actorId)) throw new HqError("session_required",401);
   }
   get(session, kind, id) {
+    if(this.access)this.assertSession(session);
     if (!allowedKinds.has(kind) || !uuid(id)) throw new HqError("not_found",404);
     const row = this.db.prepare("SELECT body FROM records WHERE workspace_id=? AND kind=? AND id=?").get(session.workspaceId,kind,id);
     if (!row) throw new HqError("not_found",404);
@@ -181,6 +196,7 @@ export class HqStore {
     if(["actorId","workspaceId","role","permissions","financialExecution"].some(k=>Object.hasOwn(p,k)))throw new HqError("invalid_input");
     const materialHash=hash(canonical(envelope));
     return this.transaction(()=>{
+      this.assertSession(session);
       const old=this.db.prepare("SELECT * FROM commands WHERE workspace_id=? AND id=?").get(session.workspaceId,commandId);
       if(old){if(old.payload_hash!==materialHash)throw new HqError("command_conflict",409);return JSON.parse(old.receipt);}
       let result;

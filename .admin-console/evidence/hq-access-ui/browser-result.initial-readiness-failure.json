@@ -1,0 +1,11 @@
+{
+  "classification": "Synthetic owner browser evidence; independent acceptance required",
+  "checks": [],
+  "unexpectedErrors": [],
+  "externalRequests": [],
+  "expectedTransportFailures": 0,
+  "startedAt": "2026-10-23T20:04:05.571Z",
+  "status": "failed",
+  "failure": "AssertionError [ERR_ASSERTION]: isolated synthetic fixture server must become ready\n\nfalse !== true\n\n    at file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests-browser/hq-access-owner.mjs:48:9\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at process.processTimers (node:internal/timers:538:9)",
+  "finishedAt": "2026-10-23T20:05:38.682Z"
+}

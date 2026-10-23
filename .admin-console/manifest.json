@@ -256,6 +256,14 @@
         "appliedTo": [
           "hq-local.recovery"
         ]
+      },
+      {
+        "topic": "Installed Next16.3.8 distDir reference consulted: separate .next-access-fixture output only in guarded synthetic mode; inherited default/pilot paths preserved.",
+        "url": "https://nextjs.org/docs/app/api-reference/config/next-config-js/distDir",
+        "checkedOn": "2026-10-23",
+        "appliedTo": [
+          "hq-local.access"
+        ]
       }
     ],
     "volumes": {
@@ -7737,6 +7745,169 @@
           "interfaceKind": "cli",
           "cliEntrypoint": "scripts/hq-recovery/cli.mjs",
           "reviewedBy": "qa-hq-recovery"
+        },
+        {
+          "id": "hq-local.access-controls",
+          "outcome": "Synthetic explicit initialization and founder continuity with no-create guard and safe backup compatibility",
+          "kind": "command",
+          "roles": [
+            "local-development-reviewer"
+          ],
+          "risk": "high",
+          "status": "implemented",
+          "rationale": "CEO HQ-NEXT-04 approved synthetic-only implementation. No live instance migration, real seat action or business activation; list/search/bulk/import/export/delete/merge/seat-transfer not required. Proof-bound lifecycle commands and audit required.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [
+            "scripts/hq-access/cli.mjs",
+            "scripts/hq-access/index.mjs",
+            "web_platform/src/lib/hq/server/access-schema.mjs",
+            "web_platform/src/lib/hq/server/access-storage.mjs",
+            "web_platform/src/lib/hq/server/access-controls.mjs",
+            "scripts/hq-recovery/schema.mjs",
+            "scripts/hq-recovery/dependencies.mjs",
+            "initializeAccess",
+            "adoptAccess",
+            "resumeAccess",
+            "issueEnrollmentPermit",
+            "openAccessStore"
+          ],
+          "authorizationPolicies": [
+            "Synthetic owner-restricted root outside project; exact seat proof",
+            "Generation/expiry/purpose checks, default deny, bootstrap enrollment-only"
+          ],
+          "auditEvents": [
+            "access.enroll.staged",
+            "access.enroll.committed",
+            "access.enroll.cancelled",
+            "access.enroll.expired",
+            "access.recover.staged",
+            "access.recover.committed",
+            "access.recover.cancelled",
+            "access.recover.expired",
+            "access.rotate.staged",
+            "access.rotate.committed",
+            "access.rotate.cancelled",
+            "access.rotate.expired",
+            "access.revoke.committed",
+            "access.signout.committed"
+          ],
+          "safeguards": [
+            "No implicit creation or guessed ownership",
+            "No secrets in logs/persistence/backup",
+            "Synthetic instance only; active preview held"
+          ],
+          "dataBinding": "sqlite:positively-marked-isolated-synthetic-instance; no live binding",
+          "idempotency": "Exact operation/generation receipt",
+          "concurrency": "Atomic generation/session/audit transaction",
+          "recovery": "Saved new factor before commit; missing storage refuses",
+          "tests": [
+            "web_platform/tests/hq-access-owner.test.mjs",
+            "web_platform/tests/hq-access-backup.test.mjs",
+            "web_platform/tests/hq-access-security.test.mjs",
+            "web_platform/tests/hq-access-independent.test.mjs"
+          ],
+          "evidence": [
+            "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md",
+            "planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md",
+            "docs/volabi-access-contract.md",
+            ".admin-console/evidence/hq-access-root/actual-pty.json",
+            ".admin-console/evidence/hq-access-owner/final-source-freeze.json",
+            ".admin-console/evidence/hq-access-ui/source-hashes.json",
+            ".admin-console/evidence/hq-access-security/acceptance.json",
+            ".admin-console/evidence/hq-access-security/final-source-freeze.json",
+            ".admin-console/evidence/hq-access-security/ui-source-review.json",
+            ".admin-console/evidence/hq-access-security/authorization-matrix.md",
+            ".admin-console/evidence/hq-access-security/verified-auth.txt",
+            ".admin-console/evidence/hq-access-security/verified-storage.txt",
+            ".admin-console/evidence/hq-access-security/verified-portable-race-resume.txt",
+            ".admin-console/evidence/hq-access-security/secret-shape-scan.json",
+            ".admin-console/evidence/hq-access-security/dependency-advisory-follow-up.json"
+          ],
+          "owner": "",
+          "reviewStatus": "reviewed",
+          "interfaceKind": "cli",
+          "cliEntrypoint": "scripts/hq-access/cli.mjs",
+          "reviewedBy": "sec-hq-access"
+        },
+        {
+          "id": "hq-local.access",
+          "outcome": "Exact enrolled synthetic seat access through bilingual page and three dialogs",
+          "kind": "command",
+          "roles": [
+            "local-development-reviewer"
+          ],
+          "risk": "high",
+          "status": "implemented",
+          "rationale": "CEO HQ-NEXT-04 approved synthetic-only implementation. No live instance migration, real seat action or business activation; list/search/bulk/import/export/delete/merge/seat-transfer not required. Proof-bound lifecycle commands and audit required.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/hq/access"
+          ],
+          "serverOperations": [
+            "web_platform/src/lib/hq/server/access-handler.mjs",
+            "web_platform/src/lib/hq/server/handler.mjs",
+            "handleAccess"
+          ],
+          "authorizationPolicies": [
+            "Synthetic owner-restricted root outside project; exact seat proof",
+            "Generation/expiry/purpose checks, default deny, bootstrap enrollment-only"
+          ],
+          "auditEvents": [
+            "access.enroll.staged",
+            "access.enroll.committed",
+            "access.enroll.cancelled",
+            "access.enroll.expired",
+            "access.recover.staged",
+            "access.recover.committed",
+            "access.recover.cancelled",
+            "access.recover.expired",
+            "access.rotate.staged",
+            "access.rotate.committed",
+            "access.rotate.cancelled",
+            "access.rotate.expired",
+            "access.revoke.committed",
+            "access.signout.committed"
+          ],
+          "safeguards": [
+            "No implicit creation or guessed ownership",
+            "No secrets in logs/persistence/backup",
+            "Synthetic instance only; active preview held"
+          ],
+          "dataBinding": "sqlite:positively-marked-isolated-synthetic-instance; no live binding",
+          "idempotency": "Exact operation/generation receipt",
+          "concurrency": "Atomic generation/session/audit transaction",
+          "recovery": "Saved new factor before commit; missing storage refuses",
+          "tests": [
+            "web_platform/tests/hq-access-client.test.mjs",
+            "web_platform/tests/hq-access-independent.test.mjs",
+            "web_platform/tests-browser/hq-access-owner.mjs",
+            "web_platform/tests-browser/hq-access-independent.mjs",
+            "web_platform/tests-browser/hq-access-independent-supplement.mjs"
+          ],
+          "evidence": [
+            "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md",
+            "planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md",
+            "docs/volabi-access-contract.md",
+            ".admin-console/evidence/hq-access-root/actual-pty.json",
+            ".admin-console/evidence/hq-access-owner/final-source-freeze.json",
+            ".admin-console/evidence/hq-access-ui/source-hashes.json",
+            ".admin-console/evidence/hq-access-independent/acceptance.json",
+            ".admin-console/evidence/hq-access-independent/source-pins.json",
+            ".admin-console/evidence/hq-access-independent/browser-result.json",
+            ".admin-console/evidence/hq-access-independent/browser-supplement-result.json",
+            ".admin-console/evidence/hq-access-independent/source-pins-supplement.json",
+            ".admin-console/evidence/hq-access-independent/final-format-review.json"
+          ],
+          "owner": "",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "qa-hq-access"
         }
       ]
     }
@@ -9866,6 +10037,45 @@
         "web_platform/tests-browser/hq-council-owner.mjs",
         "web_platform/tests-browser/hq-council-independent.mjs"
       ]
+    },
+    {
+      "id": "hq-access",
+      "route": "/hq/access",
+      "purpose": "Synthetic founder-seat enrollment/recovery/rotation/revocation",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:positively-marked-isolated-synthetic-instance"
+      ],
+      "capabilities": [
+        "hq-local.access"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "signed-out",
+        "enrolled",
+        "unenrolled",
+        "submitting",
+        "error",
+        "forbidden",
+        "conflict",
+        "expired",
+        "unknown-result",
+        "success",
+        "storage-unavailable"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Approved existing design; one access page/three dialogs. Independent bilingual/RTL/mobile/focus and actual lifecycle browser checks pass. Default active preview unchanged.",
+      "tests": [
+        "web_platform/tests-browser/hq-access-owner.mjs",
+        "web_platform/tests-browser/hq-access-independent.mjs",
+        "web_platform/tests-browser/hq-access-independent-supplement.mjs"
+      ]
     }
   ],
   "integrations": [
@@ -11470,6 +11680,19 @@
       "status": "confirmed",
       "appliesTo": [
         "hq-local.recovery"
+      ]
+    },
+    {
+      "id": "hq-next04-approved",
+      "decision": "CEO approved HQ-NEXT-04 as scoped in FOUNDER_CONTINUITY_SCOPE_20261023.md: synthetic-only storage/auth spine, Access page and three dialogs, backup compatibility, independent review, isolated branch commit/push.",
+      "reason": "Current explicit human authorization; real data/seat, active instance/launcher, production, management activation, business permissions/external writes/finance and new services held.",
+      "evidence": [
+        "planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md",
+        "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "headquarters-local"
       ]
     }
   ],
@@ -14934,6 +15157,16 @@
         ".admin-console/evidence/hq-recovery-security/source-review.json",
         ".admin-console/evidence/hq-recovery-security/independent-post-sidecar.txt"
       ]
+    },
+    {
+      "id": "development-credential-diagnostic-exposure",
+      "severity": "high",
+      "description": "A wildcard environment diagnostic exposed an inherited GitHub credential in tool output; secure credential rotation is pending owner authorization/action.",
+      "status": "open",
+      "rationale": "Value not copied into project evidence; environment dumps stopped and CEO informed. This operational risk remains open independently of bounded synthetic module acceptance. No account credential rotation performed under current holds.",
+      "evidence": [
+        ".admin-console/evidence/hq-access-root/credential-diagnostic-incident.json"
+      ]
     }
   ],
   "declaredStatic": [
@@ -15292,6 +15525,83 @@
       "evidence": [
         "planning/volabi/APPROVAL_RECOVERY_20261023.md",
         "docs/volabi-recovery-contract.md"
+      ]
+    },
+    {
+      "id": "hq-access-copy",
+      "path": "web_platform/src/lib/hq/access-copy.ts",
+      "value": "Bilingual approved Access labels, validation and safe diagnostic vocabulary",
+      "reason": "Static technical/UI protocol under approved synthetic HQ-NEXT-04; no fabricated business records, authority, financial rates or credentials. Entropy is generated at runtime.",
+      "approvedBy": "CEO HQ-NEXT-04 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md",
+        "docs/volabi-access-contract.md"
+      ]
+    },
+    {
+      "id": "hq-access-client-routes",
+      "path": "web_platform/src/lib/hq/access-client.ts",
+      "value": "Existing HQ return-route allowlist and proof/lifecycle protocol identifiers",
+      "reason": "Static technical/UI protocol under approved synthetic HQ-NEXT-04; no fabricated business records, authority, financial rates or credentials. Entropy is generated at runtime.",
+      "approvedBy": "CEO HQ-NEXT-04 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md",
+        "docs/volabi-access-contract.md"
+      ]
+    },
+    {
+      "id": "hq-access-schema",
+      "path": "web_platform/src/lib/hq/server/access-schema.mjs",
+      "value": "Versioned synthetic access schema and bounded expiry/attempt/session protocol budgets",
+      "reason": "Static technical/UI protocol under approved synthetic HQ-NEXT-04; no fabricated business records, authority, financial rates or credentials. Entropy is generated at runtime.",
+      "approvedBy": "CEO HQ-NEXT-04 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md",
+        "docs/volabi-access-contract.md"
+      ]
+    },
+    {
+      "id": "hq-access-controls",
+      "path": "web_platform/src/lib/hq/server/access-controls.mjs",
+      "value": "Security command vocabulary and fixed actual audit method/reason labels",
+      "reason": "Static technical/UI protocol under approved synthetic HQ-NEXT-04; no fabricated business records, authority, financial rates or credentials. Entropy is generated at runtime.",
+      "approvedBy": "CEO HQ-NEXT-04 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md",
+        "docs/volabi-access-contract.md"
+      ]
+    },
+    {
+      "id": "hq-access-storage",
+      "path": "web_platform/src/lib/hq/server/access-storage.mjs",
+      "value": "Fixture formats, native identity/ACL/storage checks and bounded diagnostic vocabulary",
+      "reason": "Static technical/UI protocol under approved synthetic HQ-NEXT-04; no fabricated business records, authority, financial rates or credentials. Entropy is generated at runtime.",
+      "approvedBy": "CEO HQ-NEXT-04 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md",
+        "docs/volabi-access-contract.md"
+      ]
+    },
+    {
+      "id": "hq-access-cli",
+      "path": "scripts/hq-access/cli.mjs",
+      "value": "Synthetic-only CLI names, masked confirmations and safe diagnostic text",
+      "reason": "Static technical/UI protocol under approved synthetic HQ-NEXT-04; no fabricated business records, authority, financial rates or credentials. Entropy is generated at runtime.",
+      "approvedBy": "CEO HQ-NEXT-04 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md",
+        "docs/volabi-access-contract.md"
+      ]
+    },
+    {
+      "id": "hq-access-fixture-launcher",
+      "path": "scripts/start-volabi-access-fixture.mjs",
+      "value": "Separate development-only port range3130–3199 and guarded environment configuration",
+      "reason": "Static technical/UI protocol under approved synthetic HQ-NEXT-04; no fabricated business records, authority, financial rates or credentials. Entropy is generated at runtime.",
+      "approvedBy": "CEO HQ-NEXT-04 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_FOUNDER_CONTINUITY_20261023.md",
+        "docs/volabi-access-contract.md"
       ]
     }
   ],
@@ -16571,6 +16881,51 @@
       ],
       "status": "promoted",
       "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-access-native-identity",
+      "observation": "A healthy Windows fixture initially failed because native file IDs exceeded safe JavaScript integers and PowerShell ACL autoload differed in a child process. Native bigint string identity and direct native ACL APIs restored the intended boundary.",
+      "category": "new-pattern",
+      "proposedChange": "For filesystem custody controls require a healthy native-platform baseline, lossless file identity and explicit native API behavior before judging denial tests.",
+      "evidence": [
+        ".admin-console/evidence/hq-access-security/acceptance.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-access-hmr-boundary",
+      "observation": "Actual Next development reload changed constructor identity; an old guarded store and HqError instanceof check produced the wrong refusal shape. Focused module reload and actual-browser tests exposed it.",
+      "category": "new-pattern",
+      "proposedChange": "Test cached security modules across development reload; close old constructor-owned stores and preserve only bounded approved error shapes across module identities.",
+      "evidence": [
+        ".admin-console/evidence/hq-access-owner/hmr-regression.log",
+        ".admin-console/evidence/hq-access-security/ui-source-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-access-review-claim-order",
+      "observation": "A review claim sets the same transient owner field that the review validator treats as implementation authorship. Independent review registration refused until the claim was released.",
+      "category": "tooling",
+      "proposedChange": "Keep implementation authorship separate from transient claim ownership; until the model supports that distinction record reviewer identity, release its transient claim, then record accepted review. Never force the write.",
+      "evidence": [
+        ".admin-console/evidence/hq-access-independent/review-registration.json"
+      ],
+      "status": "promoted",
+      "scope": "references/multi-agent.md"
+    },
+    {
+      "id": "fb-hq-access-secret-safe-diagnostics",
+      "observation": "A wildcard environment diagnostic unexpectedly included an inherited credential in private tool output. The task stopped environment enumeration and retained an open operational incident without copying the secret to project evidence.",
+      "category": "new-pattern",
+      "proposedChange": "Diagnostics must query only specific nonsecret metadata and return presence booleans or redacted classifications. Never enumerate environment values or credential stores to diagnose Git context.",
+      "evidence": [
+        ".admin-console/evidence/hq-access-root/credential-diagnostic-incident.json"
+      ],
+      "status": "promoted",
+      "scope": "references/security-governance.md"
     }
   ],
   "agents": [
@@ -17259,6 +17614,60 @@
       "status": "done",
       "notes": "DEVELOPMENT-ONLY final learning pass; no business activation or global guidance change.",
       "worklog": ".admin-console/worklog/harvest-hq-recovery.md"
+    },
+    {
+      "id": "hq-access-architect",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY HQ-NEXT-04; no business identity activation or authority.",
+      "worklog": ".admin-console/worklog/hq-access-architect.md"
+    },
+    {
+      "id": "impl-hq-access-server",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY HQ-NEXT-04; no business identity activation or authority.",
+      "worklog": ".admin-console/worklog/impl-hq-access-server.md"
+    },
+    {
+      "id": "impl-hq-access-ui",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY HQ-NEXT-04; no business identity activation or authority.",
+      "worklog": ".admin-console/worklog/impl-hq-access-ui.md"
+    },
+    {
+      "id": "sec-hq-access",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "Independent synthetic HQ-NEXT-04 security acceptance:28/28 final groups;24 core/test and18 UI/launcher/config pins unchanged. No product implementation. Claim released before review gate. Operational credential HIGH/open and global regulated release holds remain. Evidence: .admin-console/evidence/hq-access-security/acceptance.json",
+      "worklog": ".admin-console/worklog/sec-hq-access.md"
+    },
+    {
+      "id": "qa-hq-access",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent HQ-NEXT-04 synthetic API/history and actual browser QA; no implementation or business authority.",
+      "worklog": ".admin-console/worklog/qa-hq-access.md"
+    },
+    {
+      "id": "harvest-hq-access",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY final local learning pass; no capability review, business authority or global guidance adoption.",
+      "worklog": ".admin-console/worklog/harvest-hq-access.md"
     }
   ]
 }

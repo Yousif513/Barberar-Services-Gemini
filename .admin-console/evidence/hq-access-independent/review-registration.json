@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-23T20:34:28.676Z",
+  "capability": "hq-local.access",
+  "reviewStatus": "reviewed",
+  "reviewedBy": "qa-hq-access",
+  "transientOwner": "",
+  "claimReleased": true,
+  "agentStatus": "done",
+  "independentReferences": [
+    ".admin-console/evidence/hq-access-independent/acceptance.json",
+    ".admin-console/evidence/hq-access-independent/source-pins.json",
+    ".admin-console/evidence/hq-access-independent/browser-result.json"
+  ],
+  "productChanges": false,
+  "globalGateChanges": false
+}

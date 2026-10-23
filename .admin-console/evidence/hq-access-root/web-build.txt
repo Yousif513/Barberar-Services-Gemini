@@ -1,0 +1,319 @@
+
+> web_platform@0.1.0 build
+> next build
+
+▲ Next.js 16.3.8 (Turbopack)
+✓ Running next.config.ts took 39ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 6.1s
+  Running TypeScript ...
+  Finished TypeScript in 14.1s ...
+  Collecting page data using 23 workers ...
+  Generating static pages using 23 workers (0/112) ...
+  Generating static pages using 23 workers (28/112)
+  Generating static pages using 23 workers (56/112)
+  Generating static pages using 23 workers (84/112)
+✓ Generating static pages using 23 workers (112/112) in 8.8s
+  Finalizing page optimization ...
+
+Route (app)                               Revalidate  Expire
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ○ /admin
+├ ○ /admin/activity
+├ ○ /admin/approvals
+├ ○ /admin/audit-logs
+├ ○ /admin/bookings
+├ ○ /admin/branches
+├ ○ /admin/coupons
+├ ○ /admin/customers
+├ ○ /admin/disputes
+├ ○ /admin/employees
+├ ○ /admin/help
+├ ○ /admin/incidents
+├ ○ /admin/integrations
+├ ○ /admin/ledger
+├ ○ /admin/notifications
+├ ○ /admin/packages
+├ ○ /admin/platform-rules
+├ ○ /admin/privacy
+├ ○ /admin/providers
+├ ○ /admin/reconciliation
+├ ○ /admin/reconciliation/checkouts
+├ ○ /admin/refunds
+├ ○ /admin/reports
+├ ○ /admin/reviews
+├ ○ /admin/roles
+├ ○ /admin/ropa
+├ ○ /admin/services
+├ ○ /admin/settings
+├ ○ /admin/sponsored
+├ ○ /admin/supply
+├ ○ /admin/taxes
+├ ○ /admin/whatsapp
+├ ƒ /api/hq/[...path]
+├ ƒ /api/pilot/[...path]
+├ ○ /become-provider
+├ ○ /categories/barber
+├ ○ /categories/hair
+├ ○ /categories/makeup
+├ ○ /categories/spa
+├ ○ /customer/book
+├ ○ /customer/bookings
+├ ƒ /customer/bookings/[id]/confirmation
+├ ƒ /customer/bookings/[id]/intake
+├ ○ /customer/dashboard
+├ ○ /customer/dependents
+├ ○ /customer/favorites
+├ ○ /customer/following
+├ ○ /customer/group
+├ ○ /customer/jobs
+├ ○ /customer/memberships
+├ ○ /customer/messages
+├ ○ /customer/notifications
+├ ○ /customer/packages
+├ ○ /customer/privacy
+├ ○ /customer/reviews
+├ ○ /customer/search
+├ ○ /customer/series
+├ ○ /customer/settings
+├ ○ /customer/wallet
+├ ○ /developer
+├ ○ /discover
+├ ○ /hq
+├ ○ /hq/access
+├ ○ /hq/agents
+├ ƒ /hq/agents/[id]
+├ ○ /hq/council
+├ ƒ /hq/council/[id]
+├ ○ /hq/decisions
+├ ƒ /hq/decisions/[id]
+├ ○ /hq/knowledge
+├ ƒ /hq/knowledge/[id]
+├ ○ /hq/projects
+├ ƒ /hq/projects/[id]
+├ ○ /hq/tasks
+├ ƒ /hq/tasks/[id]
+├ ○ /login
+├ ○ /login/mfa
+├ ƒ /pilot/booking
+├ ○ /privacy
+├ ƒ /pro/[handle]
+├ ○ /provider/become
+├ ○ /provider/bookings
+├ ○ /provider/calendar
+├ ○ /provider/chain
+├ ○ /provider/customers
+├ ○ /provider/dashboard
+├ ○ /provider/developer
+├ ○ /provider/employees
+├ ○ /provider/groups
+├ ○ /provider/identity
+├ ○ /provider/intake
+├ ○ /provider/inventory
+├ ○ /provider/jobs
+├ ○ /provider/memberships
+├ ○ /provider/messages
+├ ○ /provider/my-day
+├ ○ /provider/packages
+├ ○ /provider/pricing
+├ ○ /provider/promote
+├ ○ /provider/promotions
+├ ○ /provider/recurring
+├ ○ /provider/reports
+├ ○ /provider/resources
+├ ○ /provider/reviews
+├ ○ /provider/services
+├ ○ /provider/settings
+├ ○ /provider/share
+├ ○ /provider/staff-management
+├ ○ /provider/team
+├ ○ /provider/time-off
+├ ○ /provider/wallet
+├ ○ /provider/whatsapp
+├ ○ /robots.txt
+├ ○ /security
+├ ○ /service-board
+├ ○ /services
+├ ƒ /shop/[id]
+├ ○ /sitemap.xml                                  1h      1y
+├ ○ /store
+└ ○ /terms
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+[sitemap] could not list providers: TypeError: fetch failed
+Turbopack build encountered 6 warnings:
+./scripts/hq-recovery/paths.mjs:33:90
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m31 |[0m ...
+  [90m32 |[0m ...
+[33m[1m>[0m [90m33 |[0m ...[33m_PROJECT_ROOT[0m,projectRoot].map(x=>fs.realpathSync(x));[36mreturn[0m [...[36mnew[0m [33mSet[0m(roots)];}
+  [90m   |[0m                                      [33m[1m^^^^^^^^^^^^^^^^^^[0m
+  [90m34 |[0m ...[33m_PROJECT_ROOT[0m,file=[36mfalse[0m,maxBytes=[33mLIMITS[0m.[36mpackage[0m}={}){
+  [90m35 |[0m ...ed))refuse([32m'path_missing'[0m);[36mconst[0m real=fs.realpathSync(resolved);
+  [90m36 |[0m ...real,root))refuse([32m'project_path_forbidden'[0m);
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: fs.realpathSync(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import trace:
+  App Route:
+    ./scripts/hq-recovery/paths.mjs
+    ./web_platform/src/lib/hq/server/access-storage.mjs
+    ./web_platform/src/lib/hq/server/local-store.mjs
+    ./web_platform/src/lib/hq/server/handler.mjs
+    ./web_platform/src/app/api/hq/[...path]/route.ts
+
+
+./web_platform/src/lib/hq/server/catalog.mjs:17:29
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m15 |[0m     [36mconst[0m globalPath=path.join(process.env.[33mUSERPROFILE[0m||[32m""[0m, [32m".codex/skills"[0m, id, [32m"SKILL.md"[0m);
+  [90m16 |[0m     [36mif[0m(existsSync(globalPath))file=globalPath;
+[33m[1m>[0m [90m17 |[0m     [36mconst[0m installed=!!file&&existsSync(file)&&!file.includes([32m`[0m${path.sep[32m}staged-skills[0m${pa...
+  [90m   |[0m                             [33m[1m^^^^^^^^^^^^^^^^[0m
+  [90m18 |[0m     [36mconst[0m body=file&&existsSync(file)?readFileSync(file,[32m"utf8"[0m):[36mnull[0m;
+  [90m19 |[0m     [36mconst[0m version=body?.match([35m/^  version:\s*["']?([^"'\r\n]+)/m[0m)?.[[35m1[0m]?.trim()||s.declared...
+  [90m20 |[0m     [36mconst[0m description=body?.match([35m/^description:\s*(.+)/m[0m)?.[[35m1[0m]||[32m""[0m;
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: fs.existsSync(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./web_platform/src/lib/hq/server/catalog.mjs
+    ./web_platform/src/lib/hq/server/handler.mjs
+    ./web_platform/src/app/api/hq/[...path]/route.ts
+
+  #2 [App Route]:
+    ./web_platform/src/lib/hq/server/catalog.mjs
+    ./web_platform/src/lib/hq/server/handler.mjs
+    ./web_platform/src/app/api/hq/[...path]/route.ts
+
+
+./web_platform/src/lib/hq/server/catalog.mjs:18:22
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m16 |[0m     [36mif[0m(existsSync(globalPath))file=globalPath;
+  [90m17 |[0m     [36mconst[0m installed=!!file&&existsSync(file)&&!file.includes([32m`[0m${path.sep[32m}staged-skills[0m${pa...
+[33m[1m>[0m [90m18 |[0m     [36mconst[0m body=file&&existsSync(file)?readFileSync(file,[32m"utf8"[0m):[36mnull[0m;
+  [90m   |[0m                      [33m[1m^^^^^^^^^^^^^^^^[0m
+  [90m19 |[0m     [36mconst[0m version=body?.match([35m/^  version:\s*["']?([^"'\r\n]+)/m[0m)?.[[35m1[0m]?.trim()||s.declared...
+  [90m20 |[0m     [36mconst[0m description=body?.match([35m/^description:\s*(.+)/m[0m)?.[[35m1[0m]||[32m""[0m;
+  [90m21 |[0m     [36mconst[0m value={id,name:id,version,sha256:body?hash(body):[36mnull[0m,path:file||[32m""[0m,installed,bi...
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: fs.existsSync(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./web_platform/src/lib/hq/server/catalog.mjs
+    ./web_platform/src/lib/hq/server/handler.mjs
+    ./web_platform/src/app/api/hq/[...path]/route.ts
+
+  #2 [App Route]:
+    ./web_platform/src/lib/hq/server/catalog.mjs
+    ./web_platform/src/lib/hq/server/handler.mjs
+    ./web_platform/src/app/api/hq/[...path]/route.ts
+
+
+./web_platform/src/lib/hq/server/catalog.mjs:18:39
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m16 |[0m ...existsSync(globalPath))file=globalPath;
+  [90m17 |[0m ...[36mst[0m installed=!!file&&existsSync(file)&&!file.includes([32m`[0m${path.sep[32m}staged-skills[0m${path.s..[32m.[0m
+[33m[1m>[0m [90m18 |[0m ...[36mst[0m body=file&&existsSync(file)?readFileSync(file,[32m"utf8"[0m):[36mnull[0m;
+  [90m   |[0m                                   [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m19 |[0m ...[36mst[0m version=body?.match([35m/^  version:\s*["']?([^"'\r\n]+)/m[0m)?.[[35m1[0m]?.trim()||s.declared_ver...
+  [90m20 |[0m ...[36mst[0m description=body?.match([35m/^description:\s*(.+)/m[0m)?.[[35m1[0m]||[32m""[0m;
+  [90m21 |[0m ...[36mst[0m value={id,name:id,version,sha256:body?hash(body):[36mnull[0m,path:file||[32m""[0m,installed,bindin...
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: fs.readFileSync(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./web_platform/src/lib/hq/server/catalog.mjs
+    ./web_platform/src/lib/hq/server/handler.mjs
+    ./web_platform/src/app/api/hq/[...path]/route.ts
+
+  #2 [App Route]:
+    ./web_platform/src/lib/hq/server/catalog.mjs
+    ./web_platform/src/lib/hq/server/handler.mjs
+    ./web_platform/src/app/api/hq/[...path]/route.ts
+
+
+./web_platform/src/lib/hq/server/handler.mjs:25:54
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m23 |[0m ...guarded.close();cache.[36mdelete[0m(root);guarded=[36mnull[0m;}
+  [90m24 |[0m ...[36mch[0m(error){guarded.close();cache.[36mdelete[0m(root);[36mthrow[0m error;}}
+[33m[1m>[0m [90m25 |[0m ...[33mROOT[0m||path.resolve(process.cwd(),process.cwd().endsWith([32m'web_platform'[0m)?[32m'..'[0m:[32m'.'[0m);[36mconst[0m...
+  [90m   |[0m          [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m26 |[0m ...
+  [90m27 |[0m ...lve(process.cwd(),process.cwd().endsWith([32m"web_platform"[0m)?[32m".."[0m:[32m"."[0m);
+  [90m28 |[0m ...[32mhq.sqlite"[0m),key=[33mSymbol[0m.[36mfor[0m([32m"volabi.local.sqlite"[0m);
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: path.resolve(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import trace:
+  App Route:
+    ./web_platform/src/lib/hq/server/handler.mjs
+    ./web_platform/src/app/api/hq/[...path]/route.ts
+
+
+./web_platform/src/lib/hq/server/handler.mjs:27:39
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m25 |[0m ...[33mVOLABI_PROJECT_ROOT[0m||path.resolve(process.cwd(),process.cwd().endsWith([32m'web_platform'[0m)?[32m...[0m
+  [90m26 |[0m ...
+[33m[1m>[0m [90m27 |[0m ...[33mROOT[0m||path.resolve(process.cwd(),process.cwd().endsWith([32m"web_platform"[0m)?[32m".."[0m:[32m"."[0m);
+  [90m   |[0m          [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m ...[32m".local-volabi/hq.sqlite"[0m),key=[33mSymbol[0m.[36mfor[0m([32m"volabi.local.sqlite"[0m);
+  [90m29 |[0m ...);
+  [90m30 |[0m ...[key]=[36mnew[0m [33mMap[0m();
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: path.resolve(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import trace:
+  App Route:
+    ./web_platform/src/lib/hq/server/handler.mjs
+    ./web_platform/src/app/api/hq/[...path]/route.ts

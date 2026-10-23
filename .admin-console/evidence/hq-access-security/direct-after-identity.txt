@@ -1,0 +1,100 @@
+✖ security: legacy adoption requires the original valid seat proof and preserves both workspaces (9240.6072ms)
+✖ security: wrong, unknown and cross-instance recovery factors cannot guess or change a seat (6848.1773ms)
+✖ security: cancelled recovery leaves the factor and old ordinary session valid without exposing staged credential again (6485.4411ms)
+✖ security: confirmed response loss is resolved by redacted receipt and saved replacement, never another cookie (6160.2495ms)
+✖ security: audit persistence failure rolls back factor, generation, revocation and receipt atomically (6363.0631ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35192.0066
+
+✖ failing tests:
+
+test at web_platform\tests\hq-access-security.test.mjs:78:1
+✖ security: legacy adoption requires the original valid seat proof and preserves both workspaces (9240.6072ms)
+  Error [HqError]: storage_unsafe
+      at fail (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:11:25)
+      at assertFileCustody (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:20:297)
+      at inspectAccessRoot (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:49:3)
+      at new HqStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:42:27)
+      at openAccessStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:17:57)
+      at enroll (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:48:23)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:82:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17) {
+    code: 'storage_unsafe',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-security.test.mjs:90:1
+✖ security: wrong, unknown and cross-instance recovery factors cannot guess or change a seat (6848.1773ms)
+  Error [HqError]: storage_unsafe
+      at fail (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:11:25)
+      at assertFileCustody (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:20:297)
+      at inspectAccessRoot (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:49:3)
+      at new HqStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:42:27)
+      at openAccessStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:17:57)
+      at enroll (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:48:23)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:91:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18) {
+    code: 'storage_unsafe',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-security.test.mjs:101:1
+✖ security: cancelled recovery leaves the factor and old ordinary session valid without exposing staged credential again (6485.4411ms)
+  Error [HqError]: storage_unsafe
+      at fail (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:11:25)
+      at assertFileCustody (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:20:297)
+      at inspectAccessRoot (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:49:3)
+      at new HqStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:42:27)
+      at openAccessStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:17:57)
+      at enroll (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:48:23)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:102:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18) {
+    code: 'storage_unsafe',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-security.test.mjs:111:1
+✖ security: confirmed response loss is resolved by redacted receipt and saved replacement, never another cookie (6160.2495ms)
+  Error [HqError]: storage_unsafe
+      at fail (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:11:25)
+      at assertFileCustody (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:20:297)
+      at inspectAccessRoot (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:49:3)
+      at new HqStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:42:27)
+      at openAccessStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:17:57)
+      at enroll (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:48:23)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:112:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18) {
+    code: 'storage_unsafe',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-security.test.mjs:123:1
+✖ security: audit persistence failure rolls back factor, generation, revocation and receipt atomically (6363.0631ms)
+  Error [HqError]: storage_unsafe
+      at fail (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:11:25)
+      at assertFileCustody (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:20:297)
+      at inspectAccessRoot (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:49:3)
+      at new HqStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:42:27)
+      at openAccessStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:17:57)
+      at enroll (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:48:23)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:124:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18) {
+    code: 'storage_unsafe',
+    status: 503
+  }

@@ -1,0 +1,28 @@
+[
+  {
+    "name": "manifest-plan",
+    "exitCode": 0,
+    "output": "manifest-plan.json",
+    "errors": 0,
+    "warnings": 42
+  },
+  {
+    "name": "manifest-release",
+    "exitCode": 1,
+    "output": "manifest-release.json",
+    "errors": 330,
+    "warnings": 42
+  },
+  {
+    "name": "manifest-coverage",
+    "exitCode": 0,
+    "output": "manifest-coverage.txt"
+  },
+  {
+    "name": "manifest-installed-release",
+    "exitCode": 1,
+    "output": "manifest-installed-release.json",
+    "errors": 384,
+    "warnings": 42
+  }
+]

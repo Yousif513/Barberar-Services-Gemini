@@ -1,0 +1,140 @@
+{
+  "format": "volabi-access-independent-security-acceptance-1",
+  "at": "2026-10-23T20:39:40.212708+00:00",
+  "reviewer": "sec-hq-access",
+  "capability": "hq-local.access-controls",
+  "disposition": "accepted-for-approved-synthetic-development-scope",
+  "implementationAuthorship": false,
+  "profile": "regulated platform; bounded development-only local HQ capability",
+  "totals": {
+    "tests": 28,
+    "pass": 28,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "partitionSemantics": "Disjoint Node test-name-pattern selections omit nonselected groups in each invocation; every one of the28 source groups executed exactly once across final partitions. Omitted groups are not counted as passes or skips.",
+  "partitions": [
+    {
+      "log": ".admin-console/evidence/hq-access-security/verified-auth.txt",
+      "sha256": "dcbf8e6d14311acb7e397f57a4937f147c83af0c833ffca17d6e156ccd960720",
+      "bytes": 1814,
+      "exitCode": 0,
+      "namePattern": "restricted bootstrap|legacy adoption|wrong, unknown|cancelled recovery|confirmed response|audit persistence|revoked retained|HTTP recovery|unauthenticated challenges|invalid proof budget|request queued|adopted second-seat|expired saved-factor|lost signout",
+      "durationMs": 565301.9516,
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "groups": [
+        "security: restricted bootstrap cannot read domain data, create sessions or nominate another seat",
+        "security: legacy adoption requires the original valid seat proof and preserves both workspaces",
+        "security: wrong, unknown and cross-instance recovery factors cannot guess or change a seat",
+        "security: cancelled recovery and rotation retain the current factor until confirmed commit",
+        "security: confirmed response loss is resolved by redacted receipt and saved replacement, never another cookie",
+        "security: audit persistence failure rolls back factor, generation, revocation and receipt atomically",
+        "security: revoked retained request objects and stale CSRF cannot read or commit commands",
+        "security: HTTP recovery challenge is bound to the exact browser while bad origin, body and forged scope refuse",
+        "security: unauthenticated challenges cannot replace a proved pending seat operation or disable normal sessions",
+        "security: invalid proof budget persists across reopen and never disables an existing valid session",
+        "security: a request queued after initial authorization rechecks its seat inside the write transaction",
+        "security: adopted second-seat enrollment requires exact current cookie and one-use local permit together",
+        "security: expired saved-factor stage consumes only the stage and leaves old factor and session usable",
+        "security: lost signout or revoke responses replay receipts without clearing or revoking a newer session"
+      ]
+    },
+    {
+      "log": ".admin-console/evidence/hq-access-security/verified-storage.txt",
+      "sha256": "d6077fc308a2c9c9be323af6c2be8b8a2e1ef52a7adad68c556b41eabcf01461",
+      "bytes": 1302,
+      "exitCode": 0,
+      "namePattern": "guarded open refuses|cached guard loss|native Windows junction|native owner custody|replaced database|inert markers|guard loss after|explicit insecure|actual running|same-inode",
+      "durationMs": 308379.8176,
+      "tests": 10,
+      "pass": 10,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "groups": [
+        "security: guarded open refuses missing database, guard, both and parent without implicit creation",
+        "security: cached guard loss blocks reads and writes while preserving existing business rows",
+        "security: native Windows junction and hard-linked database aliases refuse without rebinding",
+        "security: native owner custody rejects an insecure instance directory",
+        "security: replaced database and swapped guard cannot be adopted as the cached authoritative instance",
+        "security: inert markers, moved inert application identity and unenrolled legacy storage refuse normal guarded open",
+        "security: guard loss after a real business write rolls back before commit and closes the cached handle",
+        "security: explicit insecure guard and database file ACLs refuse even under an owner-only directory",
+        "security: actual running Windows database rename either denies replacement or closes the orphaned cached handle",
+        "security: same-inode native overwrite is detected instead of serving stale cached SQLite pages"
+      ]
+    },
+    {
+      "log": ".admin-console/evidence/hq-access-security/verified-portable-race-resume.txt",
+      "sha256": "494ee0bb5e3026c0a308bf6ae2cad4f2d6be69d1df8b046c47f151f5327a6619",
+      "bytes": 642,
+      "exitCode": 0,
+      "namePattern": "encrypted new-schema|old v1 fixture|truly concurrent|early partial",
+      "durationMs": 166000.222,
+      "tests": 4,
+      "pass": 4,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "groups": [
+        "security: encrypted new-schema capture physically excludes every auth control and restores inert with exact business history",
+        "security: old v1 fixture package remains fully inspectable and inert after access schema support",
+        "security: truly concurrent worker confirmations produce one session and one committed transition",
+        "security: early partial initialization and adoption stay blocked until exact owned-operation resume with original proof"
+      ]
+    }
+  ],
+  "sourceVerification": {
+    "final-source-freeze.json": {
+      "files": 24,
+      "mismatches": 0,
+      "receiptSha256": "a41994aeb969b9a1d27d2141add74c75e94214161bbf1d47c53251ff4cc797c2"
+    },
+    "ui-source-review.json": {
+      "files": 18,
+      "mismatches": 0,
+      "receiptSha256": "f816a8ab567473e5becec71e4c262ab0d0c67a687251abf5a676e0fa9b991214"
+    }
+  },
+  "testSha256": "b360dbc3514038b879ab85eaee3171b895c9a1ddcfe760aa4d6a562b0947ec8c",
+  "sourceReview": [
+    "Independent reread of access protocol, native storage custody, exact identity, cached and fresh metadata guards, HTTP boundary, bootstrap and two-seat proof authorization, transactional generation/session/audit, replay material, bounded diagnostics, source-only backup rebuild and ciphertext/raw-page exclusion.",
+    "Independent reread of frozen UI/client/fields/dialog/provider/shell, canonical15-agent return allowlist, unknown outcome handling, separate fixture launcher and unchanged legacy launcher. Actual browser QA is separate independent QA evidence.",
+    "ESLint one-line generated fixture output ignore matches existing generated Next output ignores; lint rules unchanged.",
+    "Operations guide correctly limits all helpers and launcher to marked external synthetic fixtures, separates cookies/browser profile and holds real/live/production/activation/external finance actions."
+  ],
+  "operationsGuide": {
+    "file": "docs/volabi-access-operations.md",
+    "sha256": "b0e31a9c91673aae99ac8a11dab926d28a9c74c6f9ff645f2cef87948a4ddf4b"
+  },
+  "auditMethodsVerified": [
+    "restricted-bootstrap",
+    "session-csrf-and-local-permit",
+    "recovery-factor",
+    "session-and-csrf",
+    "session-csrf-and-recovery-factor"
+  ],
+  "authorizationBoundary": "A current same-seat cookie authorizes its permitted HQ reads/writes and signout only; recovery/enrollment/rotation/revoke-all require their additional exact factor or local permit and proofs. Restricted bootstrap grants no ordinary HQ access. No business roles or cross-seat authority.",
+  "residualSliceFindings": [],
+  "priorEvidence": "Original RED failures, interrupted obsolete execution, refusal-label and missing-operation-material harness corrections, and pre-audit-label candidate28 receipts retained; they are not final acceptance receipts.",
+  "cleanup": {
+    "remainingOwnedSyntheticFixtureRoots": 0,
+    "priorOwnedOrphanCleanupReceipt": "orphan-cleanup.json"
+  },
+  "releaseLimits": [
+    "No real data, .local-volabi, real cookies, real recovery/enrollment, launcher replacement, production, business activation, Azure or financial/external action.",
+    "Global regulated release gates are owned by root and are not waived by this capability acceptance.",
+    "development-credential-diagnostic-exposure remains HIGH/open; no credential values copied.",
+    "Dependency/runtime advisories require separate applicability and maintenance follow-up; no whole-platform security-clear claim."
+  ],
+  "independence": "No product implementation edits, no other test edits, no self-review, no commit or push by this reviewer."
+}

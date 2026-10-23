@@ -1,0 +1,12 @@
+✔ SEAT-01 SEAT-03 SEAT-06: independent rich history survives enrollment, lost-cookie commit, scoped receipt and reconnect (82264.917ms)
+✔ SEAT-02 SEAT-05: HTTP wrong-seat, stale cookie/CSRF, direct details/receipts and forged claims refuse after healthy baselines (42396.6809ms)
+✔ SEAT-02 SEAT-05: independent queued write rechecks authority; neighbour enrollment requires its matching session and local permit (46773.926ms)
+✔ DB-01: healthy guarded baseline then missing database, missing root and absent parent never bootstrap storage or anonymous workspaces (44849.8487ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 216432.2045

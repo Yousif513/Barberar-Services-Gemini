@@ -1,0 +1,35 @@
+✔ supported access schema is excluded physically while exact v1 business snapshot and inert schema remain unchanged (85.6095ms)
+✔ access schema does not permit unfamiliar tables or indexes and cannot be added to inert artifacts (89.7167ms)
+✔ missing or oversized security state refuses instead of silently discarding an unsupported control store (35.2749ms)
+✖ new dependency inventory pins access code while old v1 dependency inventories remain inspectable with explicit gaps (1976.2663ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2307.8713
+
+✖ failing tests:
+
+test at web_platform\tests\hq-access-backup.test.mjs:16:1
+✖ new dependency inventory pins access code while old v1 dependency inventories remain inspectable with explicit gaps (1976.2663ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(inventory.files.some(f=>f.reference==='web_platform/src/lib/hq/server/access-controls.mjs'&&f.status==='captured'))
+
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-backup.test.mjs:16:282)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

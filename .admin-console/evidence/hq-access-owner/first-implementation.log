@@ -1,0 +1,155 @@
+✖ SEAT-01 explicit initialization has restricted bootstrap and exact-seat saved-copy confirmation (3345.5007ms)
+✖ SEAT-03/04 recovery preserves data, rotates only after confirmation and replay never reissues secrets (3102.812ms)
+✖ SEAT-05 retained session objects fail inside command transaction after revoke (2991.2541ms)
+✖ SEAT-04 audit failure rolls back factor and sessions (3059.5502ms)
+✔ DB-01 normal missing open creates no path or database (3444.2868ms)
+✖ DB-02/03 cached store refuses lost guard and replaced database without repair (2879.5026ms)
+✖ SEAT-07 invalid attempts persist across reopen and bound independent challenges (2964.4189ms)
+✖ HTTP bounded access and session bootstrap do not create an anonymous workspace (2932.9481ms)
+✖ DB partial publication is blocked then explicit same-fixture resume reissues restricted bootstrap (3182.6111ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 1
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27999.4149
+
+✖ failing tests:
+
+test at web_platform\tests\hq-access-owner.test.mjs:14:1
+✖ SEAT-01 explicit initialization has restricted bootstrap and exact-seat saved-copy confirmation (3345.5007ms)
+  Error [HqError]: storage_guard_invalid
+      at bad (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:11:24)
+      at validateAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:13:227)
+      at readAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:25:415)
+      at initializeAccess (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:39:17)
+      at enrolled (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:12:44)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:14:116)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    code: 'storage_guard_invalid',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-owner.test.mjs:15:1
+✖ SEAT-03/04 recovery preserves data, rotates only after confirmation and replay never reissues secrets (3102.812ms)
+  Error [HqError]: storage_guard_invalid
+      at bad (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:11:24)
+      at validateAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:13:227)
+      at readAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:25:415)
+      at initializeAccess (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:39:17)
+      at enrolled (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:12:44)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:15:122)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19) {
+    code: 'storage_guard_invalid',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-owner.test.mjs:16:1
+✖ SEAT-05 retained session objects fail inside command transaction after revoke (2991.2541ms)
+  Error [HqError]: storage_guard_invalid
+      at bad (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:11:24)
+      at validateAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:13:227)
+      at readAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:25:415)
+      at initializeAccess (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:39:17)
+      at enrolled (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:12:44)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:16:98)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19) {
+    code: 'storage_guard_invalid',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-owner.test.mjs:17:1
+✖ SEAT-04 audit failure rolls back factor and sessions (3059.5502ms)
+  Error [HqError]: storage_guard_invalid
+      at bad (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:11:24)
+      at validateAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:13:227)
+      at readAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:25:415)
+      at initializeAccess (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:39:17)
+      at enrolled (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:12:44)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:17:73)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19) {
+    code: 'storage_guard_invalid',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-owner.test.mjs:19:1
+✖ DB-02/03 cached store refuses lost guard and replaced database without repair (2879.5026ms)
+  Error [HqError]: storage_guard_invalid
+      at bad (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:11:24)
+      at validateAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:13:227)
+      at readAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:25:415)
+      at initializeAccess (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:39:17)
+      at enrolled (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:12:44)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:19:98)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19) {
+    code: 'storage_guard_invalid',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-owner.test.mjs:20:1
+✖ SEAT-07 invalid attempts persist across reopen and bound independent challenges (2964.4189ms)
+  Error [HqError]: storage_guard_invalid
+      at bad (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:11:24)
+      at validateAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:13:227)
+      at readAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:25:415)
+      at initializeAccess (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:39:17)
+      at enrolled (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:12:44)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:20:100)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19) {
+    code: 'storage_guard_invalid',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-owner.test.mjs:21:1
+✖ HTTP bounded access and session bootstrap do not create an anonymous workspace (2932.9481ms)
+  Error [HqError]: storage_guard_invalid
+      at bad (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:11:24)
+      at validateAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:13:227)
+      at readAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:25:415)
+      at initializeAccess (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:39:17)
+      at enrolled (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:12:44)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:21:105)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19) {
+    code: 'storage_guard_invalid',
+    status: 503
+  }
+
+test at web_platform\tests\hq-access-owner.test.mjs:22:1
+✖ DB partial publication is blocked then explicit same-fixture resume reissues restricted bootstrap (3182.6111ms)
+  Error [HqError]: storage_guard_invalid
+      at bad (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:11:24)
+      at validateAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:13:227)
+      at readAccessState (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-schema.mjs:25:415)
+      at initializeAccess (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:39:17)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:22:132)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12) {
+    code: 'storage_guard_invalid',
+    status: 503
+  }

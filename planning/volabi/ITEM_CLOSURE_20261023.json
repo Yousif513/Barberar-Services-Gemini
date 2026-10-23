@@ -11,13 +11,14 @@
     "Knowledge and evidence",
     "Projects and Initiatives",
     "Executive Council preparation and meeting records",
-    "Development-only encrypted backup and inert restore verification (CLI; synthetic fixtures only)"
+    "Development-only encrypted backup and inert restore verification (CLI; synthetic fixtures only)",
+    "Synthetic-only storage guards and founder-seat Access continuity (one route/three dialogs)"
   ],
   "scopeFamilies": 8,
-  "routePatterns": 13,
-  "sharedOverlays": 25,
+  "routePatterns": 14,
+  "sharedOverlays": 28,
   "currentAuthorizedClosures": [
-    "HQ-NEXT-03"
+    "HQ-NEXT-04"
   ],
   "items": [
     {
@@ -68,7 +69,7 @@
       "evidence": [
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687"
+          "sha256_utf8_lf": "aee7766ac9c1e9a9b85ef96aab03c0f827819231ff0e04cf614afc719e8c49ae"
         },
         {
           "path": ".admin-console/evidence/volabi-local/server-independent-review.json",
@@ -112,7 +113,7 @@
       "evidence": [
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687"
+          "sha256_utf8_lf": "aee7766ac9c1e9a9b85ef96aab03c0f827819231ff0e04cf614afc719e8c49ae"
         },
         {
           "path": "web_platform/tests/hq-independent-review.test.mjs",
@@ -148,7 +149,7 @@
         },
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687"
+          "sha256_utf8_lf": "aee7766ac9c1e9a9b85ef96aab03c0f827819231ff0e04cf614afc719e8c49ae"
         },
         {
           "path": ".admin-console/evidence/volabi-first-loop/independent-frontend.json",
@@ -200,7 +201,7 @@
         },
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687"
+          "sha256_utf8_lf": "aee7766ac9c1e9a9b85ef96aab03c0f827819231ff0e04cf614afc719e8c49ae"
         }
       ]
     },
@@ -331,25 +332,53 @@
           "sha256_utf8_lf": "8142b49056e4d59a1f8611858456a3756a5554691d66d82dd98e03bc8195c649"
         }
       ]
+    },
+    {
+      "id": "HQ-NEXT-04",
+      "title": "Synthetic founder-seat Access continuity and storage guards",
+      "status": "verified-development-synthetic-only",
+      "boundary": "One route/three dialogs, exact-seat recovery/session lifecycle, no-create storage guards, safe backup compatibility. Independent security28/nativeQA4/browserQA14 pass. No real data/seat/launcher action; operational credential incident remains HIGH/open.",
+      "evidence": [
+        {
+          "path": "docs/volabi-access-delivery.md",
+          "sha256_utf8_lf": "981d276cc9d6cd8d7dedab3ca40de22f83f41fa4feebcef08ca500c6e436054c"
+        },
+        {
+          "path": ".admin-console/evidence/hq-access-security/acceptance.json",
+          "sha256_utf8_lf": "8f9c5b39a3f29f4a160200a1adfab143650b9e56a1e5a75cf4cff1fe6ae2979c"
+        },
+        {
+          "path": ".admin-console/evidence/hq-access-independent/acceptance.json",
+          "sha256_utf8_lf": "8b9e8a42c33ad428166b6e9ff4e57a9e48aa0f6054fcc3161fa4557390022b59"
+        },
+        {
+          "path": ".admin-console/evidence/hq-access-independent/browser-supplement-result.json",
+          "sha256_utf8_lf": "7c85f0fe0262d11d22dbe3b77bf514a19b8f2b73560accbec108a6aa65d3a311"
+        },
+        {
+          "path": ".admin-console/evidence/hq-access-root/regression-results.json",
+          "sha256_utf8_lf": "f04208636c86dd5552ba8175923da6dca90d028ad0994875391f9a2c6024945f"
+        }
+      ]
     }
   ],
   "nextProposedItem": {
-    "id": "HQ-NEXT-03",
-    "title": "Encrypted synthetic backup and inert recovery verification",
-    "status": "verified-development-synthetic-only",
-    "packet": "planning/volabi/RECOVERY_SCOPE_20261023.md",
-    "packet_sha256_utf8_lf": "1713e226613d257ce45bc27fcf4647642c287875aba2ca15daec99f1c895b2e2",
-    "approval": "planning/volabi/APPROVAL_RECOVERY_20261023.md",
-    "scope": "Three CLI operations, zero routes/overlays. Next founder-seat continuity scope remains to prepare."
+    "id": "SEC-OPS-01",
+    "title": "Secure rotation of exposed GitHub development credential",
+    "status": "authorization-pending",
+    "report": "docs/volabi-access-delivery.md",
+    "scope": "Use provider secure interface; never expose secrets in chat/files/logs. Keep all existing HQ approval holds."
   },
   "releaseGate": {
     "profile": "regulated",
     "planExitCode": 0,
     "coverageExitCode": 0,
     "localReleaseExitCode": 1,
-    "localErrors": 318,
-    "warnings": 35,
-    "evidence": ".admin-console/evidence/hq-recovery-root/manifest-release.json",
-    "note": "Prior303 plus15 independently verified scanner-context findings retained; four new static applicability warnings. Exact final source/gate evidence separate; no waiver."
+    "localErrors": 330,
+    "warnings": 42,
+    "installedReleaseExitCode": 1,
+    "installedErrors": 384,
+    "evidence": ".admin-console/evidence/hq-access-root/manifest-release.json",
+    "note": "Prior318 +11 independently classified scanner-context findings +1 genuine HIGH credential exposure; findings retained, no waiver. Seven new static-applicability warnings. Full Headquarters remains under development."
   }
 }

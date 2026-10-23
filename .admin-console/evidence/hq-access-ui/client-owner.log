@@ -1,0 +1,23 @@
+(node:65900) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/access-client.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\web_platform\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Access status makes only a no-store current-cookie status request and refuses public seat details (95.521ms)
+✔ Authenticated status accepts only the bounded inactive local session shape (0.7082ms)
+✔ Recovery preparation obtains a browser challenge then sends the factor only in one bounded JSON body (0.6252ms)
+✔ Bootstrap proof uses only challenge/enrollment; existing-session enrollment and rotation carry CSRF (1.1452ms)
+✔ Return destinations are exact existing routes and never carry a query, external URL or encoded escape (0.2522ms)
+✔ Confirmation checks operation identity, committed state and returned destination before allowing success (0.584ms)
+✔ Lost confirmation has no automatic replay; receipt lookup carries only the scoped proof and no credential (0.2901ms)
+✔ Cancellation accepts truthful terminal receipts and never treats pending or mismatched data as cancelled (0.2976ms)
+✔ Refusals expose safe codes and diagnostic UUIDs, never server-provided message or arbitrary diagnostics (0.3864ms)
+✔ Oversized secret material is refused before any stage network request (0.2076ms)
+✔ Signout and all-session revocation keep one client-generated receipt proof across a lost response (1.1293ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 166.8452

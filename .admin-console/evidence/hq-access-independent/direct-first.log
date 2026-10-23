@@ -1,0 +1,50 @@
+✖ SEAT-01 SEAT-03 SEAT-06: independent rich history survives enrollment, lost-cookie commit, scoped receipt and reconnect (17491.7892ms)
+✖ SEAT-02 SEAT-05: HTTP wrong-seat, stale cookie/CSRF, direct details/receipts and forged claims refuse after healthy baselines (34136.503ms)
+✔ SEAT-02 SEAT-05: independent queued write rechecks authority; neighbour enrollment requires its matching session and local permit (41831.4716ms)
+✔ DB-01: healthy guarded baseline then missing database, missing root and absent parent never bootstrap storage or anonymous workspaces (42708.341ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 2
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 136295.6117
+
+✖ failing tests:
+
+test at web_platform\tests\hq-access-independent.test.mjs:13:1
+✖ SEAT-01 SEAT-03 SEAT-06: independent rich history survives enrollment, lost-cookie commit, scoped receipt and reconnect (17491.7892ms)
+  AssertionError [ERR_ASSERTION]: only access audit events added
+
+  false !== true
+
+      at assertBusinessUnchanged (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-independent-fixture.mjs:33:9)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-independent.test.mjs:19:2)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at web_platform\tests\hq-access-independent.test.mjs:37:1
+✖ SEAT-02 SEAT-05: HTTP wrong-seat, stale cookie/CSRF, direct details/receipts and forged claims refuse after healthy baselines (34136.503ms)
+  AssertionError [ERR_ASSERTION]: only access audit events added
+
+  false !== true
+
+      at assertBusinessUnchanged (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-independent-fixture.mjs:33:9)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-independent.test.mjs:51:2)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

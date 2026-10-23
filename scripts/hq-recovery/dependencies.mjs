@@ -9,13 +9,17 @@ const REQUIRED=[
  'planning/volabi/APPROVAL_20261022.md','planning/volabi/DESIGN.md','docs/legal/2026-10-10-adopted-decisions.md','docs/volabi-finance-refund-gaps.md',
  'scripts/hq-recovery/common.mjs','scripts/hq-recovery/envelope.mjs','scripts/hq-recovery/paths.mjs','scripts/hq-recovery/schema.mjs','scripts/hq-recovery/dependencies.mjs','scripts/hq-recovery/index.mjs','scripts/hq-recovery/cli.mjs','scripts/hq-recovery/worker.mjs'
 ];
+const ACCESS_REFERENCES=[
+ 'web_platform/src/lib/hq/server/access-schema.mjs','web_platform/src/lib/hq/server/access-storage.mjs','web_platform/src/lib/hq/server/access-controls.mjs','web_platform/src/lib/hq/server/access-handler.mjs',
+ 'scripts/hq-access/index.mjs','scripts/hq-access/cli.mjs'
+];
 function relativeReference(value){if(typeof value!=='string'||path.isAbsolute(value)||value.includes('\\')||value.split('/').some(part=>['.','..',''].includes(part)))refuse('dependency_reference_invalid');return value;}
 function refs(projectRoot){
- const names=[...REQUIRED];const file=path.join(projectRoot,'planning/volabi/persona-and-skills/PERSONA_REGISTRY.json');
+ const names=[...REQUIRED,...ACCESS_REFERENCES.filter(ref=>fs.existsSync(path.join(projectRoot,ref)))];const file=path.join(projectRoot,'planning/volabi/persona-and-skills/PERSONA_REGISTRY.json');
  if(fs.existsSync(file)){noLinks(file);const people=parseJson(boundedRead(file,LIMITS.dependencyFile)).profiles;if(!Array.isArray(people)||people.length>100)refuse('dependency_inventory_invalid');for(const person of people){if(!/^[a-z][a-z0-9-]*$/.test(person.agent_id))refuse('dependency_inventory_invalid');names.push(`web_platform/public/volabi/agents/${person.agent_id}.png`,`web_platform/public/volabi/voices/${person.agent_id}-en.wav`);}}
  if(names.length>LIMITS.dependencyFiles)refuse('dependency_limit');return names.sort();
 }
-function allowedReference(value){return REQUIRED.includes(value)||/^web_platform\/public\/volabi\/(agents\/[a-z][a-z0-9-]*\.png|voices\/[a-z][a-z0-9-]*-en\.wav)$/.test(value);}
+function allowedReference(value){return REQUIRED.includes(value)||ACCESS_REFERENCES.includes(value)||/^web_platform\/public\/volabi\/(agents\/[a-z][a-z0-9-]*\.png|voices\/[a-z][a-z0-9-]*-en\.wav)$/.test(value);}
 export function captureDependencies(projectRoot,data,checkTime){
  const files=[];let total=0;const references=refs(projectRoot);noLinksBatch(references.map(r=>path.join(projectRoot,r)));
  for(const reference of references){

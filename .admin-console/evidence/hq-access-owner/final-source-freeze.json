@@ -1,0 +1,56 @@
+{
+  "format": "volabi-access-owner-freeze-1",
+  "at": "2026-10-23T20:23:11.700Z",
+  "classification": "Synthetic-development implementation handoff; independent review and final gates required",
+  "files": [
+    {
+      "file": "web_platform/src/lib/hq/server/access-schema.mjs",
+      "sha256": "489ebde46eb28eb0e7cac9a54550ade01859ad35e34752631695e1692615e34c"
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-storage.mjs",
+      "sha256": "6c314daa17d148da70762c1451508442605efa2605713f8c2c28a84cb5ff18cf"
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-controls.mjs",
+      "sha256": "aeb1e8cfc65a66d654245701edf69cfbc730d731f4eae0feda81390f52d528d5"
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-handler.mjs",
+      "sha256": "1e2a2dcc99005f9a94bb3ef1d5c98a90358a30e0d535da1623e568febc56a69c"
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256": "4b3ccb15d5f35637f8c0d88831c0de11861eacfcdde03a028d67ec4387d9cc1f"
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/local-boundary.mjs",
+      "sha256": "e6128d6241f04a2ff53e5ef1b0dcbf62a802e7ca00240bef6bb560d235be3ff0"
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256": "6e399668235eecdd4f97cd9a6aead27281771756c77e393c0d316f64aa826ee9"
+    },
+    {
+      "file": "scripts/hq-access/index.mjs",
+      "sha256": "9df85d4fcc4356f63ce4467ad98a0d380bb56081c594af6cf0bdd246985dc079"
+    },
+    {
+      "file": "scripts/hq-access/cli.mjs",
+      "sha256": "759e8363fa3bbf9abe3f6d4d9b9b86ff7bade925d225ed2aa09ad4d654729582"
+    },
+    {
+      "file": "web_platform/tests/hq-access-owner.test.mjs",
+      "sha256": "bc95bae0d45926749b97938ae1e1130a9d2cfd8b0476b3e1eb6f4bacfe6cdfed"
+    },
+    {
+      "file": "docs/volabi-access-contract.md",
+      "sha256": "3df9fd23dcb7d058ac27ed2b0e5767366571da7a4c601d76bed1142c661287cb"
+    },
+    {
+      "file": "docs/volabi-access-api.json",
+      "sha256": "b3f90fbe33b90dfcace60c5e1d5eb1e0138638145a87473426d216ac1e2c2441"
+    }
+  ],
+  "revision": "parent-requested exact P2 audit authentication label correction"
+}

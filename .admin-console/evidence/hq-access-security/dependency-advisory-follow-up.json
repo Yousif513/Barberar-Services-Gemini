@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-23T20:39:40.212708+00:00",
+  "actualInstalled": {
+    "node": "v24.15.0",
+    "installedNext": "16.3.8"
+  },
+  "sources": [
+    "https://nextjs.org/blog/nextjs-security-update-october-14-2026",
+    "https://nodejs.org/en/blog/release/v24.22.1"
+  ],
+  "disposition": "Separate host/framework maintenance follow-up; no installed dependency changes, no global dependency security-clear claim, no active exploitability conclusion. Next official October14 advisory conditions concern Cache Components/use-cache typed arrays, glibc Linux SVG optimization, or Server Actions; current synthetic review is Windows loopback and does not enable Cache Components. Application-wide applicability is not established by this bounded capability review. Node October21 security release is newer than current runtime. Parent owns release follow-up."
+}

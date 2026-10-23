@@ -1,0 +1,12 @@
+✔ security: encrypted new-schema capture physically excludes every auth control and restores inert with exact business history (44081.0734ms)
+✔ security: old v1 fixture package remains fully inspectable and inert after access schema support (30531.6523ms)
+✔ security: truly concurrent worker confirmations produce one session and one committed transition (31178.9094ms)
+✔ security: early partial initialization and adoption stay blocked until exact owned-operation resume with original proof (33538.7526ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 139433.9155

@@ -1,0 +1,44 @@
+✔ security: restricted bootstrap cannot read domain data, create sessions or nominate another seat (13148.5079ms)
+✔ security: legacy adoption requires the original valid seat proof and preserves both workspaces (15134.1143ms)
+✔ security: wrong, unknown and cross-instance recovery factors cannot guess or change a seat (43084.2696ms)
+✔ security: cancelled recovery leaves the factor and old ordinary session valid without exposing staged credential again (25081.1809ms)
+✔ security: confirmed response loss is resolved by redacted receipt and saved replacement, never another cookie (28165.8063ms)
+✔ security: audit persistence failure rolls back factor, generation, revocation and receipt atomically (17819.0946ms)
+✖ security: revoked retained request objects and stale CSRF cannot read or commit commands (21171.2191ms)
+✔ security: HTTP recovery challenge is bound to the exact browser while bad origin, body and forged scope refuse (21030.6949ms)
+✔ security: unauthenticated challenges cannot replace a proved pending seat operation or disable normal sessions (34954.5057ms)
+✔ security: invalid proof budget persists across reopen and never disables an existing valid session (96189.7026ms)
+✔ security: a request queued after initial authorization rechecks its seat inside the write transaction (19192.7446ms)
+✔ security: adopted second-seat enrollment requires exact current cookie and one-use local permit together (26796.9927ms)
+✔ security: expired saved-factor stage consumes only the stage and leaves old factor and session usable (20971.5144ms)
+✔ security: lost signout or revoke responses replay receipts without clearing or revoking a newer session (33478.1921ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 13
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 416333.8238
+
+✖ failing tests:
+
+test at web_platform\tests\hq-access-security.test.mjs:134:1
+✖ security: revoked retained request objects and stale CSRF cannot read or commit commands (21171.2191ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'invalid_input'
+  - 'csrf_failed'
+
+      at httpCode (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:62:164)
+      at async TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:143:2)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'invalid_input',
+    expected: 'csrf_failed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

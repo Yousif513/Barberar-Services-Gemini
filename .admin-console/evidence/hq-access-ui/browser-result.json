@@ -1,0 +1,43 @@
+{
+  "classification": "Synthetic owner browser evidence; independent acceptance required",
+  "checks": [
+    "Access bypasses ordinary session bootstrap and discloses no protected task data",
+    "Enrollment dialog masks proof, traps keyboard focus and returns focus on Escape",
+    "Bootstrap enrolls only after saved-copy confirmation and reconnects to the exact task/seat",
+    "Cancelling a staged rotation preserves current session and factor",
+    "Invalid rotation proof is refused in-dialog and the submitted secret is cleared",
+    "Rotation requires re-entered saved replacement and commits only the matching copy",
+    "Lost final response/cookie stays unknown until scoped receipt; confirmed replacement recovers exact seat",
+    "Signout response loss uses the original client-held operation proof and truthful receipt",
+    "All-session revocation requires current factor and explicit acknowledgement",
+    "Invalid return is visibly refused and credentials never enter generated request URLs",
+    "Arabic RTL and 320/768/1024/1440 layouts remain operable without horizontal overflow",
+    "Only locale is persisted; no credential, permit, operation proof or command draft is stored",
+    "Running guard loss blocks Access with safe diagnostics and performs no browser repair",
+    "Exact original business rows and receipts are unchanged; the second workspace/session stays isolated"
+  ],
+  "apiRefusals": [
+    {
+      "path": "/api/hq/access/stage",
+      "status": 400,
+      "code": "proof_invalid"
+    },
+    {
+      "path": "/api/hq/access/confirm",
+      "status": 400,
+      "code": "proof_invalid"
+    },
+    {
+      "path": "/api/hq/access/status",
+      "status": 503,
+      "code": "storage_not_initialized"
+    }
+  ],
+  "unexpectedErrors": [],
+  "externalRequests": [],
+  "expectedTransportFailures": 2,
+  "startedAt": "2026-10-23T20:17:41.737Z",
+  "readinessFailure": "TypeError",
+  "status": "passed",
+  "finishedAt": "2026-10-23T20:19:36.022Z"
+}

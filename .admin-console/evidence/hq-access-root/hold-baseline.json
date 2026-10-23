@@ -1,0 +1,27 @@
+{
+  "files": [
+    {
+      "path": "scripts/start-volabi-local.mjs",
+      "sha256_utf8_lf": "39c60dcd00a4326f5f6ab9678066d24d240e3b6bd7cac18041fb50ab14ba6ef6"
+    },
+    {
+      "path": "planning/volabi/persona-and-skills/PERSONA_REGISTRY.json",
+      "sha256_utf8_lf": "7bdd8e081a2527f989aedfc668317ead714cdb298c63d6055e201d50f642caf3"
+    },
+    {
+      "path": "planning/volabi/VOICE_ACCENT_REQUIREMENTS.json",
+      "sha256_utf8_lf": "d54fb490edcf0adcd4a7d0165e0c99e2cc3f42a24560c3890d97f0a2555f805b"
+    },
+    {
+      "path": "planning/volabi/voice-auditions/EXECUTION_APPROVAL_20261022.md",
+      "sha256_utf8_lf": "69c0057d215ca513c08539739598ecd4c53a51c083342fe4b0e4fd4c460b4b1d"
+    },
+    {
+      "path": "planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md",
+      "sha256_utf8_lf": "0504826c178e39f41785bc1cbc8bfa31c4125f314e9a23dc8c4d30d813364203"
+    }
+  ],
+  "live_data_access": false,
+  "active_launcher_changed": false,
+  "credential_incident": "Worker environment diagnostics inadvertently printed inherited GitHub credential; no credential value copied to project evidence, no rotation/usage authorized. CEO informed. Environment enumeration stopped."
+}

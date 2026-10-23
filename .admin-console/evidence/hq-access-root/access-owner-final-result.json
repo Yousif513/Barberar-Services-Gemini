@@ -1,0 +1,9 @@
+{
+  "exitCode": 0,
+  "elapsedSeconds": 346.339,
+  "files": [
+    "hq-access-owner.test.mjs",
+    "hq-access-client.test.mjs",
+    "hq-access-backup.test.mjs"
+  ]
+}

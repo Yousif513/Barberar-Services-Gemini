@@ -1,0 +1,428 @@
+{
+  "format": "volabi-access-exact-raw-output-index-1",
+  "archive": "execution-raw.zip",
+  "sha256_archive": "6fbdde2e11a664d999234cd48edff77b14d2c14b7d8be043e8208bce60d9cd35",
+  "meaning": "Original raw output hashes in independent receipts refer to the exact ZIP entries. Plain .txt/.log files are readable copies with CRLF converted to LF, trailing whitespace removed and one final newline. Sources/tests/JSON reviews are not normalized. Original RED/failed/interrupted logs are retained.",
+  "files": [
+    {
+      "path": ".admin-console/evidence/hq-access-independent/browser-final.log",
+      "sha256_raw": "665c15441326f138e4dc917ef5fded8480ef0dda420f59ed5111d059428a5da7",
+      "rawBytes": 1048,
+      "sha256_readable_utf8": "c7cefdcbc71dd846505e276f8c89ffb24b723d6b6a36da7c728096140ab35e79",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-independent/browser-supplement-first.log",
+      "sha256_raw": "47e04c6486b05802c5671330833ead55a3b821cffa05a9faa9fad5c0743f2514",
+      "rawBytes": 523,
+      "sha256_readable_utf8": "d4e484a0484547da00c1aa546fc72edc148fcaacdb6355471f50faac417775f7",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-independent/direct-final.log",
+      "sha256_raw": "0265d280067e8071e525435012ad07e3013f33c95b76c1673741e38a9dbe2bb5",
+      "rawBytes": 712,
+      "sha256_readable_utf8": "38cfee68f20c7f2d0c80a55c37d866f1c24c9c10b88fea533868060aa2d7797c",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-independent/direct-first.log",
+      "sha256_raw": "7f3d0214305905be632f447b57a9ddbf0d30ee8f9c71930d534b6880d7cb8fa7",
+      "rawBytes": 2739,
+      "sha256_readable_utf8": "d46bf8256d67e4a4ac65ca91ae2d972ed40fd9c7e842fb446a0141bc091130e5",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-independent/lint-supplement.log",
+      "sha256_raw": "edbecf0d4f89178c72b9bbdfd496a4a2b3d9a79ca82a7a31b36b34314be3db12",
+      "rawBytes": 299,
+      "sha256_readable_utf8": "4ab640fef2a783c157cc5a7e1118e6db70953a0c4b5da57e33e0a8306259dc7a",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-independent/lint.log",
+      "sha256_raw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "sha256_readable_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/audit-methods-final.log",
+      "sha256_raw": "3ebe31fc216c09def7ab5485718ae1b7e96558d5931a85f63b3b0cb080bfc3c6",
+      "rawBytes": 354,
+      "sha256_readable_utf8": "3f70ae6c6396ffb719492733817374637caddc7cc98711742b4ed80f8bfb4539",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/baseline-fourth.log",
+      "sha256_raw": "5fa47ce74f87e61d1d4c95f9c3873924a59620093c1eae8dd71fed435c137646",
+      "rawBytes": 239,
+      "sha256_readable_utf8": "a6a7fb2155c0691cd735ec6f368384bb530a903c771dff34472e7177106174a6",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/baseline-third.log",
+      "sha256_raw": "1f455d63e8c7a33cf5fa9e1ca2188f13c2d55e46bce37d6ae1b844215b00844e",
+      "rawBytes": 1504,
+      "sha256_readable_utf8": "91cc311555449872dd4dd90b8d35593a82ca24f688fe3c681588bf25899c314f",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/early-resume.log",
+      "sha256_raw": "1c2586182ed4d3cea119aa23dd7b59100480c1bfe77f0fe923aea65e1c90a64e",
+      "rawBytes": 352,
+      "sha256_readable_utf8": "9570dd7e6829e5f9eef5a239bf6196351823ad47b3824ab65eba041dbea195a2",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/first-implementation.log",
+      "sha256_raw": "1e01804c4735fbe5cd697c69977d280e9fc9436e16dfcfc7efa23cd92fc82662",
+      "rawBytes": 13896,
+      "sha256_readable_utf8": "bd95c0b4bf71b7d4e04c89a386f0d76f7e0e3b3f0975a7cf46a25c7708b6e6fd",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/green-candidate.log",
+      "sha256_raw": "62978961f446129cd9941a8e771d05a12df2c19a69e0a800b134aa27d2de7b8f",
+      "rawBytes": 1017,
+      "sha256_readable_utf8": "ea568a4ae2cb504754bf0f93bc71908e682c047becf55887c5104dc30c3650ef",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/green-final-candidate.log",
+      "sha256_raw": "8223bc529b8afbb88a1fc3f94b4a805bc14db74e8752d76576d33aad131bae57",
+      "rawBytes": 1146,
+      "sha256_readable_utf8": "c293504263ade156ec164ef14c34ab7815fa92891d1bce8e83a2d955ffa829cd",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/hmr-regression.log",
+      "sha256_raw": "5ada4f27a6cc8df870cc139064f9e3641d2b8d81ae0da38ccb49bb48ef69b429",
+      "rawBytes": 233,
+      "sha256_readable_utf8": "3d4dcce1b4f72c71e94fb1338bc19e52ac02746ae42f5154ed51c128cd652382",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/http-hmr-fix.log",
+      "sha256_raw": "cf5c53d6f39f122aced5c54d980b888cd37c9844b464b72a71c0c6e5d4550a75",
+      "rawBytes": 221,
+      "sha256_readable_utf8": "41ed9c3bf185c7403e8741b3085479e39ccac4dc5784fef10e0304c473ec974f",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/journal-final.log",
+      "sha256_raw": "743db86ad45f0e0e138d73413b14fc564afd7cc448faabf4786285b865feb687",
+      "rawBytes": 228,
+      "sha256_readable_utf8": "80b4a597bdb1f02753c7eaee45d8b1314d128ae691fd9aabb0c54e9bc8ed6335",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/legacy-compatibility.log",
+      "sha256_raw": "32b96e85a12c8ed06b4729c115de3e997a69fafe1fe4ba61e8a2f1bd4f5d14f6",
+      "rawBytes": 2039,
+      "sha256_readable_utf8": "9061334ca400902084b4879c3aa79a8ebfd2a1c5e5a7afe35d7dbe8c71a7b285",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/red-initial.log",
+      "sha256_raw": "093340c612bd3584cbb3819956f2551ad15bbca9173765a6b411f58051fbf973",
+      "rawBytes": 1678,
+      "sha256_readable_utf8": "850e0e2ded70e6c05e62b332c88e3aede197cbb0e42d7a01712e03a17adb6e3f",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-owner/second-implementation.log",
+      "sha256_raw": "abf3c6f01126bcc2f32f8e9457a65cf3ab2223bbc22b7091becfc31d489d605c",
+      "rawBytes": 14739,
+      "sha256_readable_utf8": "84e1da4920c0a0ed9e6b3a677c26418eb6f5c7d6b944b49ccf7dbeeeb6b6a651",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/access-owner-final.txt",
+      "sha256_raw": "70df0f6d74b0a6d73b3fcf7e57ede82143ffd71d105d2368452418aaa7a01f50",
+      "rawBytes": 4009,
+      "sha256_readable_utf8": "70df0f6d74b0a6d73b3fcf7e57ede82143ffd71d105d2368452418aaa7a01f50",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/backup-dependencies-red.txt",
+      "sha256_raw": "0446545136fef7c46f2044132fce8273b51bd8d714f21e9d7d7952f25282958d",
+      "rawBytes": 1801,
+      "sha256_readable_utf8": "3dacad46bf5e7b7cf671d970e12b5618a8bc93c1abe2b6486c0901e580649bd3",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/backup-green.txt",
+      "sha256_raw": "0a2fa1fb118cd249f8d33c5d776c018b0843ac689c6c047ea2d63013bb74d4e6",
+      "rawBytes": 624,
+      "sha256_readable_utf8": "2d76d06411347b9fd1dde71238e3103df5b6eec185ae45ff5e4d6bd3dcdfe35a",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/backup-initial-cleanup-failure.txt",
+      "sha256_raw": "7dc6a7330bde1dc91c24e38df66c6a8bddd29c2848251330f4edf9346d63c1cf",
+      "rawBytes": 4269,
+      "sha256_readable_utf8": "9445df754636f4ab8c7ceba944046897b4293ad2fbd01f2a33078a5c4db0fb5f",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/backup-red.txt",
+      "sha256_raw": "413446addb8e0ec4b69d3c299c88053175542a5735de7850a27ce916dffdcaa5",
+      "rawBytes": 5188,
+      "sha256_readable_utf8": "fe4c6b1eb14cc6eaba2aaf724eaf636aa52e7c7093a3ec599da94bce664f88ed",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/existing-web.txt",
+      "sha256_raw": "94b04f28b54c2453c31ea3c2a819a5e2787a9bcfcd0cd729e2c9e1c87abdc6aa",
+      "rawBytes": 114001,
+      "sha256_readable_utf8": "94b04f28b54c2453c31ea3c2a819a5e2787a9bcfcd0cd729e2c9e1c87abdc6aa",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/harvest-add.txt",
+      "sha256_raw": "b07387bbf81dca9df2f108eb1395213ecdf2437ba73fb756cb7c6d92a78804ad",
+      "rawBytes": 159,
+      "sha256_readable_utf8": "68b4f01b7b4a706a851be30a4576a0aaf8b7d34748a0bec2f00e5a63b0504da5",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/harvest-harvest.txt",
+      "sha256_raw": "6514af63532181c256bf8bc308e42d062b9c0eb68e124aa922f71eaee9b7f0a5",
+      "rawBytes": 176,
+      "sha256_readable_utf8": "8e426c23dd426179b2ee0e4dd5e8f33d08a4adf336dd6616b7770b65ff3cc9a0",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/harvest-promote.txt",
+      "sha256_raw": "d49266f0286aa527070a3500b850cd5a94f68736026917b165b9f246bcc3aa25",
+      "rawBytes": 192,
+      "sha256_readable_utf8": "86f8831b578f0b3b07e472c3487c0da7041ceb3516e26d605c49dd0a3627ed9e",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/initial-manifest-coverage.txt",
+      "sha256_raw": "3e035b0a04d84954557d404be3452deb665f0d55a98ed9d6b6796814a7b0d9df",
+      "rawBytes": 96,
+      "sha256_readable_utf8": "b3c61bed0a94051febc16f948a40474b1c273303054fa806d1a4d93aad72d504",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/manifest-coverage-stderr.txt",
+      "sha256_raw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "sha256_readable_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/manifest-coverage.txt",
+      "sha256_raw": "3e035b0a04d84954557d404be3452deb665f0d55a98ed9d6b6796814a7b0d9df",
+      "rawBytes": 96,
+      "sha256_readable_utf8": "b3c61bed0a94051febc16f948a40474b1c273303054fa806d1a4d93aad72d504",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/manifest-installed-release-stderr.txt",
+      "sha256_raw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "sha256_readable_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/manifest-plan-stderr.txt",
+      "sha256_raw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "sha256_readable_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/manifest-release-stderr.txt",
+      "sha256_raw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "sha256_readable_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/mobile.txt",
+      "sha256_raw": "5ba5f82d500ce735184b16d71fdd8685b8d51c91d3e1e17360c3e21bbaf8beb1",
+      "rawBytes": 125,
+      "sha256_readable_utf8": "499f27fa9365399aa25fba1f1948513982a46787c996e292ea462f7aed90c559",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/prior-recovery.txt",
+      "sha256_raw": "52ca5266bae7bfbdd8ceb214c70fb5deb6bb5e96d401c11fabce9b4c99a6c059",
+      "rawBytes": 4738,
+      "sha256_readable_utf8": "52ca5266bae7bfbdd8ceb214c70fb5deb6bb5e96d401c11fabce9b4c99a6c059",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/python-tests.txt",
+      "sha256_raw": "33676e61c4bc62cc3dcd6d2886d7b2bdd3b66893a9cb3f0ba4512a7da1d373e2",
+      "rawBytes": 20600,
+      "sha256_readable_utf8": "b481e76a3879456c65fa800ca5533b311e47421c2011970d1e0e3286f992ce2e",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/web-build.txt",
+      "sha256_raw": "69ec036bbfea81099237ff2391b1c129ef2a3f93f430f8fae43349ec9eafd6f7",
+      "rawBytes": 14396,
+      "sha256_readable_utf8": "6ea4b7a4898a5e3d0e520cf86f2543fc85b6a836440e6a992e6e2987c31c378e",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/web-lint-before-browser-supplement.txt",
+      "sha256_raw": "3500a563c293ab3e158b5d1cc2f4daff7ab3d54e74a5737314245c2b2fcf3d75",
+      "rawBytes": 286294,
+      "sha256_readable_utf8": "5144099b9889ebf242957348d5d87ec84d182fa0a23f70415adf426ece391ce0",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/web-lint-final.txt",
+      "sha256_raw": "e1531ea982c03f7a9e000b2aa6219224fb32541a777897e7cbc3a1885b9f2f52",
+      "rawBytes": 286549,
+      "sha256_readable_utf8": "a9c4a6316405e809d9946debc57e4f9c175fb769bbd2d4bfdcce34a6069749dd",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-root/web-lint.txt",
+      "sha256_raw": "17da4401eba1ff4347df3a4781c8d6fe21ba74a91e618b6c276c1fbb106527ee",
+      "rawBytes": 2318950,
+      "sha256_readable_utf8": "9d98b0203b90dab0ea55e95d9bd8ea58ad754f637360b659b07270b72b32eca1",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/auth-current.txt",
+      "sha256_raw": "9d492539dddb3ebf1f9195317bfde17f89e95e4e87cbb01a4b253894f12aea60",
+      "rawBytes": 2885,
+      "sha256_readable_utf8": "2d865a0a74ab3010c6a009ec2feb8dc0de2baf648b15687e06f6fe2fef712b89",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/direct-after-custody.txt",
+      "sha256_raw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "sha256_readable_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/direct-after-identity.txt",
+      "sha256_raw": "c01b137ddbe528864243caf792626ec07cf296728e2d0bd576e465f21bbbe6e5",
+      "rawBytes": 9522,
+      "sha256_readable_utf8": "4d7350802c2a9e19c029d0c5ccfd0d4dbcb7d8d13be5907dd1e2808ba3336d3c",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/direct-initial.txt",
+      "sha256_raw": "b103605294e70ba0a2701e0e4cd3f3b14ec052f31d05d09f6096d36a490fec28",
+      "rawBytes": 8638,
+      "sha256_readable_utf8": "d7ff5acfe280fd14ef37722adcac01839d1977d538b2b28ccd690eb00e270ac4",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/final-auth.txt",
+      "sha256_raw": "05a2ce007458f9e67bf427934a6aca34bd997bdab991724580711d1b003434e0",
+      "rawBytes": 1840,
+      "sha256_readable_utf8": "9c9b5e971bbd0e0a19391382d33bcfaf58aec80450cfac990ce026ba77a450e0",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/final-portable-race-resume.txt",
+      "sha256_raw": "71a117bb2491458b9d4d4fee5ae6d4a5d08e1d2fff91e025c40d196b6ca3e7de",
+      "rawBytes": 643,
+      "sha256_readable_utf8": "00c2e22c178cd4c99a5a5a2d30034d8d79cf66cfcf50a51ed0b8057349d47786",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/final-storage.txt",
+      "sha256_raw": "65145c3e028c863ab1d412da7e19b8838b1ede0903351a60f3366107e7259095",
+      "rawBytes": 1302,
+      "sha256_readable_utf8": "4bd388f12697b3965ee0e20c8c91a1f95894834b22d307ed4816cf996bf1d638",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/harness-corrections-current.txt",
+      "sha256_raw": "5498485cac27a342fed439e64b10423eb383fc6dbe0ce2a059bbb5b7ef25dc85",
+      "rawBytes": 456,
+      "sha256_readable_utf8": "27f55e8975e2377e628457e81e1b9faffb651d18f2a3070deb696bcc33977e42",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/partial-resume-current.txt",
+      "sha256_raw": "121e25ab9f8c13132188a39d6af54ebe153a272468a3e550ee52a6740c589e3f",
+      "rawBytes": 263,
+      "sha256_readable_utf8": "693b3c57b585ab8d5bc70ab0fda2523fba9629c408ea17b0b9bd03c4d295f753",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/portable-race-current.txt",
+      "sha256_raw": "4fad9b5c201472a8955844c86c1c1d57208408bf484ac713e7a91022e3ff2aba",
+      "rawBytes": 502,
+      "sha256_readable_utf8": "9be86440a992fef82d60a3ee5938cd1b0f9d3ba2bf1c292ab222cce56f09c66d",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/queued-after-owner-fix.txt",
+      "sha256_raw": "0a5e2ca7bb5ab941cb3ad1c4376e11585ad0761e0bb3cb86b782bc0d973d6eb6",
+      "rawBytes": 245,
+      "sha256_readable_utf8": "59d73da2cd4bcecc57ec71813d8652a6c51e83d5f8d1ee6b151344d7fb70f031",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/storage-current.txt",
+      "sha256_raw": "db08690f1130a71baadc29a39e3ffba99245ffee1e3133d2c8c5aaab3b71ae95",
+      "rawBytes": 6778,
+      "sha256_readable_utf8": "028625855d856e4e850752ca74c27d5ea1d243cb1e14e4089443f9535f65b0e1",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/verified-auth.txt",
+      "sha256_raw": "dcbf8e6d14311acb7e397f57a4937f147c83af0c833ffca17d6e156ccd960720",
+      "rawBytes": 1814,
+      "sha256_readable_utf8": "50fb4a0790d110538d4d24a69f8ed1e08964be948b7d9e259014e723977d5d8b",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/verified-portable-race-resume.txt",
+      "sha256_raw": "494ee0bb5e3026c0a308bf6ae2cad4f2d6be69d1df8b046c47f151f5327a6619",
+      "rawBytes": 642,
+      "sha256_readable_utf8": "01fa65f58a5b5d030abd34a045f0c9e2756ff5d350077336a22a9beb635dfbe3",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-security/verified-storage.txt",
+      "sha256_raw": "d6077fc308a2c9c9be323af6c2be8b8a2e1ef52a7adad68c556b41eabcf01461",
+      "rawBytes": 1302,
+      "sha256_readable_utf8": "3647f4977b18e9605a402325f03a5d698e29229311d124ed3a11a006722732ab",
+      "normalized": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-ui/client-owner.log",
+      "sha256_raw": "2b2bed8b191d2843c85f0b5cfec7507c303f7e226cc5660bae1c42a8aab2fa93",
+      "rawBytes": 1948,
+      "sha256_readable_utf8": "2b2bed8b191d2843c85f0b5cfec7507c303f7e226cc5660bae1c42a8aab2fa93",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-ui/lint-owner.log",
+      "sha256_raw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "sha256_readable_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-ui/typecheck-owner.log",
+      "sha256_raw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "sha256_readable_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized": false
+    },
+    {
+      "path": ".admin-console/evidence/hq-access-independent/final-format-lint.log",
+      "sha256_raw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "sha256_readable_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalized": false
+    }
+  ]
+}

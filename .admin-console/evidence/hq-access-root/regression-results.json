@@ -1,0 +1,147 @@
+{
+  "format": "volabi-access-regression-partition-1",
+  "baseline": "094aca485deb56d3f95711ae4f1c56e4ee9266f6",
+  "fileCount": 78,
+  "uniqueTestsPassed": 1182,
+  "failures": 0,
+  "skipped": 0,
+  "parts": [
+    {
+      "files": [
+        "web_platform/tests/account-flow.test.mjs",
+        "web_platform/tests/adm1-admin-wiring.test.mjs",
+        "web_platform/tests/admin-console-guards.test.mjs",
+        "web_platform/tests/api-params-pagination.test.mjs",
+        "web_platform/tests/api-router.test.mjs",
+        "web_platform/tests/booking-availability.test.mjs",
+        "web_platform/tests/booking-cancel-thresholds.test.mjs",
+        "web_platform/tests/booking-display.test.mjs",
+        "web_platform/tests/client-import.test.mjs",
+        "web_platform/tests/console-errors.test.mjs",
+        "web_platform/tests/country.test.mjs",
+        "web_platform/tests/csv-export.test.mjs",
+        "web_platform/tests/customer-pilot-api.test.mjs",
+        "web_platform/tests/customer-pilot-independent-auditions.test.mjs",
+        "web_platform/tests/customer-pilot-independent.test.mjs",
+        "web_platform/tests/customer-pilot-store.test.mjs",
+        "web_platform/tests/customer-pilot-ui-client.test.mjs",
+        "web_platform/tests/customer-pilot-ui-copy.test.mjs",
+        "web_platform/tests/customer-portal-guards.test.mjs",
+        "web_platform/tests/dbsec2-chat-screens.test.mjs",
+        "web_platform/tests/developer-console.test.mjs",
+        "web_platform/tests/distribution.test.mjs",
+        "web_platform/tests/f123-recheck-ui.test.mjs",
+        "web_platform/tests/final-approval-kinds.test.mjs",
+        "web_platform/tests/gov1-governance-screens.test.mjs",
+        "web_platform/tests/group-screens.test.mjs",
+        "web_platform/tests/held-checkout-client.test.mjs",
+        "web_platform/tests/hq-client.test.mjs",
+        "web_platform/tests/hq-council-independent.test.mjs",
+        "web_platform/tests/hq-council-owner.test.mjs",
+        "web_platform/tests/hq-http.test.mjs",
+        "web_platform/tests/hq-independent-review.test.mjs",
+        "web_platform/tests/hq-local-boundary.test.mjs",
+        "web_platform/tests/hq-projects-independent.test.mjs",
+        "web_platform/tests/hq-projects-owner.test.mjs",
+        "web_platform/tests/hq-readiness-independent.test.mjs",
+        "web_platform/tests/hq-store.test.mjs",
+        "web_platform/tests/hq-task-readiness.test.mjs",
+        "web_platform/tests/hq-voice.test.mjs",
+        "web_platform/tests/intake-screens.test.mjs",
+        "web_platform/tests/memberships-screens.test.mjs",
+        "web_platform/tests/money-screens.test.mjs",
+        "web_platform/tests/negative-authorization.test.mjs",
+        "web_platform/tests/no-mock-data.test.mjs",
+        "web_platform/tests/payment-checkout-client.test.mjs",
+        "web_platform/tests/payout-display.test.mjs",
+        "web_platform/tests/payroll-summary.test.mjs",
+        "web_platform/tests/paywave2-screens.test.mjs",
+        "web_platform/tests/phone-and-slots.test.mjs",
+        "web_platform/tests/prayer-windows.test.mjs",
+        "web_platform/tests/professional-identity-screens.test.mjs",
+        "web_platform/tests/provider-portal-guards.test.mjs",
+        "web_platform/tests/qafix-accessibility.test.mjs",
+        "web_platform/tests/qafix-console-writes.test.mjs",
+        "web_platform/tests/qafix-ux-round2.test.mjs",
+        "web_platform/tests/qr.test.mjs",
+        "web_platform/tests/recurring-screens.test.mjs",
+        "web_platform/tests/ropa-document.test.mjs",
+        "web_platform/tests/safe-redirect.test.mjs",
+        "web_platform/tests/schedule-exceptions.test.mjs",
+        "web_platform/tests/server-errors.test.mjs",
+        "web_platform/tests/session-state-retry.test.mjs",
+        "web_platform/tests/sponsored-screens.test.mjs",
+        "web_platform/tests/vercel-ignore-build.test.mjs",
+        "web_platform/tests/webhook-signature.test.mjs",
+        "web_platform/tests/webhook-url.test.mjs",
+        "web_platform/tests/whatsapp-intent.test.mjs",
+        "web_platform/tests/whatsapp-receptionist.test.mjs",
+        "web_platform/tests/whatsapp-screens.test.mjs",
+        "web_platform/tests/write-result.test.mjs"
+      ],
+      "log": ".admin-console/evidence/hq-access-root/existing-web.txt",
+      "testsPassed": 1078,
+      "exitCode": 0
+    },
+    {
+      "files": [
+        "web_platform/tests/hq-recovery-independent.test.mjs",
+        "web_platform/tests/hq-recovery-owner.test.mjs",
+        "web_platform/tests/hq-recovery-security.test.mjs"
+      ],
+      "log": ".admin-console/evidence/hq-access-root/prior-recovery.txt",
+      "testsPassed": 42,
+      "exitCode": 0
+    },
+    {
+      "files": [
+        "web_platform/tests/hq-access-owner.test.mjs",
+        "web_platform/tests/hq-access-client.test.mjs",
+        "web_platform/tests/hq-access-backup.test.mjs"
+      ],
+      "log": ".admin-console/evidence/hq-access-root/access-owner-final.txt",
+      "testsPassed": 30,
+      "exitCode": 0
+    },
+    {
+      "files": [
+        "web_platform/tests/hq-access-independent.test.mjs"
+      ],
+      "log": ".admin-console/evidence/hq-access-independent/direct-final.log",
+      "testsPassed": 4,
+      "exitCode": 0
+    },
+    {
+      "files": [
+        "web_platform/tests/hq-access-security.test.mjs"
+      ],
+      "logs": [
+        ".admin-console/evidence/hq-access-security/verified-auth.txt",
+        ".admin-console/evidence/hq-access-security/verified-storage.txt",
+        ".admin-console/evidence/hq-access-security/verified-portable-race-resume.txt"
+      ],
+      "testsPassed": 28,
+      "exitCode": 0,
+      "partition": "Disjoint name filters14+10+4 cover all28 final groups; no omitted/actual skipped tests."
+    }
+  ],
+  "pythonTests": {
+    "passed": 136,
+    "exitCode": 0,
+    "log": ".admin-console/evidence/hq-access-root/python-tests.txt"
+  },
+  "mobileTypecheckExitCode": 0,
+  "webBuildExitCode": 0,
+  "webLintExitCode": 0,
+  "webLintWarnings": 308,
+  "buildWarningNotes": "6 filesystem tracing warnings; existing provider-sitemap fetch warning; separate output and no real HQ data root.",
+  "independentBrowser": {
+    "mainPassed": 10,
+    "supplementPassed": 4,
+    "nativePassed": 4,
+    "unexpectedConsoleErrors": 0,
+    "externalRequests": 0,
+    "expectedRenderError": 1,
+    "evidence": ".admin-console/evidence/hq-access-independent/browser-supplement-result.json"
+  }
+}

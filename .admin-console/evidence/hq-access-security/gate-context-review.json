@@ -1,0 +1,223 @@
+{
+  "format": "volabi-access-independent-gate-context-review-1",
+  "at": "2026-10-23T20:42:50.802387+00:00",
+  "reviewer": "sec-hq-access",
+  "scope": "Exactly10 new placeholder-scan findings in gate-delta.json; source/evidence context inspection only, no runtime tests or dependency research.",
+  "deltaSha256": "287b3a07bf55742d1f459a882b4608f68ba89069d6879156a1a6cb6de7fd41b7",
+  "method": "Read exact original text and reproduce current scanner context transforms without running cited tests; preserve files, findings, scanner and validator unchanged.",
+  "findingCount": 10,
+  "uniqueFiles": 8,
+  "productPlaceholderCount": 0,
+  "findings": [
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[10]",
+      "file": ".admin-console/evidence/hq-access-security/verified-auth.txt",
+      "sha256": "dcbf8e6d14311acb7e397f57a4937f147c83af0c833ffca17d6e156ccd960720",
+      "keywordHits": [
+        {
+          "line": 21,
+          "token": "todo"
+        }
+      ],
+      "classification": "zero-pending-test-counter",
+      "productPlaceholder": false,
+      "reason": "Node test runner summary says todo0. This is an executed-run counter proving no pending tests, not an unfinished task.",
+      "originalFindingRetained": true
+    },
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[11]",
+      "file": ".admin-console/evidence/hq-access-security/verified-storage.txt",
+      "sha256": "d6077fc308a2c9c9be323af6c2be8b8a2e1ef52a7adad68c556b41eabcf01461",
+      "keywordHits": [
+        {
+          "line": 17,
+          "token": "todo"
+        }
+      ],
+      "classification": "zero-pending-test-counter",
+      "productPlaceholder": false,
+      "reason": "Node test runner summary says todo0. This is an executed-run counter proving no pending tests, not an unfinished task.",
+      "originalFindingRetained": true
+    },
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[12]",
+      "file": ".admin-console/evidence/hq-access-security/verified-portable-race-resume.txt",
+      "sha256": "494ee0bb5e3026c0a308bf6ae2cad4f2d6be69d1df8b046c47f151f5327a6619",
+      "keywordHits": [
+        {
+          "line": 11,
+          "token": "todo"
+        }
+      ],
+      "classification": "zero-pending-test-counter",
+      "productPlaceholder": false,
+      "reason": "Node test runner summary says todo0. This is an executed-run counter proving no pending tests, not an unfinished task.",
+      "originalFindingRetained": true
+    },
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[1]",
+      "file": "planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md",
+      "sha256": "d0761425d8f8193df1d140481449cf2b0fc23df3126a3a94ff70f3b7ddf68857",
+      "keywordHits": [
+        {
+          "line": 52,
+          "token": "random"
+        }
+      ],
+      "classification": "security-protocol-requirement",
+      "productPlaceholder": false,
+      "reason": "The phrase32 cryptographically random bytes or32 random byte base64url secret specifies recovery-secret entropy. It is a required security protocol property, not random business data or missing implementation.",
+      "originalFindingRetained": true
+    },
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[2]",
+      "file": "docs/volabi-access-contract.md",
+      "sha256": "3df9fd23dcb7d058ac27ed2b0e5767366571da7a4c601d76bed1142c661287cb",
+      "keywordHits": [
+        {
+          "line": 15,
+          "token": "random"
+        }
+      ],
+      "classification": "security-protocol-requirement",
+      "productPlaceholder": false,
+      "reason": "The phrase32 cryptographically random bytes or32 random byte base64url secret specifies recovery-secret entropy. It is a required security protocol property, not random business data or missing implementation.",
+      "originalFindingRetained": true
+    },
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access-controls].evidence[6]",
+      "file": ".admin-console/evidence/hq-access-security/acceptance.json",
+      "sha256": "e6424bc6512a628112940a46fc0e1b4e30c4e80faf3ba924fcb0308ea047490d",
+      "keywordHits": [
+        {
+          "line": 15,
+          "token": "todo"
+        },
+        {
+          "line": 31,
+          "token": "todo"
+        },
+        {
+          "line": 61,
+          "token": "todo"
+        },
+        {
+          "line": 87,
+          "token": "todo"
+        }
+      ],
+      "classification": "zero-pending-test-counter",
+      "productPlaceholder": false,
+      "reason": "JSON todo fields are numeric0 in final totals and all three executed partitions; they copy the Node summaries, not unfinished work.",
+      "originalFindingRetained": true
+    },
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access-controls].tests[0]",
+      "file": "web_platform/tests/hq-access-owner.test.mjs",
+      "sha256": "bc95bae0d45926749b97938ae1e1130a9d2cfd8b0476b3e1eb6f4bacfe6cdfed",
+      "keywordHits": [
+        {
+          "line": 6,
+          "token": "random"
+        },
+        {
+          "line": 20,
+          "token": "random"
+        },
+        {
+          "line": 65,
+          "token": "random"
+        },
+        {
+          "line": 66,
+          "token": "random"
+        }
+      ],
+      "classification": "cryptographic-test-input",
+      "productPlaceholder": false,
+      "reason": "Scanner splits actual node:crypto randomBytes identifier into random. Calls create high-entropy scoped proofs or deliberately wrong proofs in executable positive/negative synthetic assertions. They are not invented product records or fallback behavior. Existing context already blanks randomUUID only; no context/validator modification made.",
+      "originalFindingRetained": true
+    },
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access-controls].tests[2]",
+      "file": "web_platform/tests/hq-access-security.test.mjs",
+      "sha256": "b360dbc3514038b879ab85eaee3171b895c9a1ddcfe760aa4d6a562b0947ec8c",
+      "keywordHits": [
+        {
+          "line": 7,
+          "token": "random"
+        },
+        {
+          "line": 83,
+          "token": "random"
+        },
+        {
+          "line": 95,
+          "token": "random"
+        },
+        {
+          "line": 146,
+          "token": "random"
+        },
+        {
+          "line": 205,
+          "token": "random"
+        },
+        {
+          "line": 211,
+          "token": "random"
+        },
+        {
+          "line": 324,
+          "token": "random"
+        },
+        {
+          "line": 357,
+          "token": "random"
+        }
+      ],
+      "classification": "cryptographic-test-input",
+      "productPlaceholder": false,
+      "reason": "Scanner splits actual node:crypto randomBytes identifier into random. Calls create high-entropy scoped proofs or deliberately wrong proofs in executable positive/negative synthetic assertions. They are not invented product records or fallback behavior. Existing context already blanks randomUUID only; no context/validator modification made.",
+      "originalFindingRetained": true
+    },
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access].evidence[1]",
+      "file": "planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md",
+      "sha256": "d0761425d8f8193df1d140481449cf2b0fc23df3126a3a94ff70f3b7ddf68857",
+      "keywordHits": [
+        {
+          "line": 52,
+          "token": "random"
+        }
+      ],
+      "classification": "security-protocol-requirement",
+      "productPlaceholder": false,
+      "reason": "The phrase32 cryptographically random bytes or32 random byte base64url secret specifies recovery-secret entropy. It is a required security protocol property, not random business data or missing implementation.",
+      "originalFindingRetained": true
+    },
+    {
+      "manifestPath": "entities[headquarters-local].capabilities[hq-local.access].evidence[2]",
+      "file": "docs/volabi-access-contract.md",
+      "sha256": "3df9fd23dcb7d058ac27ed2b0e5767366571da7a4c601d76bed1142c661287cb",
+      "keywordHits": [
+        {
+          "line": 15,
+          "token": "random"
+        }
+      ],
+      "classification": "security-protocol-requirement",
+      "productPlaceholder": false,
+      "reason": "The phrase32 cryptographically random bytes or32 random byte base64url secret specifies recovery-secret entropy. It is a required security protocol property, not random business data or missing implementation.",
+      "originalFindingRetained": true
+    }
+  ],
+  "otherDeltaDisposition": {
+    "developmentCredentialExposure": "Genuine HIGH/open incident remains a release blocker.",
+    "screenPopulated": "Root reports truthful authenticated-populated alias metadata correction. Release rerun is needed to establish updated count.",
+    "declaredStaticUnusedWarnings": 7,
+    "declaredStaticDisposition": "All7 warnings retained; this context review grants no exemption or cleanup.",
+    "arithmetic": "Baseline318 errors+10 retained keyword findings+1 genuine incident=329 after independently unrelated populated-state metadata correction; warnings35+7=42. Counts are expected arithmetic, not a successful gate result."
+  },
+  "conclusion": "These10 scanner contexts do not identify unfinished product behavior. All machine findings remain errors; this classification is explanatory evidence, not a scanner waiver. Global regulated release is not approved."
+}

@@ -1,0 +1,9 @@
+✔ HTTP bounded access and session bootstrap do not create an anonymous workspace (10986.647ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11076.2904

@@ -1,0 +1,73 @@
+✖ supported access schema is excluded physically while exact v1 business snapshot and inert schema remain unchanged (28.613ms)
+✖ access schema does not permit unfamiliar tables or indexes and cannot be added to inert artifacts (24.4321ms)
+✖ missing or oversized security state refuses instead of silently discarding an unsupported control store (24.9017ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 168.072
+
+✖ failing tests:
+
+test at web_platform\tests\hq-access-backup.test.mjs:11:1
+✖ supported access schema is excluded physically while exact v1 business snapshot and inert schema remain unchanged (28.613ms)
+  Error [RecoveryError]: unsupported_schema
+      at refuse (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/common.mjs:5:34)
+      at validateSchema (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/schema.mjs:25:43)
+      at captureLogical (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/schema.mjs:31:2)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-backup.test.mjs:11:407)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    code: 'unsupported_schema'
+  }
+
+test at web_platform\tests\hq-access-backup.test.mjs:12:1
+✖ access schema does not permit unfamiliar tables or indexes and cannot be added to inert artifacts (24.4321ms)
+  Error [RecoveryError]: unsupported_schema
+      at refuse (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/common.mjs:5:34)
+      at validateSchema (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/schema.mjs:25:43)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-backup.test.mjs:12:261)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    code: 'unsupported_schema'
+  }
+
+test at web_platform\tests\hq-access-backup.test.mjs:13:1
+✖ missing or oversized security state refuses instead of silently discarding an unsupported control store (24.9017ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+
+  Caught error:
+
+  RecoveryError: unsupported_schema
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-backup.test.mjs:13:164)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: RecoveryError: unsupported_schema
+        at refuse (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/common.mjs:5:34)
+        at validateSchema (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/schema.mjs:25:43)
+        at captureLogical (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/schema.mjs:31:2)
+        at file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-backup.test.mjs:13:175
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-backup.test.mjs:13:164)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1201:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:831:18),
+    operator: 'throws',
+    diff: 'simple'
+  }

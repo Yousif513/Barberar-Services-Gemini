@@ -28,7 +28,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  distDir: process.env.PRIMORA_PILOT_LOCAL_MODE === "enabled" ? ".next-pilot" : ".next",
+  distDir: process.env.VOLABI_ACCESS_MODE === "synthetic-guarded" ? ".next-access-fixture" : process.env.PRIMORA_PILOT_LOCAL_MODE === "enabled" ? ".next-pilot" : ".next",
   turbopack: {
     root: path.resolve(__dirname, ".."),
   },

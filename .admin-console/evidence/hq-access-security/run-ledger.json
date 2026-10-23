@@ -1,0 +1,88 @@
+{
+  "reviewer": "sec-hq-access",
+  "stage": "final-frozen-audit-method-corrected",
+  "obsoleteRun": {
+    "log": "direct-after-custody.txt",
+    "exitCode": -1,
+    "outcome": "interrupted-no-result",
+    "reason": "Obsolete imported snapshot retained repeated native subprocess checks; positively identified owned test parent/child stopped after current replacement runs started.",
+    "bytes": 0
+  },
+  "plannedFinalPartitions": {
+    "auth": 14,
+    "storage": 10,
+    "portableRaceResume": 4
+  },
+  "completion": true,
+  "holds": [
+    "synthetic fixtures only",
+    "no real HQ root or cookies",
+    "no real enrollment or seat recovery",
+    "no live launcher replacement",
+    "no production, financial or external business action",
+    "no management activation",
+    "Azure deferred"
+  ],
+  "acceptedEvidence": "acceptance.json",
+  "finalPartitions": [
+    {
+      "log": ".admin-console/evidence/hq-access-security/verified-auth.txt",
+      "sha256": "dcbf8e6d14311acb7e397f57a4937f147c83af0c833ffca17d6e156ccd960720",
+      "bytes": 1814,
+      "exitCode": 0,
+      "namePattern": "restricted bootstrap|legacy adoption|wrong, unknown|cancelled recovery|confirmed response|audit persistence|revoked retained|HTTP recovery|unauthenticated challenges|invalid proof budget|request queued|adopted second-seat|expired saved-factor|lost signout",
+      "durationMs": 565301.9516,
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    {
+      "log": ".admin-console/evidence/hq-access-security/verified-storage.txt",
+      "sha256": "d6077fc308a2c9c9be323af6c2be8b8a2e1ef52a7adad68c556b41eabcf01461",
+      "bytes": 1302,
+      "exitCode": 0,
+      "namePattern": "guarded open refuses|cached guard loss|native Windows junction|native owner custody|replaced database|inert markers|guard loss after|explicit insecure|actual running|same-inode",
+      "durationMs": 308379.8176,
+      "tests": 10,
+      "pass": 10,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    {
+      "log": ".admin-console/evidence/hq-access-security/verified-portable-race-resume.txt",
+      "sha256": "494ee0bb5e3026c0a308bf6ae2cad4f2d6be69d1df8b046c47f151f5327a6619",
+      "bytes": 642,
+      "exitCode": 0,
+      "namePattern": "encrypted new-schema|old v1 fixture|truly concurrent|early partial",
+      "durationMs": 166000.222,
+      "tests": 4,
+      "pass": 4,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  ],
+  "candidateBeforeAuditLabelCorrection": [
+    "final-auth.txt",
+    "final-storage.txt",
+    "final-portable-race-resume.txt"
+  ],
+  "sourcePinsVerified": {
+    "final-source-freeze.json": {
+      "files": 24,
+      "mismatches": 0,
+      "receiptSha256": "a41994aeb969b9a1d27d2141add74c75e94214161bbf1d47c53251ff4cc797c2"
+    },
+    "ui-source-review.json": {
+      "files": 18,
+      "mismatches": 0,
+      "receiptSha256": "f816a8ab567473e5becec71e4c262ab0d0c67a687251abf5a676e0fa9b991214"
+    }
+  }
+}

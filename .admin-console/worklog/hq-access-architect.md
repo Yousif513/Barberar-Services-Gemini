@@ -1,0 +1,3 @@
+# HQ-NEXT-04 architect
+
+Mode extend, regulated profile. Approved source scope/domain closure is plan of record. Plan validation exit0. Server/CLI spine serialized under impl-hq-access-server; UI owns separate capability/files after shared wire contract. Root owns recovery schema compatibility/integration evidence. Independent QA/security cannot review own implementation. No real instance/launcher access/change. Initial explicit CLI metadata refused because entrypoint not yet implemented; planned capability remains honest without fabricated file, bind after code exists. Next: server worker freeze contract, tests-first spine; UI consumes exact contract; root sanitization compatibility. All business holds unchanged.

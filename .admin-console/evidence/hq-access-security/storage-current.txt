@@ -1,0 +1,76 @@
+✔ security: guarded open refuses missing database, guard, both and parent without implicit creation (65458.5426ms)
+✖ security: cached guard loss blocks reads and writes while preserving existing business rows (12821.3601ms)
+✖ security: native Windows junction and hard-linked database aliases refuse without rebinding (15370.8955ms)
+✔ security: native owner custody rejects an insecure instance directory (18910.5644ms)
+✔ security: replaced database and swapped guard cannot be adopted as the cached authoritative instance (27309.8856ms)
+✔ security: inert markers, moved inert application identity and unenrolled legacy storage refuse normal guarded open (23131.0228ms)
+✔ security: guard loss after a real business write rolls back before commit and closes the cached handle (14942.2442ms)
+✔ security: explicit insecure guard and database file ACLs refuse even under an owner-only directory (27060.9239ms)
+✔ security: actual running Windows database rename either denies replacement or closes the orphaned cached handle (11138.7344ms)
+✔ security: same-inode native overwrite is detected instead of serving stale cached SQLite pages (21413.6559ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 8
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 237649.0985
+
+✖ failing tests:
+
+test at web_platform\tests\hq-access-security.test.mjs:161:1
+✖ security: cached guard loss blocks reads and writes while preserving existing business rows (12821.3601ms)
+  AssertionError [ERR_ASSERTION]: expected storage_not_initialized at intended boundary
+      at exception (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:45:36)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:163:103)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: HqError: storage_unavailable
+        at AccessControls.check (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-controls.mjs:24:44)
+        at AccessControls.validateSession (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-controls.mjs:31:41)
+        at HqStore.assertSession (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:95:32)
+        at HqStore.command (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:192:10)
+        at file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:163:125
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at exception (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:45:36)
+        at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:163:103)
+        at Test.runInAsyncScope (node:async_hooks:227:14),
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at web_platform\tests\hq-access-security.test.mjs:168:1
+✖ security: native Windows junction and hard-linked database aliases refuse without rebinding (15370.8955ms)
+  AssertionError [ERR_ASSERTION]: expected storage_identity_changed at intended boundary
+      at exception (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:45:36)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:171:98)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: HqError: storage_unsafe
+        at fail (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:11:25)
+        at assertFileCustody (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:16:140)
+        at inspectAccessRoot (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/access-storage.mjs:50:3)
+        at new HqStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/server/local-store.mjs:42:31)
+        at openAccessStore (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-access/index.mjs:17:57)
+        at file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:171:112
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at exception (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:45:36)
+        at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-security.test.mjs:171:98),
+    operator: 'throws',
+    diff: 'simple'
+  }

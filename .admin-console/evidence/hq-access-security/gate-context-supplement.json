@@ -1,0 +1,36 @@
+{
+  "format": "volabi-access-independent-gate-context-supplement-1",
+  "at": "2026-10-23T20:44:32.140422+00:00",
+  "reviewer": "sec-hq-access",
+  "scope": "One newly added QA acceptance evidence finding only; no tests, product, manifest or validator changes.",
+  "finding": {
+    "rule": "placeholder-scan",
+    "severity": "error",
+    "path": "entities[headquarters-local].capabilities[hq-local.access].evidence[6]",
+    "message": "evidence file contains placeholder text: .admin-console/evidence/hq-access-independent/acceptance.json"
+  },
+  "file": ".admin-console/evidence/hq-access-independent/acceptance.json",
+  "sha256": "8b9e8a42c33ad428166b6e9ff4e57a9e48aa0f6054fcc3161fa4557390022b59",
+  "keywordHits": [
+    {
+      "line": 64,
+      "token": "fake"
+    }
+  ],
+  "classification": "negative-real-browser-evidence-statement",
+  "exactContext": "No HTTP fake/fulfill",
+  "assessment": "The UI-01 result explicitly states the supplemental4 tests used the actual guarded server without simulated HTTP responses. The word fake denies test substitution; it does not describe product data, a fallback or unfinished work.",
+  "productPlaceholder": false,
+  "originalFindingRetained": true,
+  "priorReview": {
+    "file": ".admin-console/evidence/hq-access-security/gate-context-review.json",
+    "sha256": "1089469448c71206ae43c2bd25cf51f9c08310e23b05f1ac8873fc5ac87b8f74",
+    "original10FindingsUnchanged": true,
+    "originalGateDeltaUnchanged": true
+  },
+  "localGateSnapshot": {
+    "errors": 330,
+    "warnings": 42
+  },
+  "conclusion": "Explanatory classification only. All machine findings and global release blockers remain; no release waiver."
+}

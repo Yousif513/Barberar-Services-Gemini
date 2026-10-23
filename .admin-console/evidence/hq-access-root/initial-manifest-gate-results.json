@@ -1,0 +1,22 @@
+[
+  {
+    "name": "manifest-plan",
+    "exitCode": 0,
+    "output": "manifest-plan.json"
+  },
+  {
+    "name": "manifest-release",
+    "exitCode": 1,
+    "output": "manifest-release.json"
+  },
+  {
+    "name": "manifest-coverage",
+    "exitCode": 0,
+    "output": "manifest-coverage.txt"
+  },
+  {
+    "name": "manifest-installed-release",
+    "exitCode": 1,
+    "output": "manifest-installed-release.json"
+  }
+]

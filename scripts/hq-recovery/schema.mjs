@@ -20,9 +20,18 @@ const definitions=[
 const normalize=sql=>sql.replace(/\bIF NOT EXISTS\s+/gi,'').replace(/\s+/g,' ').replace(/\s*([(),;])\s*/g,'$1').trim().replace(/;$/,'');
 const expected=definitions.map(([type,name,sql])=>({type,name,sql:normalize(sql)})).sort((a,b)=>a.name.localeCompare(b.name));
 export const SCHEMA_FINGERPRINT=digest(canonical(expected));
+// Only this versioned source-only table is accepted; rebuilt packages keep the v1 inert schema.
+export const ACCESS_CONTROL_SCHEMA='CREATE TABLE hq_access_state(id INTEGER PRIMARY KEY CHECK(id=1),schema_version INTEGER NOT NULL CHECK(schema_version=1),state TEXT NOT NULL CHECK(json_valid(state)))';
+const accessDefinition={type:'table',name:'hq_access_state',sql:normalize(ACCESS_CONTROL_SCHEMA)};
+const expectedWithAccess=[...expected,accessDefinition].sort((a,b)=>a.name.localeCompare(b.name));
 export function validateSchema(db,{inert=false}={}){
  const rows=db.prepare("SELECT type,name,sql FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%' ORDER BY name").all().map(r=>({type:r.type,name:r.name,sql:normalize(r.sql||'')})).sort((a,b)=>a.name.localeCompare(b.name));
- if(canonical(rows)!==canonical(expected))refuse('unsupported_schema');
+ const withAccess=!inert&&canonical(rows)===canonical(expectedWithAccess);
+ if(!withAccess&&canonical(rows)!==canonical(expected))refuse('unsupported_schema');
+ if(withAccess){
+  const controls=db.prepare("SELECT id,schema_version,json_type(state) AS shape,length(CAST(state AS BLOB)) AS bytes FROM hq_access_state").all();
+  if(controls.length!==1||controls[0].id!==1||controls[0].schema_version!==1||controls[0].shape!=='object'||controls[0].bytes>1024*1024)refuse('unsupported_access_state');
+ }
  const appId=db.prepare('PRAGMA application_id').get().application_id;
  if(appId!==(inert?INERT_APPLICATION_ID:0)||db.prepare('PRAGMA user_version').get().user_version!==0)refuse('unsupported_schema');
  if(db.prepare('PRAGMA integrity_check').get().integrity_check!=='ok'||db.prepare('PRAGMA foreign_key_check').all().length)refuse('sqlite_integrity_failed');

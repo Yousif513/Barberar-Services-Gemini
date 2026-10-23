@@ -1,0 +1,22 @@
+✔ security: restricted bootstrap cannot read domain data, create sessions or nominate another seat (15768.1343ms)
+✔ security: legacy adoption requires the original valid seat proof and preserves both workspaces (15919.6974ms)
+✔ security: wrong, unknown and cross-instance recovery factors cannot guess or change a seat (47376.1052ms)
+✔ security: cancelled recovery and rotation retain the current factor until confirmed commit (66018.0899ms)
+✔ security: confirmed response loss is resolved by redacted receipt and saved replacement, never another cookie (41749.1014ms)
+✔ security: audit persistence failure rolls back factor, generation, revocation and receipt atomically (23393.3264ms)
+✔ security: revoked retained request objects and stale CSRF cannot read or commit commands (36180.2764ms)
+✔ security: HTTP recovery challenge is bound to the exact browser while bad origin, body and forged scope refuse (26972.198ms)
+✔ security: unauthenticated challenges cannot replace a proved pending seat operation or disable normal sessions (41031.4962ms)
+✔ security: invalid proof budget persists across reopen and never disables an existing valid session (116137.8437ms)
+✔ security: a request queued after initial authorization rechecks its seat inside the write transaction (25361.4789ms)
+✔ security: adopted second-seat enrollment requires exact current cookie and one-use local permit together (36682.8458ms)
+✔ security: expired saved-factor stage consumes only the stage and leaves old factor and session usable (29585.6566ms)
+✔ security: lost signout or revoke responses replay receipts without clearing or revoking a newer session (42986.9977ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 565301.9516

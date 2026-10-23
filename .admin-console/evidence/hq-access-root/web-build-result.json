@@ -1,0 +1,7 @@
+{
+  "command": "npm run build --workspace=web_platform",
+  "exit_code": 0,
+  "elapsed_seconds": 33.38171880005393,
+  "output": "separate .next-access-fixture; local HQ mode disabled, no data root",
+  "active_preview_output_used": false
+}

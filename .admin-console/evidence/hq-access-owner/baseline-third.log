@@ -1,0 +1,30 @@
+✖ SEAT-01 explicit initialization has restricted bootstrap and exact-seat saved-copy confirmation (51004.9453ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 51103.7574
+
+✖ failing tests:
+
+test at web_platform\tests\hq-access-owner.test.mjs:15:1
+✖ SEAT-01 explicit initialization has restricted bootstrap and exact-seat saved-copy confirmation (51004.9453ms)
+  Error: EPERM, Permission denied: \\?\C:\Users\YOUSIF~1\AppData\Local\Temp\volabi-access-owner-gvHvwF '\\?\C:\Users\YOUSIF~1\AppData\Local\Temp\volabi-access-owner-gvHvwF'
+      at Object.rmSync (node:fs:1222:18)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-owner.test.mjs:11:318)
+      at TestHook.runInAsyncScope (node:async_hooks:227:14)
+      at TestHook.run (node:internal/test_runner/test:1201:25)
+      at TestHook.run (node:internal/test_runner/test:1528:18)
+      at TestHook.run (node:internal/util:602:20)
+      at Test.runHook (node:internal/test_runner/test:1117:20)
+      at after (node:internal/test_runner/test:1159:20)
+      at Test.run (node:internal/test_runner/test:1227:13)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    errno: 1,
+    code: 'EPERM',
+    path: '\\\\?\\C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-access-owner-gvHvwF',
+    syscall: 'rm'
+  }

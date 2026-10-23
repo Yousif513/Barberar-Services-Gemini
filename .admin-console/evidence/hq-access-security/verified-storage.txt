@@ -1,0 +1,18 @@
+✔ security: guarded open refuses missing database, guard, both and parent without implicit creation (72175.633ms)
+✔ security: cached guard loss blocks reads and writes while preserving existing business rows (16687.2956ms)
+✔ security: native Windows junction and hard-linked database aliases refuse without rebinding (26373.2408ms)
+✔ security: native owner custody rejects an insecure instance directory (26951.3297ms)
+✔ security: replaced database and swapped guard cannot be adopted as the cached authoritative instance (38423.1859ms)
+✔ security: inert markers, moved inert application identity and unenrolled legacy storage refuse normal guarded open (29880.7432ms)
+✔ security: guard loss after a real business write rolls back before commit and closes the cached handle (18445.1529ms)
+✔ security: explicit insecure guard and database file ACLs refuse even under an owner-only directory (39939.5255ms)
+✔ security: actual running Windows database rename either denies replacement or closes the orphaned cached handle (13333.4605ms)
+✔ security: same-inode native overwrite is detected instead of serving stale cached SQLite pages (26052.8609ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 308379.8176

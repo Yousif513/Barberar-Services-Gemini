@@ -1,0 +1,9 @@
+# HQ-NEXT-04 backup compatibility and fixture integration
+
+Owner root, implementation only. Regulated synthetic-only slice, no real instance/launcher action. Four owner cases pass: exact optional security schema sanitized physically; unsupported extra schema refused; empty/oversized control store refused; new access-code provenance captured while old v1 inventories yield explicit not-captured dependency gaps rather than refusing package inspection. Fresh sanitized/rebuilt schema and SCHEMA_FINGERPRINT remain v1; sessions/control table absent, canary absent from raw rebuilt bytes. Root cannot review its own code; security reviewer owns independent acceptance.
+
+Intended RED saved backup-red.txt / backup-dependencies-red.txt; initial cleanup-hook failure also retained. Fixed owner test to close SQLite before Windows cleanup, removed only exact owned temp names after process exited, receipt recorded. Metadata command initial CLI entrypoint validation refusal and set argument mismatch caused no validator bypass; corrected using actual CLI contracts.
+
+A separate synthetic fixture launcher uses inspectAccessRoot before Next startup, fixed local test port range3130-3199, separate .next-access-fixture output and inherited current launcher unchanged. Initial smoke hit worker module relative import error; notified owner and moved module import inside safe catch/help gate. No real data read or server launched by root yet. Final native browser/PT Y/regression checks pending source freeze.
+
+Coordination: exact security SQL matches worker ACCESS_SCHEMA_SQL; no broad unknown-table exemption. Additional access provenance optional for old packages, allowlisted exact module names only; no auth state or fixture root bytes included as dependencies. No credential values copied to evidence. All business holds remain.

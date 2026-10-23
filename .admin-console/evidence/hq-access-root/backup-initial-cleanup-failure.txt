@@ -1,0 +1,70 @@
+✖ supported access schema is excluded physically while exact v1 business snapshot and inert schema remain unchanged (82.3621ms)
+✖ access schema does not permit unfamiliar tables or indexes and cannot be added to inert artifacts (77.1932ms)
+✖ missing or oversized security state refuses instead of silently discarding an unsupported control store (28.0079ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 270.5804
+
+✖ failing tests:
+
+test at web_platform\tests\hq-access-backup.test.mjs:11:1
+✖ supported access schema is excluded physically while exact v1 business snapshot and inert schema remain unchanged (82.3621ms)
+  Error: EPERM, Permission denied: \\?\C:\Users\YOUSIF~1\AppData\Local\Temp\volabi-access-backup-Em902U '\\?\C:\Users\YOUSIF~1\AppData\Local\Temp\volabi-access-backup-Em902U'
+      at Object.rmSync (node:fs:1222:18)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-backup.test.mjs:10:271)
+      at TestHook.runInAsyncScope (node:async_hooks:227:14)
+      at TestHook.run (node:internal/test_runner/test:1201:25)
+      at TestHook.run (node:internal/test_runner/test:1528:18)
+      at TestHook.run (node:internal/util:602:20)
+      at Test.runHook (node:internal/test_runner/test:1117:20)
+      at after (node:internal/test_runner/test:1159:20)
+      at Test.run (node:internal/test_runner/test:1227:13)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    errno: 1,
+    code: 'EPERM',
+    path: '\\\\?\\C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-access-backup-Em902U',
+    syscall: 'rm'
+  }
+
+test at web_platform\tests\hq-access-backup.test.mjs:12:1
+✖ access schema does not permit unfamiliar tables or indexes and cannot be added to inert artifacts (77.1932ms)
+  Error: EPERM, Permission denied: \\?\C:\Users\YOUSIF~1\AppData\Local\Temp\volabi-access-backup-3PAdOF '\\?\C:\Users\YOUSIF~1\AppData\Local\Temp\volabi-access-backup-3PAdOF'
+      at Object.rmSync (node:fs:1222:18)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-backup.test.mjs:10:271)
+      at TestHook.runInAsyncScope (node:async_hooks:227:14)
+      at TestHook.run (node:internal/test_runner/test:1201:25)
+      at TestHook.run (node:internal/test_runner/test:1528:18)
+      at TestHook.run (node:internal/util:602:20)
+      at Test.runHook (node:internal/test_runner/test:1117:20)
+      at after (node:internal/test_runner/test:1159:20)
+      at Test.run (node:internal/test_runner/test:1227:13)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: 1,
+    code: 'EPERM',
+    path: '\\\\?\\C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-access-backup-3PAdOF',
+    syscall: 'rm'
+  }
+
+test at web_platform\tests\hq-access-backup.test.mjs:13:1
+✖ missing or oversized security state refuses instead of silently discarding an unsupported control store (28.0079ms)
+  Error: EPERM, Permission denied: \\?\C:\Users\YOUSIF~1\AppData\Local\Temp\volabi-access-backup-DN84QV '\\?\C:\Users\YOUSIF~1\AppData\Local\Temp\volabi-access-backup-DN84QV'
+      at Object.rmSync (node:fs:1222:18)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-access-backup.test.mjs:10:271)
+      at TestHook.runInAsyncScope (node:async_hooks:227:14)
+      at TestHook.run (node:internal/test_runner/test:1201:25)
+      at TestHook.run (node:internal/test_runner/test:1528:18)
+      at TestHook.run (node:internal/util:602:20)
+      at Test.runHook (node:internal/test_runner/test:1117:20)
+      at after (node:internal/test_runner/test:1159:20)
+      at Test.run (node:internal/test_runner/test:1227:13)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: 1,
+    code: 'EPERM',
+    path: '\\\\?\\C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-access-backup-DN84QV',
+    syscall: 'rm'
+  }

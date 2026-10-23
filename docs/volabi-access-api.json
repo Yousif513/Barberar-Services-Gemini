@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "prefix": "/api/hq/access",
+  "mode": "VOLABI_ACCESS_MODE=synthetic-guarded; VOLABI_ACCESS_ROOT=owned marked external fixture; VOLABI_LOCAL_MODE=enabled",
+  "sessionCookie": "volabi_session (HttpOnly, SameSite=Strict, Path=/api/hq)",
+  "csrfHeader": "x-hq-csrf",
+  "endpoints": {
+    "GET /status": {"response": {"ok": true, "access": {"state": "access_required|authenticated|bootstrap_required", "enrolled": "boolean only for authenticated", "session": "public current session only if authenticated"}}},
+    "POST /challenge": {"body": {}, "response": {"ok": true, "challenge": "opaque secret", "expiresAt": "ISO"}},
+    "POST /stage": {"body": {"purpose": "enroll|recover|rotate", "challenge": "required for recover/bootstrap", "credential": "current factor for recover/rotate", "permit": "enroll: authenticated permit or restricted bootstrap"}, "response": {"ok": true, "operationId": "UUID", "operationProof": "opaque secret", "credential": "replacement shown once", "expiresAt": "ISO", "purpose": "purpose"}},
+    "POST /confirm": {"body": {"operationId": "UUID", "operationProof": "secret", "credential": "reentered saved replacement", "returnTo": "optional validated HQ relative route"}, "response": {"ok": true, "receipt": "redacted receipt", "session": "public session on first commit only", "returnTo": "/hq"}},
+    "POST /receipt": {"body": {"operationId": "UUID", "operationProof": "secret"}, "response": {"ok": true, "receipt": {"operationId": "UUID", "purpose": "purpose", "state": "pending|committed|cancelled|expired", "at": "ISO", "priorGeneration": "number", "generation": "number"}}},
+    "POST /cancel": {"body": {"operationId": "UUID", "operationProof": "secret"}, "response": {"ok": true, "receipt": "redacted receipt"}},
+    "POST /signout": {"body": {"operationId": "client UUID", "operationProof": "client 32 random bytes base64url"}, "response": {"ok": true, "receipt": "redacted receipt"}},
+    "POST /revoke": {"body": {"operationId": "client UUID", "operationProof": "client 32 random bytes base64url", "credential": "current factor", "confirmed": true}, "response": {"ok": true, "receipt": "redacted receipt"}}
+  },
+  "errors": ["access_mode_required", "storage_not_initialized", "storage_missing", "storage_identity_changed", "storage_guard_invalid", "storage_unsafe", "storage_corrupt", "unsupported_schema", "inert_restore", "storage_unavailable", "access_required", "proof_invalid", "operation_conflict", "operation_expired", "rate_limited", "invalid_input", "request_too_large", "csrf_failed", "origin_forbidden", "return_forbidden"],
+  "errorEnvelope": {"ok": false, "error": {"code": "safe code", "message": "same code", "diagnosticId": "optional UUID for storage error", "diagnosticRecorded": "boolean when diagnosticId exists; false truthfully reports unavailable journal"}},
+  "notes": ["No body field may nominate workspaceId, actorId or role.", "POST uses same Origin and application/json, max 4096 bytes.", "rotate, session enrollment, signout and revoke require current cookie + CSRF; operation proof controls confirm/receipt/cancel.", "Bootstrap permit is entered into masked permit field; it has no ordinary HQ authority.", "A replayed committed confirm returns receipt only and never recreates a cookie; use saved replacement to reconnect.", "Legacy default launcher remains held and unchanged; UI must not bootstrap ordinary session while in Access."]
+}

@@ -1,0 +1,10 @@
+✔ DB partial fresh intent before database creation resumes only the same instance/seat/operation (11794.9475ms)
+✔ DB interrupted adoption rollback requires original masked-session material on explicit resume (11716.7515ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23599.6408

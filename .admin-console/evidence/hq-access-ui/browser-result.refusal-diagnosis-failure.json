@@ -1,0 +1,17 @@
+{
+  "classification": "Synthetic owner browser evidence; independent acceptance required",
+  "checks": [
+    "Access bypasses ordinary session bootstrap and discloses no protected task data",
+    "Enrollment dialog masks proof, traps keyboard focus and returns focus on Escape",
+    "Bootstrap enrolls only after saved-copy confirmation and reconnects to the exact task/seat",
+    "Cancelling a staged rotation preserves current session and factor"
+  ],
+  "unexpectedErrors": [],
+  "externalRequests": [],
+  "expectedTransportFailures": 0,
+  "startedAt": "2026-10-23T20:08:14.999Z",
+  "readinessFailure": "TypeError",
+  "status": "failed",
+  "failure": "Error: expect(locator).toContainText(expected) failed\n\nLocator: getByRole('dialog').getByRole('alert')\nExpected substring: \"The proof could not be verified\"\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 20000ms\n  - waiting for getByRole('dialog').getByRole('alert')\n\n    at captureRawStack (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright-core\\lib\\coreBundle.js:3172:17)\n    at callMatcherAsStep (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright\\lib\\matchers\\expect.js:12877:57)\n    at Object.toContainText (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright\\lib\\matchers\\expect.js:12867:23)\n    at C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-access-owner.mjs:74:354",
+  "finishedAt": "2026-10-23T20:09:26.268Z"
+}

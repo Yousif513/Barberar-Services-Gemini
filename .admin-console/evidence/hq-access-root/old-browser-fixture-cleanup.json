@@ -1,0 +1,6 @@
+{
+  "target_name": "volabi-access-browser-owner-C8JQHy",
+  "creator": "impl-hq-access-ui",
+  "scope": "only exact old owned synthetic browser fixture identified by owner; no database contents read",
+  "cleanup": "removed"
+}

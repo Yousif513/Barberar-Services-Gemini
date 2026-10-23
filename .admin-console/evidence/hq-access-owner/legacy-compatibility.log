@@ -1,0 +1,27 @@
+✔ HTTP session is HttpOnly, strict, scoped, reused and does not expose the bearer in JSON (37.8571ms)
+✔ HTTP denies cloud mode, cross origin and unauthenticated marketplace bearer before querying (21.7346ms)
+✔ HTTP state-changing commands require the real seat CSRF and recover exact receipts (28.4379ms)
+✔ HTTP rejects caller-defined role/scope and oversized or malformed body without mutation (27.4557ms)
+✔ real repository catalog loads all15 inactive identities and authentic sources without remote requests (126.037ms)
+✔ local development mode is explicit and never enabled on Vercel (11.7065ms)
+✔ cross-origin, missing Origin and rebinding hosts cannot open a local seat (0.5365ms)
+✔ matching loopback request passes without consulting marketplace roles (0.2351ms)
+✔ session cookie cannot be replaced by a marketplace bearer or duplicate ambiguous cookie (0.2269ms)
+✔ CSRF requires the actual session-bound value and rejects missing, foreign and malformed tokens (0.3364ms)
+✔ material payload hash canonicalization ignores object order, never material values or array order (0.1293ms)
+✔ persistent request, source-linked recommendation, exact decision and follow-up survive a new store process (42.1698ms)
+✔ same command replay has one effect; reused identity with changed material conflicts (31.1635ms)
+✔ foreign local seats and fake marketplace bearer identity cannot inspect or mutate another workspace (23.6629ms)
+✔ changed task revision cannot approve the old recommendation (27.0529ms)
+✔ source correction preserves old bytes and invalidates an older recommendation (27.1895ms)
+✔ forged citation and changed recommendation hash cannot become approval (34.834ms)
+✔ no follow-up before an exact decided proposal, no business executors accepted (31.3526ms)
+✔ audit/version/receipt rows are immutable and contain minimized structural details (26.42ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 374.0405

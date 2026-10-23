@@ -1,0 +1,81 @@
+{
+  "format": "volabi-access-independent-browser-1",
+  "scope": "HQ-NEXT-04 synthetic-only independent QA",
+  "startedAt": "2026-10-23T20:25:12.015Z",
+  "checks": [
+    "Unauthenticated Access bypasses provider bootstrap and protects original domain history",
+    "Enrollment dialog masking, focus, clear-on-close and matching saved-copy confirmation reconnect original task",
+    "Rotation dialog keyboard path, cancellation and successful factor replacement work against actual server",
+    "Lost response and cookie remain unknown until scoped receipt; saved replacement restores exact A",
+    "Revocation dialog traps and restores focus; lost signout response has scoped receipt and recoverable factor",
+    "Arabic RTL at 320/768/1024/1440 and masked mobile revoke with acknowledgement match actual access state",
+    "Redirect guard and secret-free request URLs/browser persistence hold after all flows",
+    "Signed-out protected navigation refuses anonymous bootstrap and provides the original task return path",
+    "Healthy-to-lost guard transition blocks Access with diagnostic and performs no browser repair",
+    "Original rich rows, all versions, receipts and prior audit IDs remain exact; B stays isolated"
+  ],
+  "apiRefusals": [
+    {
+      "path": "/api/hq/access/confirm",
+      "status": 400,
+      "code": "proof_invalid"
+    },
+    {
+      "path": "/api/hq/session",
+      "status": 401,
+      "code": "access_required"
+    },
+    {
+      "path": "/api/hq/access/status",
+      "status": 503,
+      "code": "storage_unsafe"
+    },
+    {
+      "path": "/api/hq/access/status",
+      "status": 503,
+      "code": "storage_not_initialized"
+    }
+  ],
+  "pageErrors": 0,
+  "unexpectedConsoleErrors": 0,
+  "externalRequests": 0,
+  "expectedResponseLosses": 2,
+  "readinessFailure": "TypeError",
+  "status": "passed",
+  "cleanup": "owned fixture removed",
+  "sourcePins": [
+    {
+      "file": "web_platform/src/components/hq/hq-access.tsx",
+      "sha256": "68678fad3a0c04d693f35e62dce73adf9f14ad9a7397236f446903f7c4829bd7"
+    },
+    {
+      "file": "web_platform/src/components/hq/hq-access-dialog.tsx",
+      "sha256": "561461a0a734a6258053a8dabb65faebbea3a2e886f49308d9a722607396768d"
+    },
+    {
+      "file": "web_platform/src/components/hq/hq-access-fields.tsx",
+      "sha256": "33e3afe9e5655cb4bb9835df8764fe85b50b3b72696e5adc7bd55050d93a1575"
+    },
+    {
+      "file": "web_platform/src/lib/hq/access-client.ts",
+      "sha256": "893957c4c2c0146b21b1ffa55988b3655bc22c4043725b73905c6ca00f6864a1"
+    },
+    {
+      "file": "web_platform/src/lib/hq/access-copy.ts",
+      "sha256": "00e01f5f5d7e9a42eeee26228dbad167830bc33d0734d947c40bc9cc54c4bbdb"
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-controls.mjs",
+      "sha256": "aeb1e8cfc65a66d654245701edf69cfbc730d731f4eae0feda81390f52d528d5"
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/access-storage.mjs",
+      "sha256": "6c314daa17d148da70762c1451508442605efa2605713f8c2c28a84cb5ff18cf"
+    },
+    {
+      "file": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256": "6e399668235eecdd4f97cd9a6aead27281771756c77e393c0d316f64aa826ee9"
+    }
+  ],
+  "finishedAt": "2026-10-23T20:28:01.963Z"
+}

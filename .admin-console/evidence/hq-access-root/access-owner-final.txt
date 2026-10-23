@@ -1,0 +1,42 @@
+✔ supported access schema is excluded physically while exact v1 business snapshot and inert schema remain unchanged (96.3954ms)
+✔ access schema does not permit unfamiliar tables or indexes and cannot be added to inert artifacts (99.1409ms)
+✔ missing or oversized security state refuses instead of silently discarding an unsupported control store (37.7706ms)
+✔ new dependency inventory pins access code while old v1 dependency inventories remain inspectable with explicit gaps (3910.7256ms)
+(node:60768) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/src/lib/hq/access-client.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\web_platform\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Access status makes only a no-store current-cookie status request and refuses public seat details (50.0042ms)
+✔ Authenticated status accepts only the bounded inactive local session shape (0.8984ms)
+✔ Recovery preparation obtains a browser challenge then sends the factor only in one bounded JSON body (0.7803ms)
+✔ Bootstrap proof uses only challenge/enrollment; existing-session enrollment and rotation carry CSRF (1.3997ms)
+✔ Return destinations are exact existing routes and never carry a query, external URL or encoded escape (0.319ms)
+✔ Confirmation checks operation identity, committed state and returned destination before allowing success (0.7428ms)
+✔ Lost confirmation has no automatic replay; receipt lookup carries only the scoped proof and no credential (0.3493ms)
+✔ Cancellation accepts truthful terminal receipts and never treats pending or mismatched data as cancelled (0.3844ms)
+✔ Refusals expose safe codes and diagnostic UUIDs, never server-provided message or arbitrary diagnostics (0.4957ms)
+✔ Oversized secret material is refused before any stage network request (0.2269ms)
+✔ Signout and all-session revocation keep one client-generated receipt proof across a lost response (1.4442ms)
+✔ SEAT-01 explicit initialization has restricted bootstrap and exact-seat saved-copy confirmation (11851.5302ms)
+✔ SEAT-03/04 recovery preserves data, rotates only after confirmation and replay never reissues secrets (28708.0007ms)
+✔ SEAT-05 retained session objects fail inside command transaction after revoke (15228.9962ms)
+✔ SEAT-04 audit failure rolls back factor and sessions (18333.2318ms)
+✔ DB-01 normal missing open creates no path or database (6446.5585ms)
+✔ DB-02/03 cached store refuses lost guard and replaced database without repair (12336.6291ms)
+✔ SEAT-07 invalid attempts persist across reopen and bound independent challenges (119248.4267ms)
+✔ HTTP bounded access and session bootstrap do not create an anonymous workspace (14095.1095ms)
+✔ DB partial publication is blocked then explicit same-fixture resume reissues restricted bootstrap (14060.2904ms)
+✔ SEAT-01/02 adoption preserves two original seats/history; cookie alone and permit alone cannot enroll B (31463.9335ms)
+✔ DB partial fresh intent before database creation resumes only the same instance/seat/operation (13013.1034ms)
+✔ DB interrupted adoption rollback requires original masked-session material on explicit resume (13497.7733ms)
+✔ HTTP development module identity preserves safe proof refusal and redacts unknown failures (11882.3187ms)
+✔ DB separate safe diagnostic journal refuses append before exceeding its exact byte cap (5195.6666ms)
+✔ Access audit authentication methods name the actual proof for each completed operation (26417.184ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 346272.7051

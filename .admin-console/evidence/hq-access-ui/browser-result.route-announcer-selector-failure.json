@@ -1,0 +1,30 @@
+{
+  "classification": "Synthetic owner browser evidence; independent acceptance required",
+  "checks": [
+    "Access bypasses ordinary session bootstrap and discloses no protected task data",
+    "Enrollment dialog masks proof, traps keyboard focus and returns focus on Escape",
+    "Bootstrap enrolls only after saved-copy confirmation and reconnects to the exact task/seat",
+    "Cancelling a staged rotation preserves current session and factor",
+    "Invalid rotation proof is refused in-dialog and the submitted secret is cleared"
+  ],
+  "apiRefusals": [
+    {
+      "path": "/api/hq/access/stage",
+      "status": 400,
+      "code": "proof_invalid"
+    },
+    {
+      "path": "/api/hq/access/confirm",
+      "status": 400,
+      "code": "proof_invalid"
+    }
+  ],
+  "unexpectedErrors": [],
+  "externalRequests": [],
+  "expectedTransportFailures": 0,
+  "startedAt": "2026-10-23T20:14:07.109Z",
+  "readinessFailure": "TypeError",
+  "status": "failed",
+  "failure": "Error: expect(locator).toContainText(expected) failed\n\nLocator: getByRole('alert')\nExpected substring: \"The proof could not be verified\"\nError: strict mode violation: getByRole('alert') resolved to 2 elements:\n    1) <div role=\"alert\" class=\"hq-message hq-message-error\">…</div> aka getByRole('region', { name: 'Access status' }).getByRole('alert')\n    2) <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\">Volabi · Local Founder Workspace</div> aka getByText('Volabi · Local Founder')\n\nCall log:\n  - Expect \"to.have.text\" with timeout 20000ms\n  - waiting for getByRole('alert')\n    8 × locator resolved to <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\">Volabi · Local Founder Workspace</div>\n      - unexpected value \"Volabi · Local Founder Workspace\"\n\n    at captureRawStack (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright-core\\lib\\coreBundle.js:3172:17)\n    at callMatcherAsStep (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright\\lib\\matchers\\expect.js:12877:57)\n    at Object.toContainText (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright\\lib\\matchers\\expect.js:12867:23)\n    at C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-access-owner.mjs:76:423",
+  "finishedAt": "2026-10-23T20:15:01.033Z"
+}

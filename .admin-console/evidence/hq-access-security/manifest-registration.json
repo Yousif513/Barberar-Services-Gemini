@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-23T20:40:28.949323+00:00",
+  "method": "admin_console_manifest.py set/release-claim only; no allow-invalid or validation changes",
+  "capability": "hq-local.access-controls",
+  "reviewStatus": "reviewed",
+  "reviewedBy": "sec-hq-access",
+  "transientClaimReleased": true,
+  "agentStatus": "done",
+  "credentialIncident": {
+    "severity": "high",
+    "status": "open"
+  },
+  "evidenceCount": 15
+}

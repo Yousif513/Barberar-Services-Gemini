@@ -1,0 +1,12 @@
+{
+  "format": "volabi-access-precommit-check-1",
+  "sourcePinsMatchWorkingAndGitIndex": 51,
+  "claimsRemaining": 0,
+  "developmentWorkersDone": 6,
+  "releaseExitCode": 1,
+  "releaseErrors": 330,
+  "releaseWarnings": 42,
+  "heldGatePreserved": true,
+  "approvedIgnoredSyntheticLogsExplicitlyStaged": 23,
+  "newRawLogsAppended": 1
+}

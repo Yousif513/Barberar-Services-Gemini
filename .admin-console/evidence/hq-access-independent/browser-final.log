@@ -1,0 +1,10 @@
+PASS Unauthenticated Access bypasses provider bootstrap and protects original domain history
+PASS Enrollment dialog masking, focus, clear-on-close and matching saved-copy confirmation reconnect original task
+PASS Rotation dialog keyboard path, cancellation and successful factor replacement work against actual server
+PASS Lost response and cookie remain unknown until scoped receipt; saved replacement restores exact A
+PASS Revocation dialog traps and restores focus; lost signout response has scoped receipt and recoverable factor
+PASS Arabic RTL at 320/768/1024/1440 and masked mobile revoke with acknowledgement match actual access state
+PASS Redirect guard and secret-free request URLs/browser persistence hold after all flows
+PASS Signed-out protected navigation refuses anonymous bootstrap and provides the original task return path
+PASS Healthy-to-lost guard transition blocks Access with diagnostic and performs no browser repair
+PASS Original rich rows, all versions, receipts and prior audit IDs remain exact; B stays isolated

@@ -1,0 +1,16 @@
+{
+  "operation": "adopt",
+  "synthetic_only": true,
+  "exit_code": 0,
+  "masked_session_input": true,
+  "plaintext_session_echoed": false,
+  "restricted_proof_displayed": true,
+  "saved_confirmation_required": true,
+  "raw_transcript_committed": false,
+  "cancel": {
+    "exit_code": 1,
+    "refused": true
+  },
+  "owned_root_cleaned": true,
+  "real_data_accessed": false
+}

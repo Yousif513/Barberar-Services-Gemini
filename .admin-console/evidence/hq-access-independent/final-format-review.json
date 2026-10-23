@@ -1,0 +1,38 @@
+{
+  "format": "volabi-access-independent-final-format-review-1",
+  "at": "2026-10-23T20:49:58.015Z",
+  "agent": "qa-hq-access",
+  "file": "web_platform/src/components/hq/hq-access-fields.tsx",
+  "accepted": true,
+  "scope": "Exactly one final LF byte removed; no other product delta is accepted by this receipt",
+  "historicalSourcePinsPreserved": true,
+  "verification": {
+    "method": "Reconstructed previous bytes as current bytes plus byte0x0a; SHA256 equals independently accepted historical raw pin. Assert current bytes equal previous bytes minus final byte.",
+    "oldBytes": 1524,
+    "newBytes": 1523,
+    "removedBytes": 1,
+    "removedByteHex": "0a",
+    "exactOldMinusFinalByte": true,
+    "rawBeforeSha256": "33e3afe9e5655cb4bb9835df8764fe85b50b3b72696e5adc7bd55050d93a1575",
+    "rawAfterSha256": "a3bc214054aeaf02c54da46c95fde54f93ebc2724f82e58d70af88c441af5d2f",
+    "canonicalDefinition": "UTF8 CRLF normalized to LF; terminal LF sequence normalized to exactly one LF",
+    "canonicalBeforeSha256": "a3bc214054aeaf02c54da46c95fde54f93ebc2724f82e58d70af88c441af5d2f",
+    "canonicalAfterSha256": "a3bc214054aeaf02c54da46c95fde54f93ebc2724f82e58d70af88c441af5d2f",
+    "canonicalBytesEqual": true,
+    "rereadFromDisk": true
+  },
+  "focusedLint": {
+    "command": "npx --no-install eslint src/components/hq/hq-access-fields.tsx",
+    "cwd": "web_platform",
+    "exitCode": 0,
+    "warnings": 0,
+    "evidence": ".admin-console/evidence/hq-access-independent/final-format-lint.log"
+  },
+  "typecheck": {
+    "rerun": false,
+    "reason": "Exact one-byte final LF deletion changes no TypeScript/JSX token; focused lint plus byte and canonical equality are proportional. Prior app-health/test gates remain root-owned."
+  },
+  "holdsUnchanged": true,
+  "noProductWritesByReviewer": true,
+  "noHistoricalPinRewrite": true
+}

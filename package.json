@@ -17,6 +17,8 @@
     "coverage:admin-console": "python tools/adminwright/scripts/admin_console_manifest.py coverage --manifest .admin-console/manifest.json --project-root .",
     "hq:dev": "node scripts/start-volabi-local.mjs",
     "hq:recovery": "node scripts/hq-recovery/cli.mjs",
+    "hq:access": "node scripts/hq-access/cli.mjs",
+    "hq:access:fixture": "node scripts/start-volabi-access-fixture.mjs",
     "pilot:dev": "node scripts/start-primora-pilot-local.mjs",
     "test:hq:browser": "node web_platform/tests-browser/hq-local-acceptance.mjs",
     "test:hq": "node --test \"web_platform/tests/hq-*.test.mjs\"",
