@@ -32,6 +32,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import time
@@ -212,6 +213,7 @@ RULES = {
     "unknown-role-reference": E3,
     "unknown-capability-reference": E3,
     "capability-route-unknown": E3,
+    "cli-interface": E3,
     "capability-screen-link": E3,
     "capability-no-role": E3,
     "transition-command-unknown": E3,
@@ -1184,7 +1186,44 @@ def check_roles(values, role_ids, path, findings):
 # --------------------------------------------------------------------------
 
 
-def structural_findings(manifest, findings, release):
+def cli_interface_error(capability, project_root):
+    """CLI applicability is explicit; it never waives policy/evidence checks."""
+    kind = capability.get("interfaceKind", "web")
+    if kind not in ("web", "cli"):
+        return "interfaceKind must be web or cli"
+    if kind == "web":
+        return "a web capability cannot declare cliEntrypoint" if "cliEntrypoint" in capability else None
+    raw = capability.get("cliEntrypoint")
+    if (not isinstance(raw, str) or not re.fullmatch(r"[A-Za-z0-9_./-]{1,240}", raw)
+            or raw.startswith("/") or any(part in ("", ".", "..") for part in raw.split("/"))
+            or Path(raw).suffix not in (".mjs", ".cjs", ".js", ".py")):
+        return "CLI needs a bounded project-relative executable entrypoint without traversal"
+    if capability.get("uiRoutes") != []:
+        return "CLI uiRoutes must be empty; it cannot claim web routes"
+    if raw not in as_list(capability.get("serverOperations")):
+        return "CLI entrypoint must be an exact declared server operation"
+    if project_root is None:
+        return "CLI entrypoint file cannot be verified without a project root"
+    try:
+        root = Path(project_root).resolve(strict=True)
+        target = root
+        for part in raw.split("/"):
+            target = target / part
+            info = target.lstat()
+            if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & 0x400:
+                return "CLI entrypoint cannot traverse a link or reparse point"
+        info = target.stat()
+        if (not target.is_file() or not 0 < info.st_size <= 1024 * 1024
+                or info.st_nlink != 1 or escapes_root(target, root)):
+            return "CLI entrypoint must be one nonempty bounded ordinary project file"
+        if not target.read_text(encoding="utf-8").strip():
+            return "CLI entrypoint cannot be blank"
+    except (OSError, ValueError, RuntimeError, UnicodeError):
+        return "CLI entrypoint is missing or inaccessible"
+    return None
+
+
+def structural_findings(manifest, findings, release, project_root=None):
     roles = [item for item in as_list(manifest.get("roles")) if isinstance(item, dict)]
     role_ids = {text_of(role.get("id")) for role in roles if text_of(role.get("id"))}
     screens = [item for item in as_list(manifest.get("screens")) if isinstance(item, dict)]
@@ -1246,6 +1285,13 @@ def structural_findings(manifest, findings, release):
                 "capability has no actor role",
             )
         routes = [value for value in as_list(capability.get("uiRoutes")) if isinstance(value, str)]
+        cli_error = cli_interface_error(capability, project_root)
+        if cli_error:
+            findings.add("cli-interface", path, cli_error)
+        if capability.get("interfaceKind") == "cli":
+            if any(cid in as_list(screen.get("capabilities")) for screen in screens):
+                findings.add("cli-interface", path, "CLI capability cannot be exposed as a web screen")
+            continue
         for route in routes:
             if route not in screen_routes:
                 findings.add(
@@ -1486,7 +1532,7 @@ def validate_manifest(manifest, phase, project_root, profile):
 
     run_placeholder_scan(manifest, findings, release)
     check_archetype_coverage(manifest, findings)
-    structural_findings(manifest, findings, release)
+    structural_findings(manifest, findings, release, project_root)
     if release:
         validate_evidence(manifest, findings, project_root)
         if not roles:
@@ -1663,7 +1709,7 @@ def validate_entities(manifest, findings, release, role_ids):
             for key in (
                 "outcome",
                 "roles",
-                "uiRoutes",
+                *(() if capability.get("interfaceKind") == "cli" else ("uiRoutes",)),
                 "serverOperations",
                 "authorizationPolicies",
                 "dataBinding",
@@ -2089,9 +2135,9 @@ def validate_evidence(manifest, findings, project_root):
 # --------------------------------------------------------------------------
 
 
-def coverage_findings(manifest, profile):
+def coverage_findings(manifest, profile, project_root=None):
     findings = Findings(profile)
-    structural_findings(manifest, findings, True)
+    structural_findings(manifest, findings, True, project_root)
     return findings
 
 
@@ -2376,7 +2422,7 @@ def emit_operator_handbook(manifest):
     return "\n".join(lines) + "\n"
 
 
-def emit_gap_report(manifest, profile):
+def emit_gap_report(manifest, profile, project_root=None):
     lines = ["# Gap report", "", "Profile: " + profile, ""]
     lines.append("## Recorded gaps")
     lines.append("")
@@ -2401,7 +2447,7 @@ def emit_gap_report(manifest, profile):
                 )
                 + " |"
             )
-    findings = coverage_findings(manifest, profile)
+    findings = coverage_findings(manifest, profile, project_root)
     lines.extend(["", "## Structural findings", ""])
     if not findings.items:
         lines.append("- none")
@@ -2725,15 +2771,15 @@ def parse_json_entries(raw):
     raise ManifestError("--json must be a JSON object or a non-empty array of objects")
 
 
-def new_error_signatures(before, after):
+def new_error_signatures(before, after, project_root=None):
     """Return errors introduced by an edit, so partial writes cannot corrupt the manifest."""
     profile = active_profile(after, None)[0]
     before_errors = {
         (item["rule"], item["path"], item["message"])
-        for item in validate_manifest(before, "plan", None, profile).errors
+        for item in validate_manifest(before, "plan", project_root, profile).errors
     }
     after_errors = [
-        item for item in validate_manifest(after, "plan", None, profile).errors
+        item for item in validate_manifest(after, "plan", project_root, profile).errors
     ]
     return [
         item
@@ -3353,7 +3399,8 @@ def cmd_coverage(args):
     manifest_path = resolve_manifest_path(args.manifest)
     manifest = load_json(manifest_path)
     profile, source = active_profile(manifest, getattr(args, "profile", None))
-    findings = coverage_findings(manifest, profile)
+    project_root = Path(args.project_root).resolve() if args.project_root else manifest_path.parent.parent
+    findings = coverage_findings(manifest, profile, project_root)
     print("# Structural coverage audit")
     print()
     print("Profile: " + profile + " (" + source + ")")
@@ -3408,7 +3455,8 @@ def cmd_emit(args):
             "note: feedback[] is empty. If this skill misled or slowed you, record it "
             "(add --kind feedback) and run `harvest` -- that is how the skill learns."
         )
-    text = EMITTERS[args.format](manifest, profile)
+    text = (emit_gap_report(manifest, profile, manifest_path.parent.parent)
+            if args.format == "gap-report" else EMITTERS[args.format](manifest, profile))
     if args.format == "gap-report" and (health.errors or health.warnings):
         text = text.replace(
             "# Gap report\n",
@@ -3473,7 +3521,7 @@ def cmd_add(args):
                 raise ManifestError(kind + " '" + entry_id + "' appears twice in this batch")
             batch_ids.add(entry_id)
         collection.extend(entries)
-        introduced = new_error_signatures(before, manifest)
+        introduced = new_error_signatures(before, manifest, manifest_path.parent.parent)
         if introduced and not args.allow_invalid:
             stderr("Refusing to write: the new " + kind + " introduces validation errors.")
             for item in introduced:
@@ -3510,7 +3558,7 @@ def cmd_set(args):
         previous = container.get(key)
         value = coerce_value(args.value, previous)
         container[key] = value
-        introduced = new_error_signatures(before, manifest)
+        introduced = new_error_signatures(before, manifest, manifest_path.parent.parent)
         if introduced and not args.allow_invalid:
             stderr("Refusing to write: the change introduces validation errors.")
             for item in introduced:

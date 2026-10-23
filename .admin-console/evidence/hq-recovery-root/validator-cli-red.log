@@ -1,0 +1,194 @@
+test_cli_cannot_claim_a_web_route_or_screen (test_cli_interface.CliInterfaceRegression.test_cli_cannot_claim_a_web_route_or_screen) ... FAIL
+test_cli_cannot_suppress_tests_policy_evidence_or_independent_review (test_cli_interface.CliInterfaceRegression.test_cli_cannot_suppress_tests_policy_evidence_or_independent_review) ... ok
+test_cli_without_web_route_passes_only_with_real_local_entrypoint (test_cli_interface.CliInterfaceRegression.test_cli_without_web_route_passes_only_with_real_local_entrypoint) ... FAIL
+test_default_web_still_requires_route_and_screen (test_cli_interface.CliInterfaceRegression.test_default_web_still_requires_route_and_screen) ... ok
+test_empty_and_oversized_entrypoint_refuse (test_cli_interface.CliInterfaceRegression.test_empty_and_oversized_entrypoint_refuse) ... FAIL
+test_entrypoint_must_be_a_declared_server_operation (test_cli_interface.CliInterfaceRegression.test_entrypoint_must_be_a_declared_server_operation) ... FAIL
+test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) ...
+  test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='') ... FAIL
+  test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='../escape.mjs') ... FAIL
+  test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='/tmp/inspect.mjs') ... FAIL
+  test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='C:/inspect.mjs') ... FAIL
+  test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts/../scripts/inspect.mjs') ... FAIL
+  test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts//inspect.mjs') ... FAIL
+  test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts/missing.mjs') ... FAIL
+  test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts') ... FAIL
+  test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts/inspect.txt') ... FAIL
+test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) ...
+  test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind='shell') ... FAIL
+  test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind='') ... FAIL
+  test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind=None) ... FAIL
+  test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind=1) ... FAIL
+  test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind='web') ... FAIL
+
+======================================================================
+FAIL: test_cli_cannot_claim_a_web_route_or_screen (test_cli_interface.CliInterfaceRegression.test_cli_cannot_claim_a_web_route_or_screen)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 55, in test_cli_cannot_claim_a_web_route_or_screen
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: release\nERROR: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 0 warning(s)\n'
+
+======================================================================
+FAIL: test_cli_without_web_route_passes_only_with_real_local_entrypoint (test_cli_interface.CliInterfaceRegression.test_cli_without_web_route_passes_only_with_real_local_entrypoint)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 30, in test_cli_without_web_route_passes_only_with_real_local_entrypoint
+    self.assertEqual(code, 0, out + err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Profile: regulated (manifest)
+Phase: release
+ERROR: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen
+ERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability
+Validation complete: 2 error(s), 0 warning(s)
+
+
+======================================================================
+FAIL: test_empty_and_oversized_entrypoint_refuse (test_cli_interface.CliInterfaceRegression.test_empty_and_oversized_entrypoint_refuse)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 95, in test_empty_and_oversized_entrypoint_refuse
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_entrypoint_must_be_a_declared_server_operation (test_cli_interface.CliInterfaceRegression.test_entrypoint_must_be_a_declared_server_operation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 87, in test_entrypoint_must_be_a_declared_server_operation
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 41, in test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='../escape.mjs')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 41, in test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='/tmp/inspect.mjs')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 41, in test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='C:/inspect.mjs')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 41, in test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts/../scripts/inspect.mjs')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 41, in test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts//inspect.mjs')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 41, in test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts/missing.mjs')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 41, in test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 41, in test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release (test_cli_interface.CliInterfaceRegression.test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release) (entry='scripts/inspect.txt')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 41, in test_invalid_or_nonlocal_entrypoints_refuse_in_plan_and_release
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind='shell')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 49, in test_unknown_interface_and_web_decoy_refuse
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind='')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 49, in test_unknown_interface_and_web_decoy_refuse
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 49, in test_unknown_interface_and_web_decoy_refuse
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 49, in test_unknown_interface_and_web_decoy_refuse
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+======================================================================
+FAIL: test_unknown_interface_and_web_decoy_refuse (test_cli_interface.CliInterfaceRegression.test_unknown_interface_and_web_decoy_refuse) (kind='web')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_cli_interface.py", line 49, in test_unknown_interface_and_web_decoy_refuse
+    self.assertIn("cli-interface", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'cli-interface' not found in 'Profile: regulated (manifest)\nPhase: plan\nERROR: [required-field-empty] entities[user].capabilities[recovery.inspect].uiRoutes: must not be empty for an implemented capability\nWARN: [capability-screen-link] entities[user].capabilities[recovery.inspect]: implemented capability is not reachable from any screen\nValidation complete: 1 error(s), 1 warning(s)\n'
+
+----------------------------------------------------------------------
+Ran 8 tests in 5.007s
+
+FAILED (failures=18)

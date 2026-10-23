@@ -1,0 +1,52 @@
+{
+  "reviewer": "sec-hq-recovery",
+  "implementationOwner": "root",
+  "independent": true,
+  "disposition": "accepted",
+  "scope": "project-local truthful CLI interface applicability only",
+  "sourceReread": "full new helper, structural coverage loop, release capability controls, evidence and default-web implications; matching two schema copies; new_error_signatures before/after and cmd_add/cmd_set explicitly pass manifest project root; no rootless bypass",
+  "files": [
+    {
+      "path": "tools/adminwright/scripts/admin_console_manifest.py",
+      "sha256Canonical": "a571d45b7d4510989e249bc87ff93df9849952daff7e70de8342653e55773c67"
+    },
+    {
+      "path": "tools/adminwright/assets/admin-console.manifest.schema.json",
+      "sha256Canonical": "2ca870a5c5ab585adc22e63b5c09334f26591453892405af8d0b16ca0279e956"
+    },
+    {
+      "path": ".admin-console/admin-console.manifest.schema.json",
+      "sha256Canonical": "2ca870a5c5ab585adc22e63b5c09334f26591453892405af8d0b16ca0279e956"
+    },
+    {
+      "path": "tools/adminwright/tests/test_cli_interface.py",
+      "sha256Canonical": "b005e30f7cf0f82100d6532cae606e1dc0076cbbdb7cb53553bfa5f64896b27a"
+    },
+    {
+      "path": "tools/adminwright/tests/test_cli_interface_security.py",
+      "sha256Canonical": "28b97ff0ff6341250791afd6ca6f7ed54f28d6e1d39050eaeae7748e47820280"
+    }
+  ],
+  "tests": {
+    "command": "python -X utf8 -m unittest discover -s tools/adminwright/tests -p test_cli_interface_security.py -v",
+    "tests": 8,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": ".admin-console/evidence/hq-recovery-security/cli-validator-independent-final.txt"
+  },
+  "negativeProof": [
+    "actual Windows junction and hard-linked entrypoints refuse",
+    "CLI does not waive critical safeguards/recovery/audit/idempotency/separation",
+    "undeclared actors and implementer self-review still fail",
+    "missing or irrelevant test evidence fails",
+    "invalid CLI metadata and default web missing route both fail",
+    "rootless verification and malformed interface discriminators fail closed",
+    "actual add valid CLI and set outcome succeed; invalid mixed add batch and missing-file set refuse without changing manifest bytes"
+  ],
+  "installedGlobalSha256": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316",
+  "globalFileChanged": false,
+  "noGateWaiver": true,
+  "notes": "Final eight-group acceptance includes manifest mutation root-context reconciliation. Root must refresh project-local provenance and run full Python regression; recovery sidecar retake remains separate.",
+  "supersedes": "cli-validator-review-before-write-context.json"
+}

@@ -10,10 +10,10 @@
     {
       "path": "scripts/admin_console_manifest.py",
       "upstream_sha256_raw_bytes": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316",
-      "candidate_sha256_raw_bytes": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597",
+      "candidate_sha256_raw_bytes": "411cc65599134fccf582f707d25fbc0c21281733e9e12434c908531ceb242215",
       "upstream_byte_identical": false,
       "upstream_sha256_utf8_crlf_to_lf": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316",
-      "candidate_sha256_utf8_crlf_to_lf": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597"
+      "candidate_sha256_utf8_crlf_to_lf": "a571d45b7d4510989e249bc87ff93df9849952daff7e70de8342653e55773c67"
     },
     {
       "path": "assets/admin-console.manifest.template.json",
@@ -26,10 +26,10 @@
     {
       "path": "assets/admin-console.manifest.schema.json",
       "upstream_sha256_raw_bytes": "e6f68c7d561ecacadce2f22d3515635e9fcabd8f0ecd29d6d51b085e27998b50",
-      "candidate_sha256_raw_bytes": "e6f68c7d561ecacadce2f22d3515635e9fcabd8f0ecd29d6d51b085e27998b50",
-      "upstream_byte_identical": true,
+      "candidate_sha256_raw_bytes": "11158bb121f20eb09c06107c9515fa9406a91e00b70788cdd41656949107f485",
+      "upstream_byte_identical": false,
       "upstream_sha256_utf8_crlf_to_lf": "e6f68c7d561ecacadce2f22d3515635e9fcabd8f0ecd29d6d51b085e27998b50",
-      "candidate_sha256_utf8_crlf_to_lf": "e6f68c7d561ecacadce2f22d3515635e9fcabd8f0ecd29d6d51b085e27998b50"
+      "candidate_sha256_utf8_crlf_to_lf": "2ca870a5c5ab585adc22e63b5c09334f26591453892405af8d0b16ca0279e956"
     },
     {
       "path": "tests/test_manifest.py",
@@ -62,13 +62,14 @@
     "README.md"
   ],
   "modified_upstream_files": [
-    "scripts/admin_console_manifest.py"
+    "scripts/admin_console_manifest.py",
+    "assets/admin-console.manifest.schema.json"
   ],
   "preserved_upstream_tests": [
     "tests/test_manifest.py"
   ],
   "local_changes": {
-    "scripts/admin_console_manifest.py": "Explicit per-validation context; bounded strict UTF8 evidence read; test-format/executable-assertion checks; executable capability/screen/queue linking. All rule severity/profile/declaredStatic behavior unchanged.",
+    "scripts/admin_console_manifest.py": "Explicit per-validation evidence context and bounded executable-evidence linking; later independently accepted explicit CLI interface applicability with bounded local entrypoint, no web route/screen, and unchanged security/evidence/review/default-web gates. New cli-interface errors always block malformed CLI metadata.",
     "scripts/evidence_context.py": "New conservative lexical classifier, runtime binding inventory, exact UUID and negative assertion/prose contexts.",
     "UPSTREAM_PATCH.diff": "Targeted upstream delta; original copyright/license retained."
   },
@@ -85,5 +86,31 @@
     ".admin-console/evidence/validator-repair-20261023/independent-review.json",
     "AGENTS.md",
     "package.json"
-  ]
+  ],
+  "cli_extension": {
+    "status": "independently accepted local applicability extension; global release remains failed",
+    "base_commit": "bf8c233db333e3b09d033ea2fc013e911cb549ff",
+    "patch": "CLI_INTERFACE_PATCH.diff",
+    "historical_initial_repair_patch": "UPSTREAM_PATCH.diff retained unchanged",
+    "review": ".admin-console/evidence/hq-recovery-security/cli-validator-review.json",
+    "owner_tests": 9,
+    "independent_tests": 8,
+    "local_additions": [
+      {
+        "path": "tests/test_cli_interface.py",
+        "sha256_raw_bytes": "659d5402013640dd027db456f8b0ff5d327f91d2baca8736095a8dd0a6150421",
+        "sha256_utf8_crlf_to_lf": "b005e30f7cf0f82100d6532cae606e1dc0076cbbdb7cb53553bfa5f64896b27a"
+      },
+      {
+        "path": "tests/test_cli_interface_security.py",
+        "sha256_raw_bytes": "3de2d7ec2440f45dd712c609444db4e2b375478206663d69e1f916c981a888f1",
+        "sha256_utf8_crlf_to_lf": "28b97ff0ff6341250791afd6ca6f7ed54f28d6e1d39050eaeae7748e47820280"
+      },
+      {
+        "path": "CLI_INTERFACE_PATCH.diff",
+        "sha256_raw_bytes": "5cd8a8d2d4a36769cfc1e02b8ef45e36696e836be36612e071c30ee749052e35",
+        "sha256_utf8_crlf_to_lf": "5cd8a8d2d4a36769cfc1e02b8ef45e36696e836be36612e071c30ee749052e35"
+      }
+    ]
+  }
 }

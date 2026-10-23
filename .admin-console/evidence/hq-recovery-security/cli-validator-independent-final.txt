@@ -1,0 +1,13 @@
+test_actual_hardlinked_entrypoint_is_not_an_ordinary_single_file (test_cli_interface_security.IndependentCliSecurity.test_actual_hardlinked_entrypoint_is_not_an_ordinary_single_file) ... ok
+test_actual_windows_junction_entrypoint_cannot_escape_file_validation (test_cli_interface_security.IndependentCliSecurity.test_actual_windows_junction_entrypoint_cannot_escape_file_validation) ... ok
+test_cli_cannot_hide_missing_or_irrelevant_test_evidence (test_cli_interface_security.IndependentCliSecurity.test_cli_cannot_hide_missing_or_irrelevant_test_evidence) ... ok
+test_cli_helper_requires_verified_root_and_handles_nonstring_discriminator (test_cli_interface_security.IndependentCliSecurity.test_cli_helper_requires_verified_root_and_handles_nonstring_discriminator) ... ok
+test_cli_unknown_role_and_self_review_remain_errors (test_cli_interface_security.IndependentCliSecurity.test_cli_unknown_role_and_self_review_remain_errors) ... ok
+test_default_web_route_anchor_and_bad_cli_mode_both_fail_closed (test_cli_interface_security.IndependentCliSecurity.test_default_web_route_anchor_and_bad_cli_mode_both_fail_closed) ... ok
+test_explicit_cli_does_not_waive_command_controls (test_cli_interface_security.IndependentCliSecurity.test_explicit_cli_does_not_waive_command_controls) ... ok
+test_real_add_set_keep_cli_context_and_refuse_invalid_batches_atomically (test_cli_interface_security.IndependentCliSecurity.test_real_add_set_keep_cli_context_and_refuse_invalid_batches_atomically) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 4.766s
+
+OK

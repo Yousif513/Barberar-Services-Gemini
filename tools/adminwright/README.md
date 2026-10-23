@@ -1,8 +1,8 @@
-# Project-local Adminwright evidence-validator repair
+# Project-local Adminwright evidence and interface validation
 
 Project-local validator for PRIMORA, accepted and adopted 2026-10-23 after separate independent review: 25/25 adversarial groups, zero failures/skips. The installed global validator remains unchanged. Both original and local full release gates still fail. Acceptance receipt: `.admin-console/evidence/validator-repair-20261023/independent-review.json`.
 
-The validator is vendored from the installed Adminwright snapshot, not an inferred upstream version/commit. `PROVENANCE.json` records every copied file's original and candidate raw SHA256, exact Apache-2.0 `LICENSE`/`NOTICE`, and dependencies (Python standard library only). `UPSTREAM_PATCH.diff` is the only delta to the upstream script. The original 73-case `tests/test_manifest.py` is byte-identical. Only schema/template assets needed by this command/test scope are vendored; this is not a global skill install.
+The validator is vendored from the installed Adminwright snapshot, not an inferred upstream version/commit. `PROVENANCE.json` records every copied file's original and candidate raw SHA256, exact Apache-2.0 `LICENSE`/`NOTICE`, and dependencies (Python standard library only). `UPSTREAM_PATCH.diff` retains the original evidence-repair delta. `CLI_INTERFACE_PATCH.diff` is the later incremental project-local CLI/schema delta from commit bf8c233; provenance records both separately. The incremental patch has zero context lines; use `git apply --unidiff-zero` against that base. This retains exact source changes without whitespace-only diff context lines. The original 73-case `tests/test_manifest.py` is byte-identical. Only schema/template assets needed by this command/test scope are vendored; this is not a global skill install.
 
 ## Reproduce locally
 
@@ -15,7 +15,7 @@ python tools/adminwright/scripts/admin_console_manifest.py validate --manifest .
 python tools/adminwright/scripts/admin_console_manifest.py coverage --manifest .admin-console/manifest.json --project-root .
 ```
 
-The repository completion gate now uses this project-local copy. `npm run test:admin-validator` runs all 119 owner, unchanged upstream and independent groups; `npm run validate:admin-console` and `npm run coverage:admin-console` expose its release and structural gates. Passing validator tests does not establish release readiness. Validate/coverage do not mutate the manifest. The original installed tool remains available only for paired regression comparison.
+The repository completion gate now uses this project-local copy. `npm run test:admin-validator` runs all 136 owner, unchanged upstream and independent groups; `npm run validate:admin-console` and `npm run coverage:admin-console` expose its release and structural gates. Passing validator tests does not establish release readiness. Validate/coverage do not mutate the manifest. The original installed tool remains available only for paired regression comparison.
 
 ## Exact repair contract
 
@@ -38,3 +38,9 @@ This is a deterministic structural floor. A matching operation in a test title i
 `UPSTREAM_TESTS.txt` records the 73 unchanged upstream cases. `original-release.json`, `candidate-release.json` and `release-comparison.json` preserve the same manifest comparison, including unresolved real baseline defects; no finding is waived and no gate is forced green. Historical 313/298 counts used a prior manifest; current same-manifest counts must be read from the comparison receipt. Separate independent review owns its tests/receipt. That pass found a genuine high-severity bare runtime-directory/root-file/absolute-path overlap bypass in the first candidate. `RED_RUNTIME_BINDINGS.txt` records five failing owner subcases before the inventory-layer repair; the new complete-value-first resolution fixed those cases without disabling the bounded fixture feature. Final source freeze and independent acceptance remain separate from owner verification.
 
 No application/HQ/payment logic, database schema, credential, business action, paid service, global skill or installed gate was modified by this repair. Azure account setup/audio remains deferred and all existing holds remain.
+
+## Explicit CLI interface applicability — HQ-NEXT-03
+
+The approved recovery tooling has zero web routes. `interfaceKind: cli` requires an exact `cliEntrypoint` in serverOperations: a nonblank bounded ordinary UTF8 executable source file within this project. Traversal, absolute paths, links/reparse points/hardlinks, missing/oversized files, web routes/screens and unknown interface kinds fail. Only the inapplicable web-route/screen-anchor requirement is replaced by this checked command entrypoint. Add/set write guards resolve the actual manifest project root for both the before and after validations, so missing CLI files cannot be admitted during incremental writes. Default web interfaces and all role, policy, audit, safeguards, idempotency, independent reviewer, executable test/evidence and runtime-source overlap checks remain. Coverage validates CLI files with its project-root context; direct rootless render helpers conservatively report unverified CLI entrypoints.
+
+Nine owner regression groups start red against the previous validator; eight independently authored adversarial groups verify actual Windows filesystem paths and preserved critical security/evidence gates. Independent acceptance: `.admin-console/evidence/hq-recovery-security/cli-validator-review.json`. The installed global validator and original 73 upstream tests remain unchanged. Full-console release findings are retained; explicit CLI applicability is not a waiver or production-readiness claim.

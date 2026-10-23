@@ -1,0 +1,50 @@
+{
+  "reviewer": "sec-hq-recovery",
+  "implementationOwner": "root",
+  "independent": true,
+  "disposition": "accepted",
+  "scope": "project-local truthful CLI interface applicability only",
+  "sourceReread": "full new helper, structural coverage loop, release capability controls, evidence and default-web implications; matching two schema copies",
+  "files": [
+    {
+      "path": "tools/adminwright/scripts/admin_console_manifest.py",
+      "sha256Canonical": "815f434ff884469bbd5ae2e905a584ab2026383025e383d5c7af3e2613ce5ec9"
+    },
+    {
+      "path": "tools/adminwright/assets/admin-console.manifest.schema.json",
+      "sha256Canonical": "2ca870a5c5ab585adc22e63b5c09334f26591453892405af8d0b16ca0279e956"
+    },
+    {
+      "path": ".admin-console/admin-console.manifest.schema.json",
+      "sha256Canonical": "2ca870a5c5ab585adc22e63b5c09334f26591453892405af8d0b16ca0279e956"
+    },
+    {
+      "path": "tools/adminwright/tests/test_cli_interface.py",
+      "sha256Canonical": "8411ee64bfa00aead439d89952803448b5866893a630ee1c8b82133340d252be"
+    },
+    {
+      "path": "tools/adminwright/tests/test_cli_interface_security.py",
+      "sha256Canonical": "649d7cf1760c0c7864985fe0c040e0594493d323bf09a04f35fe2894339cf333"
+    }
+  ],
+  "tests": {
+    "command": "python -X utf8 -m unittest discover -s tools/adminwright/tests -p test_cli_interface_security.py -v",
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": ".admin-console/evidence/hq-recovery-security/cli-validator-independent.txt"
+  },
+  "negativeProof": [
+    "actual Windows junction and hard-linked entrypoints refuse",
+    "CLI does not waive critical safeguards/recovery/audit/idempotency/separation",
+    "undeclared actors and implementer self-review still fail",
+    "missing or irrelevant test evidence fails",
+    "invalid CLI metadata and default web missing route both fail",
+    "rootless verification and malformed interface discriminators fail closed"
+  ],
+  "installedGlobalSha256": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316",
+  "globalFileChanged": false,
+  "noGateWaiver": true,
+  "notes": "Full existing global release findings remain. Root must refresh project-local provenance after this acceptance; runtime recovery security currently contested separately due native sidecar cleanup finding."
+}

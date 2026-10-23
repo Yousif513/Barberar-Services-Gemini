@@ -1,0 +1,7 @@
+# impl-hq-cli-manifest
+
+DEVELOPMENT-ONLY narrow tooling reconciliation performed by root, separate from recovery implementation and independent security review. Approved HQ-NEXT-03 explicitly adds a CLI and zero web surfaces. Existing validator required uiRoutes and a web screen for every implemented capability; adding an invented screen would misrepresent the delivered interface.
+
+Added explicit interfaceKind=cli and project-relative cliEntrypoint in local validator/schema copies. Skip only the inapplicable webroute/anchor requirement; require empty uiRoutes, no screen binding, bounded ordinary nonblank UTF8 entrypoint declared as a server operation, no path traversal/link/reparse/hardlink, and retain existing roles, policies, audit, safeguards, executable test/evidence/token and independent review gates. Defaultweb unchanged; unknown interfaces always fail. Global installed tool untouched. Eight meaningful regression groups start RED then pass; full local/upstream regression and independent adversarial review pending. No quality-gate waiver or production authority.
+
+Final independent acceptance: .admin-console/evidence/hq-recovery-security/cli-validator-review.json, 8/8 adversarial groups. Nine owner groups pass including actual add/set root-context atomicity; initial missing-context regression retained. Provenance/schema/patch updated; full136 regression pending fresh root run.

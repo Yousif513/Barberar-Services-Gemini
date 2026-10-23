@@ -1,0 +1,113 @@
+diff --git a/tools/adminwright/assets/admin-console.manifest.schema.json b/tools/adminwright/assets/admin-console.manifest.schema.json
+index 76de6a8..1509a8a 100644
+--- a/tools/adminwright/assets/admin-console.manifest.schema.json
++++ b/tools/adminwright/assets/admin-console.manifest.schema.json
+@@ -1045,0 +1046,11 @@
++        "interfaceKind": {
++          "type": "string",
++          "enum": ["web", "cli"],
++          "default": "web",
++          "description": "Explicit CLI interfaces require a bounded local cliEntrypoint, empty uiRoutes, no screen binding and all normal evidence/security/review checks."
++        },
++        "cliEntrypoint": {
++          "type": "string",
++          "maxLength": 240,
++          "description": "Project-relative existing ordinary executable source file, exactly named in serverOperations; CLI interfaces only."
++        },
+diff --git a/tools/adminwright/scripts/admin_console_manifest.py b/tools/adminwright/scripts/admin_console_manifest.py
+index 1d3e412..5fe5afe 100644
+--- a/tools/adminwright/scripts/admin_console_manifest.py
++++ b/tools/adminwright/scripts/admin_console_manifest.py
+@@ -34,0 +35 @@ import shutil
++import stat
+@@ -214,0 +216 @@ RULES = {
++    "cli-interface": E3,
+@@ -1187 +1189,38 @@ def check_roles(values, role_ids, path, findings):
+-def structural_findings(manifest, findings, release):
++def cli_interface_error(capability, project_root):
++    """CLI applicability is explicit; it never waives policy/evidence checks."""
++    kind = capability.get("interfaceKind", "web")
++    if kind not in ("web", "cli"):
++        return "interfaceKind must be web or cli"
++    if kind == "web":
++        return "a web capability cannot declare cliEntrypoint" if "cliEntrypoint" in capability else None
++    raw = capability.get("cliEntrypoint")
++    if (not isinstance(raw, str) or not re.fullmatch(r"[A-Za-z0-9_./-]{1,240}", raw)
++            or raw.startswith("/") or any(part in ("", ".", "..") for part in raw.split("/"))
++            or Path(raw).suffix not in (".mjs", ".cjs", ".js", ".py")):
++        return "CLI needs a bounded project-relative executable entrypoint without traversal"
++    if capability.get("uiRoutes") != []:
++        return "CLI uiRoutes must be empty; it cannot claim web routes"
++    if raw not in as_list(capability.get("serverOperations")):
++        return "CLI entrypoint must be an exact declared server operation"
++    if project_root is None:
++        return "CLI entrypoint file cannot be verified without a project root"
++    try:
++        root = Path(project_root).resolve(strict=True)
++        target = root
++        for part in raw.split("/"):
++            target = target / part
++            info = target.lstat()
++            if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & 0x400:
++                return "CLI entrypoint cannot traverse a link or reparse point"
++        info = target.stat()
++        if (not target.is_file() or not 0 < info.st_size <= 1024 * 1024
++                or info.st_nlink != 1 or escapes_root(target, root)):
++            return "CLI entrypoint must be one nonempty bounded ordinary project file"
++        if not target.read_text(encoding="utf-8").strip():
++            return "CLI entrypoint cannot be blank"
++    except (OSError, ValueError, RuntimeError, UnicodeError):
++        return "CLI entrypoint is missing or inaccessible"
++    return None
++
++
++def structural_findings(manifest, findings, release, project_root=None):
+@@ -1248,0 +1288,7 @@ def structural_findings(manifest, findings, release):
++        cli_error = cli_interface_error(capability, project_root)
++        if cli_error:
++            findings.add("cli-interface", path, cli_error)
++        if capability.get("interfaceKind") == "cli":
++            if any(cid in as_list(screen.get("capabilities")) for screen in screens):
++                findings.add("cli-interface", path, "CLI capability cannot be exposed as a web screen")
++            continue
+@@ -1489 +1535 @@ def validate_manifest(manifest, phase, project_root, profile):
+-    structural_findings(manifest, findings, release)
++    structural_findings(manifest, findings, release, project_root)
+@@ -1666 +1712 @@ def validate_entities(manifest, findings, release, role_ids):
+-                "uiRoutes",
++                *(() if capability.get("interfaceKind") == "cli" else ("uiRoutes",)),
+@@ -2092 +2138 @@ def validate_evidence(manifest, findings, project_root):
+-def coverage_findings(manifest, profile):
++def coverage_findings(manifest, profile, project_root=None):
+@@ -2094 +2140 @@ def coverage_findings(manifest, profile):
+-    structural_findings(manifest, findings, True)
++    structural_findings(manifest, findings, True, project_root)
+@@ -2379 +2425 @@ def emit_operator_handbook(manifest):
+-def emit_gap_report(manifest, profile):
++def emit_gap_report(manifest, profile, project_root=None):
+@@ -2404 +2450 @@ def emit_gap_report(manifest, profile):
+-    findings = coverage_findings(manifest, profile)
++    findings = coverage_findings(manifest, profile, project_root)
+@@ -2728 +2774 @@ def parse_json_entries(raw):
+-def new_error_signatures(before, after):
++def new_error_signatures(before, after, project_root=None):
+@@ -2733 +2779 @@ def new_error_signatures(before, after):
+-        for item in validate_manifest(before, "plan", None, profile).errors
++        for item in validate_manifest(before, "plan", project_root, profile).errors
+@@ -2736 +2782 @@ def new_error_signatures(before, after):
+-        item for item in validate_manifest(after, "plan", None, profile).errors
++        item for item in validate_manifest(after, "plan", project_root, profile).errors
+@@ -3356 +3402,2 @@ def cmd_coverage(args):
+-    findings = coverage_findings(manifest, profile)
++    project_root = Path(args.project_root).resolve() if args.project_root else manifest_path.parent.parent
++    findings = coverage_findings(manifest, profile, project_root)
+@@ -3411 +3458,2 @@ def cmd_emit(args):
+-    text = EMITTERS[args.format](manifest, profile)
++    text = (emit_gap_report(manifest, profile, manifest_path.parent.parent)
++            if args.format == "gap-report" else EMITTERS[args.format](manifest, profile))
+@@ -3476 +3524 @@ def cmd_add(args):
+-        introduced = new_error_signatures(before, manifest)
++        introduced = new_error_signatures(before, manifest, manifest_path.parent.parent)
+@@ -3513 +3561 @@ def cmd_set(args):
+-        introduced = new_error_signatures(before, manifest)
++        introduced = new_error_signatures(before, manifest, manifest_path.parent.parent)

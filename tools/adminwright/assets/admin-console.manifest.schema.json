@@ -1043,6 +1043,17 @@
             }
           }
         },
+        "interfaceKind": {
+          "type": "string",
+          "enum": ["web", "cli"],
+          "default": "web",
+          "description": "Explicit CLI interfaces require a bounded local cliEntrypoint, empty uiRoutes, no screen binding and all normal evidence/security/review checks."
+        },
+        "cliEntrypoint": {
+          "type": "string",
+          "maxLength": 240,
+          "description": "Project-relative existing ordinary executable source file, exactly named in serverOperations; CLI interfaces only."
+        },
         "uiRoutes": {
           "type": "array",
           "items": {
