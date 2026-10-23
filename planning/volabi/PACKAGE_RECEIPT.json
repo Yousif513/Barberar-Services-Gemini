@@ -120,7 +120,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "843692f965a3b71c843e74a298c11d2c121f168b7cf85772f5ee893dac548a8e"
+      "sha256": "c012f7f8a44cebbc3a5da0d9140be8d3e20e854314aa92fc322de7e824b79739"
     },
     {
       "path": "REQUIREMENTS_VALIDATION.json",
@@ -322,5 +322,7 @@
   ],
   "owned_worklog_sha256": "383255708c87dd1b35a7c657bfe848d019eb00adb3604f0b9fdd2a9cc63a44eb",
   "hash_basis": "UTF-8 text normalized to LF, to remain portable across Git CRLF checkouts; no self hash",
-  "approval": "APPROVAL_20261022.md"
+  "approval": "APPROVAL_20261022.md",
+  "current_readme_rechecked_on": "2026-10-23",
+  "current_readme_note": "Only current README link digest updated; original portable inventory unchanged. Current item ledger and next-scope packet are supplemental, not counted as historical package files."
 }

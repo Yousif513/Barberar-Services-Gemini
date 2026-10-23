@@ -1,0 +1,5 @@
+Profile: regulated (manifest)
+Phase: release
+ERROR: [evidence-not-resolvable] entities[user].capabilities[user.list].evidence: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] entities[user].capabilities[user.list].evidence[0]: evidence file contains placeholder text: .admin-console/evidence/security-review.json
+Validation complete: 2 error(s), 0 warning(s)

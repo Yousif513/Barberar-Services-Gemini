@@ -1,0 +1,10 @@
+{
+  "command": [
+    "npx.cmd",
+    "eslint",
+    "."
+  ],
+  "cwd": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform",
+  "exitCode": 0,
+  "output": "lint.txt"
+}

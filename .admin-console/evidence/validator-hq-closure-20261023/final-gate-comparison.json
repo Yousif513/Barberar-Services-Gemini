@@ -1,0 +1,149 @@
+{
+  "manifest_sha256_raw": "8d0e4d59cd9963d66be1afa5650eb33d58f839babd0f59024be9ead4cb771a45",
+  "original": {
+    "errors": 318,
+    "warnings": 29,
+    "exitCode": 1
+  },
+  "local": {
+    "errors": 297,
+    "warnings": 29,
+    "exitCode": 1
+  },
+  "plan": {
+    "errors": 0,
+    "warnings": 29,
+    "exitCode": 0
+  },
+  "coverageExitCode": 0,
+  "removedFindings": [
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "crossCutting.audit.evidence[9]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "crossCutting.authentication.evidence[8]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "crossCutting.authorization.evidence[13]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "crossCutting.data.evidence[7]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].evidence[3]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[0]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "workQueues[held-checkout-exceptions].tests[0]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[1]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue_independent.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "workQueues[held-checkout-exceptions].tests[1]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue_independent.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[3]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[admin-held-checkouts].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "workQueues[held-checkout-exceptions].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[8]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-citation-draft-independent.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[7]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/hq-citation-draft-owner.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "workQueues[held-checkout-exceptions].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "evidence-token-match",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests",
+      "message": "no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven"
+    },
+    {
+      "rule": "evidence-token-match",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.request-review-loop].tests",
+      "message": "no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven"
+    },
+    {
+      "rule": "evidence-token-match",
+      "severity": "error",
+      "path": "screens[admin-held-checkouts].tests",
+      "message": "no listed test file mentions the screen id or its route; the link between manifest and test is unproven"
+    }
+  ],
+  "addedFindings": [],
+  "limits": "Full regulated release remains failed. Final manifest restores separately reviewed Headquarters capability; earlier305/288 counts describe an in-progress snapshot."
+}

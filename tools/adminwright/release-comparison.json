@@ -1,0 +1,111 @@
+{
+  "manifest_sha256_raw_bytes": "5d995882da2a976ec6e903ca3195494e3c06a228b55c5a9de5293be906c4e4cc",
+  "manifest_unchanged_during_comparison": true,
+  "original_errors": 305,
+  "candidate_errors": 288,
+  "removed": [
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "crossCutting.audit.evidence[9]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "crossCutting.authentication.evidence[8]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "crossCutting.authorization.evidence[13]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "crossCutting.data.evidence[7]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].evidence[3]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "rule": "evidence-token-match",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests",
+      "message": "no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[0]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[1]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue_independent.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[3]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs"
+    },
+    {
+      "rule": "evidence-token-match",
+      "severity": "error",
+      "path": "screens[admin-held-checkouts].tests",
+      "message": "no listed test file mentions the screen id or its route; the link between manifest and test is unproven"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "screens[admin-held-checkouts].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs"
+    },
+    {
+      "rule": "evidence-not-resolvable",
+      "severity": "error",
+      "path": "workQueues[held-checkout-exceptions].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "workQueues[held-checkout-exceptions].tests[0]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "workQueues[held-checkout-exceptions].tests[1]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue_independent.test.mjs"
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "workQueues[held-checkout-exceptions].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs"
+    }
+  ],
+  "added": []
+}

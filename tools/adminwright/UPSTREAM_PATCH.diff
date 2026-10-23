@@ -1,0 +1,117 @@
+--- upstream/scripts/admin_console_manifest.py
++++ local/scripts/admin_console_manifest.py
+@@ -37,6 +37,11 @@
+ import time
+ from collections import Counter
+ from pathlib import Path
++
++# Project-local candidate: do not modify the globally installed Adminwright gate.
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++from evidence_context import (EvidenceContext, executable_assertion, executable_tokens,
++                              is_test_file, review_scan_body, test_scan_body)
+ 
+ SKILL_ROOT = Path(__file__).resolve().parent.parent
+ TEMPLATE_PATH = SKILL_ROOT / "assets" / "admin-console.manifest.template.json"
+@@ -751,7 +756,7 @@
+     return root != resolved and root not in resolved.parents
+ 
+ 
+-def path_state(candidate):
++def path_state(candidate, expect_assertions=False, context=None):
+     """Return 'missing', 'directory', 'empty', 'placeholder', or 'ok'.
+ 
+     A directory is never evidence: any folder holding one unrelated file used to
+@@ -767,10 +772,21 @@
+             return "missing"
+         if candidate.stat().st_size == 0:
+             return "empty"
+-        body = read_head(candidate)
++        if candidate.stat().st_size > EVIDENCE_READ_LIMIT:
++            return "oversized"
++        with open(str(candidate), "rb") as handle:
++            data = handle.read(EVIDENCE_READ_LIMIT + 1)
++        if len(data) > EVIDENCE_READ_LIMIT:
++            return "oversized"
++        try:
++            body = data.decode("utf-8", errors="strict")
++        except UnicodeError:
++            return "invalid"
+         if not body.strip():
+             return "empty"
+-        folded = fold_confusables(body)
++        scan_body = (test_scan_body(body, candidate, context) if expect_assertions
++                     else review_scan_body(body, candidate, context, EVIDENCE_READ_LIMIT))
++        folded = fold_confusables(scan_body)
+         squashed = folded.replace(" ", "").replace("-", "").replace("_", "")
+         if PLACEHOLDER_PATTERN.search(split_identifiers(folded)) or substring_hit(squashed):
+             return "placeholder"
+@@ -867,7 +883,12 @@
+                 "evidence path resolves outside the project: " + raw.strip(),
+             )
+             continue
+-        state = path_state(candidate)
++        state = path_state(candidate, expect_assertions, getattr(findings, "evidence_context", None))
++        if state in ("oversized", "invalid"):
++            findings.add("evidence-file-" + state, entry_path,
++                         "evidence exceeds the full-read size bound" if state == "oversized"
++                         else "evidence is not valid UTF-8: " + raw.strip())
++            continue
+         if state == "missing":
+             findings.add(
+                 missing_rule, entry_path, "evidence path does not exist: " + raw.strip()
+@@ -896,7 +917,7 @@
+             continue
+         body = read_head(candidate)
+         if expect_assertions:
+-            if not has_assertion(body):
++            if not is_test_file(candidate) or not executable_assertion(body, candidate):
+                 findings.add(
+                     "test-asserts-nothing",
+                     entry_path,
+@@ -1422,6 +1443,7 @@
+ 
+ def validate_manifest(manifest, phase, project_root, profile):
+     findings = Findings(profile, phase)
++    findings.evidence_context = EvidenceContext(manifest, project_root)
+     release = phase == "release"
+     check_required(manifest, TOP_LEVEL_KEYS, "manifest", findings)
+ 
+@@ -2002,7 +2024,7 @@
+             continue
+         matched = False
+         for candidate in test_paths:
+-            body = read_head(candidate).lower()
++            body = executable_tokens(read_head(candidate), candidate).lower()
+             if any(token.lower() in body for token in tokens):
+                 matched = True
+                 break
+@@ -2032,7 +2054,7 @@
+         if not screen_tokens or not screen_tests:
+             continue
+         if not any(
+-            token.lower() in read_head(candidate).lower()
++            token.lower() in executable_tokens(read_head(candidate), candidate).lower()
+             for candidate in screen_tests
+             for token in screen_tokens
+         ):
+@@ -2045,8 +2067,18 @@
+     for key in ("workQueues", "integrations"):
+         for path, item in iter_named(manifest, key):
+             if item.get("status") == "implemented":
+-                check_evidence_list(item.get("tests"), path + ".tests", findings, project_root, True,
+-                                    expect_assertions=True)
++                item_tests = check_evidence_list(item.get("tests"), path + ".tests", findings, project_root, True,
++                                                 expect_assertions=True)
++                if item_tests and findings.severity_for("evidence-token-match") != OFF:
++                    tokens = capability_tokens(item)
++                    for action in as_list(item.get("actions")):
++                        linked = capability_index(manifest).get(action) if isinstance(action, str) else None
++                        if linked:
++                            tokens.update(capability_tokens(linked[2]))
++                    if tokens and not any(token.lower() in executable_tokens(read_head(candidate), candidate).lower()
++                                          for candidate in item_tests for token in tokens):
++                        findings.add("evidence-token-match", path + ".tests",
++                                     "no executable test context mentions this item or a linked capability operation/route")
+     for path, gap in iter_named(manifest, "gaps"):
+         if gap.get("status") == "fixed":
+             check_evidence_list(gap.get("evidence"), path + ".evidence", findings, project_root, True)

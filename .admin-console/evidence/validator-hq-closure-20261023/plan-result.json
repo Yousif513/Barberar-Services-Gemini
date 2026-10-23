@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Python314\\python.exe",
+    "-X",
+    "utf8",
+    "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\tools\\adminwright\\scripts\\admin_console_manifest.py",
+    "validate",
+    "--manifest",
+    "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\manifest.json",
+    "--project-root",
+    "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini",
+    "--phase",
+    "plan",
+    "--json"
+  ],
+  "exitCode": 0,
+  "stdout": "plan.json",
+  "stderr": "plan.stderr.txt"
+}

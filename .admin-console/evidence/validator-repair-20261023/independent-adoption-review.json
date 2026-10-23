@@ -1,0 +1,69 @@
+{
+  "classification": "Independent project-local validator adoption metadata and proposed Headquarters scope source review",
+  "reviewer": "sec-validator-repair-independent",
+  "timestamp_utc": "2026-10-23T15:59:36.935202+00:00",
+  "verdict": "ACCEPTED_FOR_LOCAL_ADOPTION_METADATA_AND_REVIEWABLE_PROPOSAL_ONLY",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256_raw_bytes": "6ec92b92530c33831e39fa21e2d130b15003e596bd92da893406a09400500b26",
+      "sha256_utf8_crlf_to_lf": "6ec92b92530c33831e39fa21e2d130b15003e596bd92da893406a09400500b26"
+    },
+    {
+      "path": "package.json",
+      "sha256_raw_bytes": "b4d9212e6c6eb1076d58106fe27c6e772c3cd480c6a7bcab59a76a17fafebff9",
+      "sha256_utf8_crlf_to_lf": "b4d9212e6c6eb1076d58106fe27c6e772c3cd480c6a7bcab59a76a17fafebff9"
+    },
+    {
+      "path": "tools/adminwright/README.md",
+      "sha256_raw_bytes": "5e6efad64886d10da7af7eb0a7b5231d5c5991ab29ccafeb32e99316aa49ff90",
+      "sha256_utf8_crlf_to_lf": "5e6efad64886d10da7af7eb0a7b5231d5c5991ab29ccafeb32e99316aa49ff90"
+    },
+    {
+      "path": "tools/adminwright/PROVENANCE.json",
+      "sha256_raw_bytes": "2a935baf0d19024a8d85368048c95d7a1420f33bf1dbd24e4160488e7655dbbd",
+      "sha256_utf8_crlf_to_lf": "a521ab77fd797e16e80a5a51dbd6c4b4ebfb86a3837cb2daa41fcae8a8fda5e6"
+    },
+    {
+      "path": "planning/volabi/NEXT_HQ_ITEM_20261023.md",
+      "sha256_raw_bytes": "4fa09f209c6003800a6d331cd98c8f210c2e3f8185f77f91aeae27510dba6e3a",
+      "sha256_utf8_crlf_to_lf": "4fa09f209c6003800a6d331cd98c8f210c2e3f8185f77f91aeae27510dba6e3a"
+    }
+  ],
+  "adopted_commands": {
+    "test:admin-validator": "python -m unittest discover -s tools/adminwright/tests -p test_*.py -v",
+    "validate:admin-console": "python tools/adminwright/scripts/admin_console_manifest.py validate --manifest .admin-console/manifest.json --project-root . --phase release",
+    "coverage:admin-console": "python tools/adminwright/scripts/admin_console_manifest.py coverage --manifest .admin-console/manifest.json --project-root ."
+  },
+  "assertions": [
+    "AGENTS completion gate changes only the validator location while retaining release-phase validation and structural coverage exit0, existing build/mobile/lint/tests/review/operational requirements, and the regulated manifest profile. No failure-swallowing shell override or profile downgrade exists.",
+    "package.json invokes the accepted repository-local main script directly; its test discovery includes unchanged upstream73, owner21 and independent25 groups. No test is excluded by the pattern. This source review did not rerun those119 accepted tests.",
+    "README and PROVENANCE explicitly attribute local adoption after independent acceptance, leave the installed global script unchanged, retain full-release failure and preserve original licensing/upstream hashes. The initial lexical-vs-syntax wording ambiguity was corrected to statically recognized assertion call before this final read.",
+    "Main candidate, helper and verbatim upstream tests still match the independent accepted source hashes. This metadata review changes no test verdict or implementation source. Root must pair-run both script versions against one identical final manifest/status snapshot; earlier305/288 counts are not reused as that result.",
+    "NEXT_HQ_ITEM_20261023.md is expressly a scope proposal, not an approval or implementation claim. Its two project routes exist in retained LATER_SCOPE and are absent from the approved first-loop graph; six-family first-loop scope remains separate. Four proposed overlay contracts declare states/destinations, evidence-bound closure and independent review.",
+    "Original function IDs/names/areas OF20-22 Daniel, OF30-33 Omar, OF37-38 Alexander, OF39-40 Nora and OF41-42 Adam match the recovered registry; all15 identities and bindings remain inactive/proposed. Saudi male/Lebanese female voice direction and deferred Azure account/audio with unchanged one-package SAR10all-in/100000characters/three-round allowance are preserved.",
+    "Projects retain local workspace/CSRF/object checks, exact source/revision/receipt/audit lineage, and record-only CEO decisions. Proposal neither chooses finance/refund commercial rules nor treats local closure as deployment, real reconciliation, independent review, employee activation or business authority."
+  ],
+  "findings": [],
+  "remaining_critical_or_high_in_scoped_metadata": 0,
+  "advisory_resolved": {
+    "issue": "README described JS lexical assertion recognition as syntactically executable.",
+    "resolution": "Root targeted wording changed to statically recognized assertion call; independently reread before freeze.",
+    "implementation_changed": false
+  },
+  "limitations": [
+    "Read-only source and command metadata check; no new Headquarters surfaces were built or approved by this review.",
+    "The original installed validator and broad regulated-release failures remain; root final paired gate run is pending separately.",
+    "Structural evidence scanning cannot certify behavior, meaningful assertions, source authenticity or regulatory/production readiness."
+  ],
+  "prior_acceptance_retained": ".admin-console/evidence/validator-repair-20261023/independent-review.json",
+  "holds": {
+    "azure_setup_and_audio": "deferred",
+    "production_deployment_or_merge": "held",
+    "hq_business_employee_activation": "held",
+    "business_permission_grants": "held",
+    "external_business_writes": "held",
+    "financial_transactions": "held",
+    "additional_paid_services": "held"
+  }
+}

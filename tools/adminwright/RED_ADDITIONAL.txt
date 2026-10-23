@@ -1,0 +1,47 @@
+test_decoy_tokens_in_comments_imports_and_unrelated_literals_do_not_bind (test_evidence_context.EvidenceContextRegression.test_decoy_tokens_in_comments_imports_and_unrelated_literals_do_not_bind) ... ok
+test_implemented_queue_requires_relevant_linked_capability_test (test_evidence_context.EvidenceContextRegression.test_implemented_queue_requires_relevant_linked_capability_test) ... FAIL
+test_imports_comments_and_string_literals_are_not_assertions (test_evidence_context.EvidenceContextRegression.test_imports_comments_and_string_literals_are_not_assertions) ... ok
+test_invalid_utf8_evidence_is_not_accepted_with_replacement_decoding (test_evidence_context.EvidenceContextRegression.test_invalid_utf8_evidence_is_not_accepted_with_replacement_decoding) ... ok
+test_isolated_uuid_fixtures_are_valid_executable_test_evidence (test_evidence_context.EvidenceContextRegression.test_isolated_uuid_fixtures_are_valid_executable_test_evidence) ... ok
+test_non_executable_readme_cannot_be_test_evidence (test_evidence_context.EvidenceContextRegression.test_non_executable_readme_cannot_be_test_evidence) ... ok
+test_oversized_evidence_cannot_hide_reserved_text_after_read_limit (test_evidence_context.EvidenceContextRegression.test_oversized_evidence_cannot_hide_reserved_text_after_read_limit) ... ok
+test_path_traversal_is_not_eligible_for_test_context (test_evidence_context.EvidenceContextRegression.test_path_traversal_is_not_eligible_for_test_context) ... ok
+test_positive_fixture_fallback_identifier_in_tests_is_still_rejected (test_evidence_context.EvidenceContextRegression.test_positive_fixture_fallback_identifier_in_tests_is_still_rejected) ... ok
+test_real_dotted_operation_call_is_relevant_without_test_title_decoy (test_evidence_context.EvidenceContextRegression.test_real_dotted_operation_call_is_relevant_without_test_title_decoy) ... FAIL
+test_real_negative_security_assertions_may_name_prohibited_data (test_evidence_context.EvidenceContextRegression.test_real_negative_security_assertions_may_name_prohibited_data) ... ok
+test_review_denial_does_not_launder_another_positive_mock_claim (test_evidence_context.EvidenceContextRegression.test_review_denial_does_not_launder_another_positive_mock_claim) ... ok
+test_review_prose_in_production_path_stays_strict (test_evidence_context.EvidenceContextRegression.test_review_prose_in_production_path_stays_strict) ... ok
+test_review_without_current_source_hash_is_not_eligible_for_context (test_evidence_context.EvidenceContextRegression.test_review_without_current_source_hash_is_not_eligible_for_context) ... ok
+test_same_test_path_in_runtime_binding_keeps_strict_placeholder_scan (test_evidence_context.EvidenceContextRegression.test_same_test_path_in_runtime_binding_keeps_strict_placeholder_scan) ... ok
+test_scoped_negative_review_clause_is_not_a_fixture (test_evidence_context.EvidenceContextRegression.test_scoped_negative_review_clause_is_not_a_fixture) ... ok
+test_test_directory_alone_does_not_make_a_production_fixture_a_test (test_evidence_context.EvidenceContextRegression.test_test_directory_alone_does_not_make_a_production_fixture_a_test) ... ok
+test_unknown_report_type_does_not_infer_negative_context (test_evidence_context.EvidenceContextRegression.test_unknown_report_type_does_not_infer_negative_context) ... ok
+
+======================================================================
+FAIL: test_implemented_queue_requires_relevant_linked_capability_test (test_evidence_context.EvidenceContextRegression.test_implemented_queue_requires_relevant_linked_capability_test)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_evidence_context.py", line 124, in test_implemented_queue_requires_relevant_linked_capability_test
+    self.assertIn('workQueues[users-waiting].tests',out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'workQueues[users-waiting].tests' not found in 'Profile: regulated (manifest)\nPhase: release\nERROR: [evidence-token-match] entities[user].capabilities[user.list].tests: no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven\nERROR: [evidence-token-match] screens[users].tests: no listed test file mentions the screen id or its route; the link between manifest and test is unproven\nValidation complete: 2 error(s), 0 warning(s)\n'
+
+======================================================================
+FAIL: test_real_dotted_operation_call_is_relevant_without_test_title_decoy (test_evidence_context.EvidenceContextRegression.test_real_dotted_operation_call_is_relevant_without_test_title_decoy)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_evidence_context.py", line 130, in test_real_dotted_operation_call_is_relevant_without_test_title_decoy
+    self.assertNotIn('[evidence-token-match]',out,out+err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '[evidence-token-match]' unexpectedly found in 'Profile: regulated (manifest)\nPhase: release\nERROR: [evidence-token-match] entities[user].capabilities[user.list].tests: no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven\nERROR: [release-status-unresolved] screens[users].status: must be implemented for release\nERROR: [required-field-empty] screens[users].tests: must not be empty for release\nValidation complete: 3 error(s), 0 warning(s)\n' : Profile: regulated (manifest)
+Phase: release
+ERROR: [evidence-token-match] entities[user].capabilities[user.list].tests: no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven
+ERROR: [release-status-unresolved] screens[users].status: must be implemented for release
+ERROR: [required-field-empty] screens[users].tests: must not be empty for release
+Validation complete: 3 error(s), 0 warning(s)
+
+
+----------------------------------------------------------------------
+Ran 18 tests in 5.478s
+
+FAILED (failures=2)

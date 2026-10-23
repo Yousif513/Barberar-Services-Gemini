@@ -1,0 +1,8 @@
+{
+  "itemEvidenceHashes": 33,
+  "portablePackageFiles": 76,
+  "allMatched": true,
+  "hashBasis": "strictUTF8 CRLF pairs to LF then UTF8 SHA256; package historical file list preserved",
+  "currentReport": "docs/volabi-item-closure-20261023.md",
+  "currentManifestSHA256Raw": "8d0e4d59cd9963d66be1afa5650eb33d58f839babd0f59024be9ead4cb771a45"
+}

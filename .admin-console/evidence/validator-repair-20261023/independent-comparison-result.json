@@ -1,0 +1,124 @@
+{
+  "classification": "Independent identical-manifest original/candidate comparison",
+  "timestamp_utc": "2026-10-23T15:51:25.632589+00:00",
+  "manifest_sha256_raw": "5d995882da2a976ec6e903ca3195494e3c06a228b55c5a9de5293be906c4e4cc",
+  "results": {
+    "original": {
+      "exit_code": 1,
+      "errors": 305,
+      "warnings": 29,
+      "script_sha256_raw": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316"
+    },
+    "candidate": {
+      "exit_code": 1,
+      "errors": 288,
+      "warnings": 29,
+      "script_sha256_raw": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597"
+    }
+  },
+  "removed_findings": [
+    {
+      "severity": "error",
+      "rule": "evidence-not-resolvable",
+      "path": "workQueues[held-checkout-exceptions].tests",
+      "message": "no entry resolves to a non-empty local path; URL and manual entries are supplemental only"
+    },
+    {
+      "severity": "error",
+      "rule": "evidence-token-match",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests",
+      "message": "no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven"
+    },
+    {
+      "severity": "error",
+      "rule": "evidence-token-match",
+      "path": "screens[admin-held-checkouts].tests",
+      "message": "no listed test file mentions the screen id or its route; the link between manifest and test is unproven"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "crossCutting.audit.evidence[9]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "crossCutting.authentication.evidence[8]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "crossCutting.authorization.evidence[13]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "crossCutting.data.evidence[7]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].evidence[3]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[0]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue.test.mjs"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[1]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue_independent.test.mjs"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[3]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "screens[admin-held-checkouts].tests[0]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "workQueues[held-checkout-exceptions].tests[0]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue.test.mjs"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "workQueues[held-checkout-exceptions].tests[1]",
+      "message": "evidence file contains placeholder text: supabase/tests/db/held_checkout_queue_independent.test.mjs"
+    },
+    {
+      "severity": "error",
+      "rule": "placeholder-scan",
+      "path": "workQueues[held-checkout-exceptions].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs"
+    }
+  ],
+  "added_findings": []
+}

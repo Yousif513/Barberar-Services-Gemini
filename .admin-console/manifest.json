@@ -7268,7 +7268,7 @@
           ],
           "risk": "moderate",
           "status": "implemented",
-          "rationale": "Explicit CEO six-family firstloop/theme/media approval2026-10-22. Development records only; no company activation/business permissions/execution. Independent server35-case and actual frontend16-checkpoint reviews passed; exact final hashes match. Acceptance is local record-only, not regulated release.",
+          "rationale": "Explicit CEO six-family firstloop/theme/media approval2026-10-22. Development records only; no company activation/business permissions/execution. Independent server35-case and actual frontend16-checkpoint reviews passed; exact final hashes match. Acceptance is local record-only, not regulated release.23October pending quotation repair: synchronous Add/Clear intent guard, exact citations and same-command recovery verified in8owner and10separate independent browser groups; current receipt hashes match. Earlier reviews retained as historical evidence.",
           "entityStates": {
             "from": [
               "requested",
@@ -7326,7 +7326,9 @@
             "web_platform/tests/hq-client.test.mjs",
             "web_platform/tests/hq-voice.test.mjs",
             "web_platform/tests/hq-independent-review.test.mjs",
-            "web_platform/tests-browser/hq-local-acceptance.mjs"
+            "web_platform/tests-browser/hq-local-acceptance.mjs",
+            "web_platform/tests-browser/hq-citation-draft-owner.mjs",
+            "web_platform/tests-browser/hq-citation-draft-independent.mjs"
           ],
           "evidence": [
             "planning/volabi/APPROVAL_20261022.md",
@@ -7334,11 +7336,15 @@
             ".admin-console/worklog/review-volabi-local-server.md",
             ".admin-console/evidence/volabi-local/server-independent-review.json",
             ".admin-console/worklog/review-volabi-frontend.md",
-            ".admin-console/evidence/volabi-first-loop/independent-frontend.json"
+            ".admin-console/evidence/volabi-first-loop/independent-frontend.json",
+            ".admin-console/worklog/hq-citation-draft-repair.md",
+            ".admin-console/evidence/hq-citation-draft-owner/green.json",
+            ".admin-console/evidence/hq-citation-draft-independent/results.json",
+            ".admin-console/evidence/hq-citation-draft-independent/source-review.json"
           ],
           "owner": "",
           "reviewStatus": "reviewed",
-          "reviewedBy": "security-volabi-local-server"
+          "reviewedBy": "qa-hq-citation-draft"
         },
         {
           "id": "hq-local.knowledge-sources",
@@ -11011,6 +11017,27 @@
       "appliesTo": [
         "checkout-attempt.operator-queue"
       ]
+    },
+    {
+      "id": "ceo-validator-hq-closure-20261023",
+      "decision": "CEO directs locally tested evidence-validator repair with independent review before adoption, followed by itemized closure of approved Headquarters development. Current six-family local first-loop scope and theme govern; broader twenty-template and later inventory remains proposal-only until scope adoption.",
+      "reason": "Current human continuation23October2026 preserves Azure deferral and every production, business employee, permission, external-write, financial and paid-service hold. Routine reversible local development choices and repair-branch commit/push remain authorized.",
+      "evidence": [],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "local-validator-adoption-20261023",
+      "decision": "Adopt independently accepted project-local Adminwright evidence validator in AGENTS/package commands; keep installed copy unchanged and full release failed on genuine findings.",
+      "reason": "CEO authorized locally tested isolated-fixture/negative-assertion repair; independent security review accepted bounded local use after25/25 groups including actual Windows junction and repaired runtime-overlap bypass. Owner21 and unchanged upstream73 also pass. Final identical-manifest paired results remain evidence; no production or business approval inferred.",
+      "evidence": [
+        ".admin-console/evidence/validator-repair-20261023/independent-review.json"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "hq-local.request-review-loop",
+        "checkout-attempt.operator-queue"
+      ]
     }
   ],
   "gaps": [
@@ -14425,11 +14452,13 @@
       "id": "held-checkout-evidence-validator-context",
       "severity": "medium",
       "description": "Regulated evidence-content scanner treats UUID generation in isolated test setup and defensive review prose as release-path invented data, then excludes those files from token matching. Scope is preserved in independent receipts. Gate remains failed; no exemption, test obfuscation or global validator modification was applied.",
-      "status": "open",
-      "rationale": "Resolve the validator evidence/fixture-context model in a separately reviewed tooling repair; retain full raw failing gate and baseline comparison. Do not lower production requirements or remove valid independent tests.",
+      "status": "fixed",
+      "rationale": "Bounded project-local repair accepted by separate security review:73 upstream,21 owner and25 independent groups pass. HIGH runtime-path overlap fixed and independently retested. Installed global copy unchanged; full release retains genuine backlog failures. No production waiver or business authorization.",
       "evidence": [
         ".admin-console/evidence/held-checkout-queue/manifest-release.txt",
-        "supabase/tests/db/held_checkout_queue_independent.test.mjs"
+        "supabase/tests/db/held_checkout_queue_independent.test.mjs",
+        ".admin-console/evidence/validator-repair-20261023/independent-review.json",
+        "tools/adminwright/PROVENANCE.json"
       ]
     }
   ],
@@ -15880,6 +15909,42 @@
       ],
       "status": "promoted",
       "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-validator-hq-runtime-inventory-before-exceptions",
+      "observation": "Fixture context classification initially overlooked existing bare runtime directories/root files and absolute aliases, allowing an isolated-test exemption to mask runtime content. A separate reviewer found the HIGH bypass; owner reproduced five RED subcases and independent boundary tests now reject them.",
+      "category": "tooling",
+      "proposedChange": "Inventory complete existing runtime-bound values and canonical directory ancestry before applying narrow evidence exceptions; preserve actual junction and overlap adversarial cases.",
+      "evidence": [
+        ".admin-console/evidence/validator-repair-20261023/independent-review.json",
+        "tools/adminwright/RED_RUNTIME_BINDINGS.txt"
+      ],
+      "status": "promoted",
+      "scope": "scripts/admin_console_manifest.py"
+    },
+    {
+      "id": "fb-validator-hq-negative-assertions-bounded-evidence",
+      "observation": "Release evidence scanning conflated isolated UUID setup and negative security assertions with runtime invented data. Unrestricted test-directory exemptions would weaken the contract; narrow declared-test/current-hash review contexts remove false positives while real fallback cases remain rejected.",
+      "category": "tooling",
+      "proposedChange": "Keep context exceptions narrowly lexical, rooted and runtime-disjoint. Test positive laundering, source linkage, invalid encodings/size and current review hashes; static recognition never proves test execution.",
+      "evidence": [
+        "tools/adminwright/README.md",
+        ".admin-console/evidence/validator-repair-20261023/independent-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/test-data.md"
+    },
+    {
+      "id": "fb-validator-hq-pending-secondary-citation-intent",
+      "observation": "An existing recommendation with one committed citation could publish while a second selected or typed quote was pending. The current draft protocol covered earlier skill requirements but not this secondary composer path; owner RED and independent browser review verify the Add/Clear repair.",
+      "category": "gap",
+      "proposedChange": "Exercise every secondary pending input after at least one committed item. Save, Enter and direct form submission need one synchronous intent guard; Add/Clear must retain existing items and exact source identity.",
+      "evidence": [
+        ".admin-console/evidence/hq-citation-draft-owner/red.json",
+        ".admin-console/evidence/hq-citation-draft-independent/results.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
     }
   ],
   "agents": [
@@ -16388,6 +16453,51 @@
       "status": "done",
       "notes": "DEVELOPMENT-ONLY final learning pass using schema architect role; feedback/store/worklog only, no feature review or business authority.",
       "worklog": ".admin-console/worklog/harvest-held-checkout.md"
+    },
+    {
+      "id": "impl-validator-local",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY local validator implementation complete; independent acceptance recorded, global tool unchanged. No business authority.",
+      "worklog": ".admin-console/worklog/implement-local-evidence-validator-20261023.md"
+    },
+    {
+      "id": "security-validator-local",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent adversarial review of local evidence-validator candidate; no business authority.",
+      "worklog": ".admin-console/worklog/sec-validator-repair-20261023.md"
+    },
+    {
+      "id": "impl-hq-citation-draft",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY existing approved recommendation overlay repair; preserves exact citations and inactive employees.",
+      "worklog": ".admin-console/worklog/hq-citation-draft-repair.md"
+    },
+    {
+      "id": "qa-hq-citation-draft",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent source and actual-browser review of pending quotation repair; no implementation or business authority.",
+      "worklog": ".admin-console/worklog/independent-hq-citation-draft-20261023.md"
+    },
+    {
+      "id": "harvest-validator-hq",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY final learning pass; feedback/store/worklog only, no capability implementation or review.",
+      "worklog": ".admin-console/worklog/harvest-validator-hq-20261023.md"
     }
   ]
 }

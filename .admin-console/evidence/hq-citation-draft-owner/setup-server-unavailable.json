@@ -1,0 +1,28 @@
+{
+  "classification": "Owner local browser regression using an isolated development workspace, not independent acceptance",
+  "startedAt": "2026-10-23T15:42:30.113Z",
+  "phase": "red",
+  "checks": [],
+  "commands": [],
+  "blockedExternal": [],
+  "blockedBusiness": [],
+  "devices": [],
+  "pageErrors": [
+    "Failed to read the 'localStorage' property from 'Window': Access is denied for this document."
+  ],
+  "consoleErrors": [],
+  "expectedHttp": [],
+  "unexpectedHttp": [],
+  "azure": "deferred",
+  "status": "failed",
+  "failure": {
+    "message": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3113/hq\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3113/hq\", waiting until \"load\"\u001b[22m\n",
+    "stack": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3113/hq\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3113/hq\", waiting until \"load\"\u001b[22m\n\n    at goto (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-citation-draft-owner.mjs:34:53)\n    at C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-citation-draft-owner.mjs:46:46"
+  },
+  "finishedAt": "2026-10-23T15:42:44.128Z",
+  "sourceHashes": {
+    "web_platform/src/components/hq/hq-overlays.tsx": "f67358cda7683b789dac4a97a2e6cf64ef1e5d692c66edf1a28355f43feffc5e",
+    "web_platform/src/lib/hq/copy.ts": "b22a0842001c88e140978696feabf060be7eb0097fcc62a5e41a951397dd7383",
+    "web_platform/tests-browser/hq-citation-draft-owner.mjs": "f0efc1c6ea1b0a0d2757bd3d4ef8ca60c0fdbe31cf8fb85e1a9ea6a8f73b470b"
+  }
+}

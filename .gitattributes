@@ -1,3 +1,7 @@
 # SQL migrations and the seed keep LF on every checkout: patch patterns inside them span lines.
 supabase/migrations/*.sql text eol=lf
 supabase/seed.sql text eol=lf
+# Preserve copied upstream LF bytes; canonical hashes cover local additions.
+tools/adminwright/** text eol=lf
+# A unified patch uses a single-space context prefix on blank lines.
+tools/adminwright/UPSTREAM_PATCH.diff -whitespace

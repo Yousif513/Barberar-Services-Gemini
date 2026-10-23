@@ -1,0 +1,80 @@
+test_common_money_words_resolve_to_fintech (test_manifest.TestArchetypeResolution.test_common_money_words_resolve_to_fintech) ... ok
+test_llm_gateway_domains_include_the_missing_controls (test_manifest.TestArchetypeResolution.test_llm_gateway_domains_include_the_missing_controls) ... ok
+test_llm_gateway_spellings_resolve (test_manifest.TestArchetypeResolution.test_llm_gateway_spellings_resolve) ... ok
+test_unknown_archetype_resolves_to_none (test_manifest.TestArchetypeResolution.test_unknown_archetype_resolves_to_none) ... ok
+test_array_add_writes_every_entry (test_manifest.TestBatchAdd.test_array_add_writes_every_entry) ... ok
+test_duplicate_inside_the_batch_is_refused (test_manifest.TestBatchAdd.test_duplicate_inside_the_batch_is_refused) ... ok
+test_empty_array_is_refused (test_manifest.TestBatchAdd.test_empty_array_is_refused) ... ok
+test_one_duplicate_refuses_the_whole_batch (test_manifest.TestBatchAdd.test_one_duplicate_refuses_the_whole_batch) ... ok
+test_force_steal_requires_reason (test_manifest.TestClaims.test_force_steal_requires_reason) ... ok
+test_release_then_reclaim (test_manifest.TestClaims.test_release_then_reclaim) ... ok
+test_second_agent_cannot_steal_a_claim (test_manifest.TestClaims.test_second_agent_cannot_steal_a_claim) ... ok
+test_eight_concurrent_adds_all_land (test_manifest.TestConcurrentWrites.test_eight_concurrent_adds_all_land) ... ok
+test_temp_file_is_process_unique (test_manifest.TestConcurrentWrites.test_temp_file_is_process_unique) ... ok
+test_emit_nudges_when_feedback_is_empty (test_manifest.TestEmitHealth.test_emit_nudges_when_feedback_is_empty) ... ok
+test_emit_stays_quiet_on_recorded_feedback (test_manifest.TestEmitHealth.test_emit_stays_quiet_on_recorded_feedback) ... ok
+test_emit_warns_when_manifest_has_errors (test_manifest.TestEmitHealth.test_emit_warns_when_manifest_has_errors) ... ok
+test_gap_report_carries_a_health_line (test_manifest.TestEmitHealth.test_gap_report_carries_a_health_line) ... ok
+test_directory_is_not_evidence (test_manifest.TestEvidenceIntegrity.test_directory_is_not_evidence) ... ok
+test_evidence_file_content_is_scanned (test_manifest.TestEvidenceIntegrity.test_evidence_file_content_is_scanned) ... ok
+test_genuine_evidence_is_ok (test_manifest.TestEvidenceIntegrity.test_genuine_evidence_is_ok) ... ok
+test_path_inside_project_is_allowed (test_manifest.TestEvidenceIntegrity.test_path_inside_project_is_allowed) ... ok
+test_path_traversal_outside_project_is_rejected (test_manifest.TestEvidenceIntegrity.test_path_traversal_outside_project_is_rejected) ... ok
+test_whitespace_only_file_is_empty (test_manifest.TestEvidenceIntegrity.test_whitespace_only_file_is_empty) ... ok
+test_a_long_narrative_is_not_flagged_as_a_success_claim (test_manifest.TestEvidenceRigor.test_a_long_narrative_is_not_flagged_as_a_success_claim) ... ok
+test_empty_test_body_has_no_assertion (test_manifest.TestEvidenceRigor.test_empty_test_body_has_no_assertion) ... ok
+test_real_assertions_are_recognised_across_languages (test_manifest.TestEvidenceRigor.test_real_assertions_are_recognised_across_languages) ... ok
+test_real_output_is_evidence (test_manifest.TestEvidenceRigor.test_real_output_is_evidence) ... ok
+test_success_claims_are_not_evidence (test_manifest.TestEvidenceRigor.test_success_claims_are_not_evidence) ... ok
+test_community_records_corroborate_across_the_bar (test_manifest.TestGlobalLearning.test_community_records_corroborate_across_the_bar)
+One local project plus one community record clears a 2-project bar. ... ok
+test_export_bundle_is_sanitised (test_manifest.TestGlobalLearning.test_export_bundle_is_sanitised)
+Poisoned fixtures: nothing identifying may survive an export. ... ok
+test_export_drops_evidence_paths (test_manifest.TestGlobalLearning.test_export_drops_evidence_paths) ... ok
+test_harvest_is_idempotent (test_manifest.TestGlobalLearning.test_harvest_is_idempotent) ... ok
+test_observation_seen_on_two_projects_clears_the_bar (test_manifest.TestGlobalLearning.test_observation_seen_on_two_projects_clears_the_bar) ... ok
+test_coverage_does_not_block_on_warnings_alone (test_manifest.TestHonestTiering.test_coverage_does_not_block_on_warnings_alone) ... ok
+test_mock_data_fails_at_every_profile (test_manifest.TestHonestTiering.test_mock_data_fails_at_every_profile) ... ok
+test_truthful_build_passes_at_every_profile (test_manifest.TestHonestTiering.test_truthful_build_passes_at_every_profile) ... ok
+test_can_add_entity_before_any_capability_exists (test_manifest.TestIncrementalModelling.test_can_add_entity_before_any_capability_exists) ... ok
+test_can_add_role_before_any_capability_exists (test_manifest.TestIncrementalModelling.test_can_add_role_before_any_capability_exists) ... ok
+test_duplicate_id_is_refused (test_manifest.TestIncrementalModelling.test_duplicate_id_is_refused) ... ok
+test_malformed_edit_is_still_refused (test_manifest.TestIncrementalModelling.test_malformed_edit_is_still_refused) ... ok
+test_init_creates_v2_manifest_and_schema (test_manifest.TestInit.test_init_creates_v2_manifest_and_schema) ... ok
+test_plan_phase_passes_on_empty_model (test_manifest.TestInit.test_plan_phase_passes_on_empty_model) ... ok
+test_release_phase_fails_on_empty_model (test_manifest.TestInit.test_release_phase_fails_on_empty_model) ... ok
+test_schema_and_template_agree (test_manifest.TestInit.test_schema_and_template_agree) ... ok
+test_recognised_archetype_does_not_warn (test_manifest.TestInitArchetypeWarning.test_recognised_archetype_does_not_warn) ... ok
+test_unrecognised_archetype_warns_at_init (test_manifest.TestInitArchetypeWarning.test_unrecognised_archetype_warns_at_init) ... ok
+test_deeply_nested_json (test_manifest.TestMalformedInput.test_deeply_nested_json) ... ok
+test_json_array_as_root (test_manifest.TestMalformedInput.test_json_array_as_root) ... ok
+test_missing_file (test_manifest.TestMalformedInput.test_missing_file) ... ok
+test_non_utf8_manifest (test_manifest.TestMalformedInput.test_non_utf8_manifest) ... ok
+test_truncated_json (test_manifest.TestMalformedInput.test_truncated_json) ... ok
+test_wrong_types_do_not_crash (test_manifest.TestMalformedInput.test_wrong_types_do_not_crash) ... ok
+test_category_and_scope_gate_the_grouping (test_manifest.TestObservationClustering.test_category_and_scope_gate_the_grouping) ... ok
+test_same_finding_in_different_words_groups (test_manifest.TestObservationClustering.test_same_finding_in_different_words_groups) ... ok
+test_similarity_is_symmetric_and_bounded (test_manifest.TestObservationClustering.test_similarity_is_symmetric_and_bounded) ... ok
+test_unrelated_findings_stay_apart (test_manifest.TestObservationClustering.test_unrelated_findings_stay_apart) ... ok
+test_does_not_flag_legitimate_identifiers (test_manifest.TestPlaceholderScanner.test_does_not_flag_legitimate_identifiers) ... ok
+test_flags_camelcase_embedded (test_manifest.TestPlaceholderScanner.test_flags_camelcase_embedded) ... ok
+test_flags_concatenated_without_case_boundary (test_manifest.TestPlaceholderScanner.test_flags_concatenated_without_case_boundary) ... ok
+test_flags_obvious_placeholders (test_manifest.TestPlaceholderScanner.test_flags_obvious_placeholders) ... ok
+test_flags_unicode_homoglyphs (test_manifest.TestPlaceholderScanner.test_flags_unicode_homoglyphs) ... ok
+test_nested_arrays_are_flattened (test_manifest.TestPlaceholderScanner.test_nested_arrays_are_flattened) ... ok
+test_short_capability_ids_still_produce_tokens (test_manifest.TestPlaceholderScanner.test_short_capability_ids_still_produce_tokens) ... ok
+test_independent_review_is_accepted (test_manifest.TestReviewerIdentity.test_independent_review_is_accepted) ... ok
+test_review_without_a_reviewer_is_flagged (test_manifest.TestReviewerIdentity.test_review_without_a_reviewer_is_flagged) ... ok
+test_reviewer_identity_is_advisory_below_regulated (test_manifest.TestReviewerIdentity.test_reviewer_identity_is_advisory_below_regulated) ... ok
+test_self_review_is_flagged (test_manifest.TestReviewerIdentity.test_self_review_is_flagged) ... ok
+test_declared_static_without_value_is_not_a_valid_escape (test_manifest.TestSchemaParity.test_declared_static_without_value_is_not_a_valid_escape) ... ok
+test_research_source_with_appliedTo_is_accepted (test_manifest.TestSchemaParity.test_research_source_with_appliedTo_is_accepted) ... ok
+test_research_source_without_appliedTo_is_flagged (test_manifest.TestSchemaParity.test_research_source_without_appliedTo_is_flagged) ... ok
+test_assertion_free_test_is_caught_before_the_token_rule (test_manifest.TestScreenEvidenceTokens.test_assertion_free_test_is_caught_before_the_token_rule) ... ok
+test_test_mentioning_the_route_is_accepted (test_manifest.TestScreenEvidenceTokens.test_test_mentioning_the_route_is_accepted) ... ok
+test_unrelated_test_file_is_flagged (test_manifest.TestScreenEvidenceTokens.test_unrelated_test_file_is_flagged) ... ok
+
+----------------------------------------------------------------------
+Ran 73 tests in 13.116s
+
+OK

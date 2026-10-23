@@ -1,0 +1,10 @@
+{
+  "command": [
+    "npm.cmd",
+    "run",
+    "test:admin-validator"
+  ],
+  "cwd": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini",
+  "exitCode": 0,
+  "output": "validator-tests.txt"
+}

@@ -1,0 +1,121 @@
+{
+  "classification": "Owner local browser regression using an isolated development workspace, not independent acceptance",
+  "startedAt": "2026-10-23T15:46:04.568Z",
+  "phase": "green",
+  "checks": [
+    {
+      "name": "After one added citation, a typed pending quote blocks Save, Enter and direct requestSubmit",
+      "status": "passed"
+    },
+    {
+      "name": "Explicit Clear drops only pending quote and preserves previously added citation and recommendation text",
+      "status": "passed"
+    },
+    {
+      "name": "Mismatched and overlong exact quotes retain draft, existing citations and pending-submit block",
+      "status": "passed"
+    },
+    {
+      "name": "Selected second occurrence remains bound to original CRLF and UTF-16 source offsets, version and hash on actual publish",
+      "status": "passed"
+    },
+    {
+      "name": "Thirteenth Add is refused without losing pending draft; removing one enables explicit retry",
+      "status": "passed"
+    },
+    {
+      "name": "Server stale-source refusal preserves authored text and citations; later pending draft still blocks every submit path",
+      "status": "passed"
+    },
+    {
+      "name": "Arabic 375px RTL localized pending/mismatch/Clear states preserve added citations and guard Enter/requestSubmit without page overflow",
+      "status": "passed"
+    },
+    {
+      "name": "No activation, external/business/device/speech call or unexpected browser error",
+      "status": "passed"
+    }
+  ],
+  "commands": [
+    {
+      "type": "source.add",
+      "commandId": "31d20fea-ab08-4d2c-b783-c7c00a81db38"
+    },
+    {
+      "type": "task.create",
+      "commandId": "aef79829-8779-457c-bd0e-848c5d4af808"
+    },
+    {
+      "type": "recommendation.publish",
+      "commandId": "e970b9a4-1f0c-4c7f-abff-9c061dfcff8e"
+    },
+    {
+      "type": "task.create",
+      "commandId": "cec78cfe-181b-4240-900e-da458b88e603"
+    },
+    {
+      "type": "task.create",
+      "commandId": "14ef87a8-81e9-4b00-9999-50b9b0a6bb66"
+    },
+    {
+      "type": "source.correct",
+      "commandId": "fe800380-79d2-4c21-8044-1ce482d5ee14"
+    },
+    {
+      "type": "recommendation.publish",
+      "commandId": "19f9e498-907a-4aae-a0a8-42cdcf0e40a4"
+    },
+    {
+      "type": "task.create",
+      "commandId": "d6e122c1-3a27-4638-8cc6-557df1f30643"
+    }
+  ],
+  "blockedExternal": [],
+  "blockedBusiness": [],
+  "devices": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "expectedHttp": [
+    {
+      "path": "/api/hq/commands/e970b9a4-1f0c-4c7f-abff-9c061dfcff8e",
+      "status": 404,
+      "method": "GET",
+      "code": "not_found"
+    },
+    {
+      "path": "/api/hq/commands/19f9e498-907a-4aae-a0a8-42cdcf0e40a4",
+      "status": 404,
+      "method": "GET",
+      "code": "not_found"
+    },
+    {
+      "path": "/api/hq/commands",
+      "status": 400,
+      "method": "POST",
+      "code": "invalid_citation"
+    }
+  ],
+  "unexpectedHttp": [],
+  "azure": "deferred",
+  "expectedConsole": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/e970b9a4-1f0c-4c7f-abff-9c061dfcff8e"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/19f9e498-907a-4aae-a0a8-42cdcf0e40a4"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "url": "http://127.0.0.1:3113/api/hq/commands"
+    }
+  ],
+  "status": "passed_local_owner_regression",
+  "finishedAt": "2026-10-23T15:46:15.592Z",
+  "sourceHashes": {
+    "web_platform/src/components/hq/hq-overlays.tsx": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4",
+    "web_platform/src/lib/hq/copy.ts": "515530b6139b51c3edd10bdfed910355f581c7ec3505fb94b5204cc30f59c53d",
+    "web_platform/tests-browser/hq-citation-draft-owner.mjs": "d36ec4afd25ff3060830be4fc3be37be2949dcccd5411c2a5603341f8545a9f0"
+  }
+}

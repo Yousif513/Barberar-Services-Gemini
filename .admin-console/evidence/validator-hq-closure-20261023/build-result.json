@@ -1,0 +1,1 @@
+{"command": ["C:\\Program Files\\nodejs\\npm.CMD", "run", "build", "--workspace=web_platform"], "exitCode": 0, "output": "build.txt"}

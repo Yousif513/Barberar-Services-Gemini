@@ -1,0 +1,91 @@
+{
+  "reviewer": "hq_citation_independent_review",
+  "implementationOwner": "impl-hq-citation-draft",
+  "reviewType": "Independent fresh source and actual loopback browser review",
+  "decision": "accepted_for_local_development_scope",
+  "reviewedAt": "2026-10-23T15:54:15.314Z",
+  "sourceHashBasis": "Strict UTF-8 decoded bytes, CRLF converted to LF only; raw bytes also recorded in browser results.",
+  "files": [
+    {
+      "path": "web_platform/src/components/hq/hq-overlays.tsx",
+      "sha256_raw_bytes": "bab3c44af39a8230fb9143fab32bf2798254e3ac9d724df7b4241cd5a810ec02",
+      "sha256_utf8_crlf_to_lf": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4"
+    },
+    {
+      "path": "web_platform/src/lib/hq/copy.ts",
+      "sha256_raw_bytes": "67d09dc0c8bbfbc0294dad46f8696f8054aebfd4587fd95aad20bbbba3b00321",
+      "sha256_utf8_crlf_to_lf": "515530b6139b51c3edd10bdfed910355f581c7ec3505fb94b5204cc30f59c53d"
+    },
+    {
+      "path": "web_platform/src/lib/hq/client.ts",
+      "sha256_raw_bytes": "22e3c789c329b489e25aff0f616894dea0546ed696adfee746c1c931ee6f69b6",
+      "sha256_utf8_crlf_to_lf": "090754fde2b0f4c9aee383c65392cfb76c29d5a722425ae450d487770c40767b"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-context.tsx",
+      "sha256_raw_bytes": "9495c62453d035fb8ed2862bbee23308d8e13c988898b472a0a4df4c796c1651",
+      "sha256_utf8_crlf_to_lf": "2b99ccb5b9a273595c9116c8dc29d44f1b1b7eb77f2eef28afd442976be6f882"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256_raw_bytes": "6c8dc556691d5cd9f22262d89e5a68d56a3ced54401b54c0095916fbd28d9da6",
+      "sha256_utf8_crlf_to_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256_raw_bytes": "57d2bd9cb1e5265a6edf7576fef911b805ab681b74630fec0b1e9d3b2e962dc4",
+      "sha256_utf8_crlf_to_lf": "5ea0d0efe958140e2d77002ce6e601aca8855b6d828cf6efa4612597d7834585"
+    }
+  ],
+  "scope": "Existing authored Recommendation overlay pending citation guard, exact quote validation, explicit Add/Clear, localized retained-draft errors, no new route/theme/business command.",
+  "sourceFindings": [],
+  "sourceReview": [
+    "Synchronous pending quote ref guards onSubmit in addition to Save-disabled state. Typed text and selected exact range both become pending intent.",
+    "Clear resets pending quote and selection only. Added citations and authored title/summary/next action remain separate state.",
+    "Adding refuses mismatched source binding, >12 rows and original range >1200 characters without clearing pending draft; deleting one citation permits explicit Add retry.",
+    "Source switch is unavailable while pending, preventing hidden retargeting. Actual selected repeated occurrence uses preserved source ID/version/hash and original CRLF/UTF-16 offset conversion.",
+    "Server still independently validates current source version/hash, integer boundaries, original source substring, 1200-character and 12-row limits, and task-linked source scope.",
+    "Existing transactional local command receipt and publish behavior is retained. Source correction does not rewrite old source history or earlier recommendation references.",
+    "Unknown response keeps original command/payload in session storage, locks conflicting edits and recovers original receipt before any fresh POST. Actual browser injection committed once then obscured response; recovery produced one recommendation/decision.",
+    "Authored output remains development-preparer authored text; no employee/model work or competence claim. Scope remains local record-only and all 15 original employees inactive."
+  ],
+  "actualBrowser": {
+    "path": ".admin-console/evidence/hq-citation-draft-independent/results.json",
+    "sha256_raw_bytes": "54c680936a55817ce6b454c0974f5c53c6c67cb4bb9c0b2d8203c55d4710659b",
+    "groupsPassed": 10,
+    "exitCode": 0,
+    "commandPosts": 12,
+    "expectedHttp": 4,
+    "expectedBrowserHttpConsole": 4,
+    "unexpectedHttp": 0,
+    "unexpectedConsoleErrors": 0,
+    "pageErrors": 0
+  },
+  "presentation": "Reviewer visually inspected both final English/Arabic 375px screenshots. Pending hint and Clear with visible keyboard focus, added citation and disabled Save are legible and within the dialog. Keyboard Enter activates Clear without publishing. RTL and no document overflow verified.",
+  "script": {
+    "path": "web_platform/tests-browser/hq-citation-draft-independent.mjs",
+    "sha256_utf8_crlf_to_lf": "8caf1570a88a65c0784fb5466ffcb00a35655303785f38484b2e592d41ea9843",
+    "focusedEslintExitCode": 0
+  },
+  "counterevidence": [
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/initial-preview-unavailable.json",
+      "meaning": "Connection refused before any source/task fixture or command. Root restarted owned preview. Not a product RED proof."
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/initial-harness-blank-origin-results.json",
+      "meaning": "Seven actual browser groups passed, then new mobile context setup used relative fetch while still at about:blank. Independent harness corrected to visit loopback HQ before fixture setup; no app source change. Full accepted run then passed all ten groups."
+    }
+  ],
+  "independentRedClaim": false,
+  "limits": [
+    "Local development acceptance only; no production-regulated release certification.",
+    "No real provider/Auth/account or external integration acceptance.",
+    "No native Arabic pronunciation/voice evaluation, paid services or microphone/media/speech calls.",
+    "Overall Headquarters remains under development; broader orchestration, live employee conversations, hosted integration, finance/refund execution, employee activation and permissions are not closed by this repair."
+  ],
+  "holds": [
+    "Azure signup/audio deferred; existing capped allowance and Saudi male/Lebanese female preferences retained without reset.",
+    "Production deployment/merges, HQ employee activation, business permissions, external business writes, financial transactions and new paid/native services remain held."
+  ]
+}

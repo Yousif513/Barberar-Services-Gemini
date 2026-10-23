@@ -1,0 +1,97 @@
+{
+  "classification": "Independent local validator security/source review",
+  "reviewer": "sec-validator-repair-independent",
+  "timestamp_utc": "2026-10-23T15:52:35.523137+00:00",
+  "verdict": "ACCEPTED_FOR_BOUNDED_PROJECT_LOCAL_USE_WITH_REGULATED_RELEASE_STILL_FAILED",
+  "scope": "Evidence-context classification only, not full console security approval or production readiness",
+  "independence": "Reviewer implemented no candidate validator/helper/owner tests and made no application, manifest or globally installed tool changes. Fresh disk read and public CLI tests followed explicit source refreeze.",
+  "files": [
+    {
+      "path": "tools/adminwright/scripts/admin_console_manifest.py",
+      "sha256_raw_bytes": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597",
+      "sha256_utf8_crlf_to_lf": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597"
+    },
+    {
+      "path": "tools/adminwright/scripts/evidence_context.py",
+      "sha256_raw_bytes": "7082801832b9c476297f6fc0e82179696aa746702e031f22a3860aa229fecd6e",
+      "sha256_utf8_crlf_to_lf": "b4be308877ebcf5d6876c7cf35bf3602edc00c5899402981b545fc327997a246"
+    },
+    {
+      "path": "tools/adminwright/tests/test_evidence_context.py",
+      "sha256_raw_bytes": "0a94b007732d9ecf80a9bb3062c367fcd1ac4a368ca60075356af0e5c76b7e96",
+      "sha256_utf8_crlf_to_lf": "198de30cabd647133d37a90f340f5d82d2958cc686d714383dd51742df689064"
+    },
+    {
+      "path": "tools/adminwright/tests/test_evidence_context_independent.py",
+      "sha256_raw_bytes": "d8a4a58dae7620880bc3affeb970a7347ecd1d3d09794a525719b84160f82b1f",
+      "sha256_utf8_crlf_to_lf": "d8a4a58dae7620880bc3affeb970a7347ecd1d3d09794a525719b84160f82b1f"
+    },
+    {
+      "path": "tools/adminwright/tests/test_manifest.py",
+      "sha256_raw_bytes": "472045c15f0138762886950c406ef548aec0646b30691a11e5001fff170b05bf",
+      "sha256_utf8_crlf_to_lf": "472045c15f0138762886950c406ef548aec0646b30691a11e5001fff170b05bf"
+    }
+  ],
+  "global_script_sha256_raw": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316",
+  "preserved_rules_ast_equal": {
+    "PLACEHOLDER_PATTERN": true,
+    "HARDCODE_PATTERN": true,
+    "CONFUSABLES": true,
+    "SUBSTRING_TOKENS": true,
+    "SUBSTRING_PATTERN": true,
+    "SUBSTRING_EXCEPTIONS": true
+  },
+  "tests": {
+    "independent_groups": 25,
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "raw_receipt": "independent-tests-result.json",
+    "source_hashes_match_tested_freeze": true
+  },
+  "initial_counterevidence": "independent-first-observation.json",
+  "finding_resolution": [
+    {
+      "id": "runtime-directory-overlap",
+      "initial_severity": "high",
+      "status": "fixed-and-independently-retested",
+      "resolution": "Authoritative runtime inventory now considers complete existing paths, single-component directories/root files, directory ancestry, absolute Windows paths and fragment aliases. Independent public CLI rejects each overlap; the owner recorded valid RED/GREEN for the same family."
+    }
+  ],
+  "assertions": [
+    "Isolated executable test artifacts may use the exact standard UUID generator; positive fake/mock fallback identifiers remain blocked, including confusable and split identifiers.",
+    "Imports, comments, prose documents and unrelated string literals cannot establish assertions or capability linkage. The stronger static contract still does not execute tests.",
+    "Only narrow negative clauses in a structured independently attributed source-review JSON with current bounded UTF8 hashes receive context. Other JSON fields, same-sentence positives, nested mixed claims, stale hashes and production bindings remain strict.",
+    "Missing, empty, directory, traversal/out-of-root aliases, invalid UTF8, oversized files and banned final bytes at the exact limit cannot supply accepted evidence. A real Windows directory junction exercised the resolved-path containment check after file symlink creation was denied by host privilege.",
+    "Original installed validator and unchanged vendored upstream regression bytes match captured SHA256; placeholder rules and severity policy were not downgraded."
+  ],
+  "comparison": {
+    "manifest_sha256_raw": "5d995882da2a976ec6e903ca3195494e3c06a228b55c5a9de5293be906c4e4cc",
+    "original_errors": 305,
+    "candidate_errors": 288,
+    "warnings_both": 29,
+    "exit_both": 1,
+    "removed_findings": 17,
+    "added_findings": 0,
+    "removed_classification": "15 held-checkout fixture/negative-review/dependent matching diagnostics plus two existing references to the isolated hq-http UUID fixture; all directly inspected.",
+    "baseline_drift": "Historical313 changed to305 because root temporarily moved separate Headquarters request-review-loop capability from implemented to in-progress, replacing9oldHQevidence diagnostics with1unresolved-status diagnostic. This is not validator improvement.",
+    "receipt": "independent-comparison-result.json",
+    "final_model_rerun_required": "Root will run both scripts against the same final restored Headquarters model; these counts describe only the frozen review snapshot."
+  },
+  "remaining_critical_or_high_in_scoped_candidate": 0,
+  "limitations": [
+    "This deterministic static scanner cannot prove test execution, meaningful assertion semantics, source authenticity, honest review authorship or runtime policy correctness; the separate reviewer/test evidence remains necessary.",
+    "File symbolic-link creation was denied by Windows privilege; final containment test used an actual directory junction, with both alias and target inside one verified owned temporary tree.",
+    "Full console release, underlying operational controls and baseline genuine errors remain unresolved."
+  ],
+  "holds": {
+    "azure_setup_and_audio": "deferred",
+    "production_deployment_and_merge": "held",
+    "hq_employee_activation": "held",
+    "business_permission_grants": "held",
+    "external_business_writes": "held",
+    "financial_transactions": "held",
+    "new_paid_services": "held"
+  }
+}

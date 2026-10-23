@@ -1,0 +1,48 @@
+{
+  "classification": "Owner local browser regression using an isolated development workspace, not independent acceptance",
+  "startedAt": "2026-10-23T15:44:52.574Z",
+  "phase": "green",
+  "checks": [
+    {
+      "name": "After one added citation, a typed pending quote blocks Save, Enter and direct requestSubmit",
+      "status": "passed"
+    },
+    {
+      "name": "Explicit Clear drops only pending quote and preserves previously added citation and recommendation text",
+      "status": "passed"
+    },
+    {
+      "name": "Mismatched and overlong exact quotes retain draft, existing citations and pending-submit block",
+      "status": "passed"
+    }
+  ],
+  "commands": [
+    {
+      "type": "source.add",
+      "commandId": "5b099150-51ab-4682-b4a8-6167149101d8"
+    },
+    {
+      "type": "task.create",
+      "commandId": "a1a940a5-e04f-484d-bc6b-97ada6ba237c"
+    }
+  ],
+  "blockedExternal": [],
+  "blockedBusiness": [],
+  "devices": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "expectedHttp": [],
+  "unexpectedHttp": [],
+  "azure": "deferred",
+  "status": "failed",
+  "failure": {
+    "message": "expect(locator).not.toHaveValue(expected) failed\n\nLocator:  getByRole('dialog').getByLabel('Exact quote', { exact: true })\nExpected: not \"\"\nReceived: \"\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"to.have.value\" with timeout 5000ms\n  - waiting for getByRole('dialog').getByLabel('Exact quote', { exact: true })\n    14 × locator resolved to <textarea id=\"_r_5_\" class=\"hq-input\"></textarea>\n       - unexpected value \"\"\n",
+    "stack": "Error: expect(locator).not.toHaveValue(expected) failed\n\nLocator:  getByRole('dialog').getByLabel('Exact quote', { exact: true })\nExpected: not \"\"\nReceived: \"\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"to.have.value\" with timeout 5000ms\n  - waiting for getByRole('dialog').getByLabel('Exact quote', { exact: true })\n    14 × locator resolved to <textarea id=\"_r_5_\" class=\"hq-input\"></textarea>\n       - unexpected value \"\"\n\n    at captureRawStack (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright-core\\lib\\coreBundle.js:3172:17)\n    at callMatcherAsStep (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright\\lib\\matchers\\expect.js:12877:57)\n    at Object.toHaveValue (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\node_modules\\playwright\\lib\\matchers\\expect.js:12867:23)\n    at selectRange (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-citation-draft-owner.mjs:43:304)\n    at async file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests-browser/hq-citation-draft-owner.mjs:54:90"
+  },
+  "finishedAt": "2026-10-23T15:45:01.531Z",
+  "sourceHashes": {
+    "web_platform/src/components/hq/hq-overlays.tsx": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4",
+    "web_platform/src/lib/hq/copy.ts": "515530b6139b51c3edd10bdfed910355f581c7ec3505fb94b5204cc30f59c53d",
+    "web_platform/tests-browser/hq-citation-draft-owner.mjs": "244a3211b2ab96cd89ba4105707bc51adc053be9094b03d042d2d7c32a2e0f5c"
+  }
+}

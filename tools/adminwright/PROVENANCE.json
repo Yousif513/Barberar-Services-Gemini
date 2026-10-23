@@ -1,0 +1,89 @@
+{
+  "status": "PROJECT_LOCAL_ADOPTED_AFTER_INDEPENDENT_ACCEPTANCE_RELEASE_REMAINS_FAILED",
+  "upstream_repository": "https://github.com/TarikAI/adminwright",
+  "source": "Installed local snapshot; no release or upstream commit inferred",
+  "installed_source": "C:\\Users\\Yousif's PC\\.claude\\skills\\adminwright",
+  "license": "Apache-2.0",
+  "copyright": "Copyright 2026 TarikAI",
+  "dependencies": "Python standard library only",
+  "copied_files": [
+    {
+      "path": "scripts/admin_console_manifest.py",
+      "upstream_sha256_raw_bytes": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316",
+      "candidate_sha256_raw_bytes": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597",
+      "upstream_byte_identical": false,
+      "upstream_sha256_utf8_crlf_to_lf": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316",
+      "candidate_sha256_utf8_crlf_to_lf": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597"
+    },
+    {
+      "path": "assets/admin-console.manifest.template.json",
+      "upstream_sha256_raw_bytes": "8b9f8e0e55c0c275f29a2ebc0a030093d225dc0707ca79463e0e65430096826b",
+      "candidate_sha256_raw_bytes": "8b9f8e0e55c0c275f29a2ebc0a030093d225dc0707ca79463e0e65430096826b",
+      "upstream_byte_identical": true,
+      "upstream_sha256_utf8_crlf_to_lf": "8b9f8e0e55c0c275f29a2ebc0a030093d225dc0707ca79463e0e65430096826b",
+      "candidate_sha256_utf8_crlf_to_lf": "8b9f8e0e55c0c275f29a2ebc0a030093d225dc0707ca79463e0e65430096826b"
+    },
+    {
+      "path": "assets/admin-console.manifest.schema.json",
+      "upstream_sha256_raw_bytes": "e6f68c7d561ecacadce2f22d3515635e9fcabd8f0ecd29d6d51b085e27998b50",
+      "candidate_sha256_raw_bytes": "e6f68c7d561ecacadce2f22d3515635e9fcabd8f0ecd29d6d51b085e27998b50",
+      "upstream_byte_identical": true,
+      "upstream_sha256_utf8_crlf_to_lf": "e6f68c7d561ecacadce2f22d3515635e9fcabd8f0ecd29d6d51b085e27998b50",
+      "candidate_sha256_utf8_crlf_to_lf": "e6f68c7d561ecacadce2f22d3515635e9fcabd8f0ecd29d6d51b085e27998b50"
+    },
+    {
+      "path": "tests/test_manifest.py",
+      "upstream_sha256_raw_bytes": "472045c15f0138762886950c406ef548aec0646b30691a11e5001fff170b05bf",
+      "candidate_sha256_raw_bytes": "472045c15f0138762886950c406ef548aec0646b30691a11e5001fff170b05bf",
+      "upstream_byte_identical": true,
+      "upstream_sha256_utf8_crlf_to_lf": "472045c15f0138762886950c406ef548aec0646b30691a11e5001fff170b05bf",
+      "candidate_sha256_utf8_crlf_to_lf": "472045c15f0138762886950c406ef548aec0646b30691a11e5001fff170b05bf"
+    },
+    {
+      "path": "LICENSE",
+      "upstream_sha256_raw_bytes": "de30236b4c9c1f3bb7134577c71bec31ad246afabfbef9eb7ed75b42c4c1c3de",
+      "candidate_sha256_raw_bytes": "de30236b4c9c1f3bb7134577c71bec31ad246afabfbef9eb7ed75b42c4c1c3de",
+      "upstream_byte_identical": true,
+      "upstream_sha256_utf8_crlf_to_lf": "de30236b4c9c1f3bb7134577c71bec31ad246afabfbef9eb7ed75b42c4c1c3de",
+      "candidate_sha256_utf8_crlf_to_lf": "de30236b4c9c1f3bb7134577c71bec31ad246afabfbef9eb7ed75b42c4c1c3de"
+    },
+    {
+      "path": "NOTICE",
+      "upstream_sha256_raw_bytes": "4b94b1f791bf54560d130cbf0e9df938083c39e9ca3d62bb15020abe54e2d5df",
+      "candidate_sha256_raw_bytes": "4b94b1f791bf54560d130cbf0e9df938083c39e9ca3d62bb15020abe54e2d5df",
+      "upstream_byte_identical": true,
+      "upstream_sha256_utf8_crlf_to_lf": "4b94b1f791bf54560d130cbf0e9df938083c39e9ca3d62bb15020abe54e2d5df",
+      "candidate_sha256_utf8_crlf_to_lf": "4b94b1f791bf54560d130cbf0e9df938083c39e9ca3d62bb15020abe54e2d5df"
+    }
+  ],
+  "local_additions": [
+    "scripts/evidence_context.py",
+    "tests/test_evidence_context.py",
+    "README.md"
+  ],
+  "modified_upstream_files": [
+    "scripts/admin_console_manifest.py"
+  ],
+  "preserved_upstream_tests": [
+    "tests/test_manifest.py"
+  ],
+  "local_changes": {
+    "scripts/admin_console_manifest.py": "Explicit per-validation context; bounded strict UTF8 evidence read; test-format/executable-assertion checks; executable capability/screen/queue linking. All rule severity/profile/declaredStatic behavior unchanged.",
+    "scripts/evidence_context.py": "New conservative lexical classifier, runtime binding inventory, exact UUID and negative assertion/prose contexts.",
+    "UPSTREAM_PATCH.diff": "Targeted upstream delta; original copyright/license retained."
+  },
+  "candidate_review_status": "Independent review accepted 25/25 adversarial CLI groups, zero failures/skips; project gate adopted after acceptance. Installed global copy unchanged.",
+  "local_addition_sha256_raw_bytes": {
+    "scripts/evidence_context.py": "7082801832b9c476297f6fc0e82179696aa746702e031f22a3860aa229fecd6e",
+    "tests/test_evidence_context.py": "0a94b007732d9ecf80a9bb3062c367fcd1ac4a368ca60075356af0e5c76b7e96"
+  },
+  "local_addition_sha256_utf8_crlf_to_lf": {
+    "scripts/evidence_context.py": "b4be308877ebcf5d6876c7cf35bf3602edc00c5899402981b545fc327997a246",
+    "tests/test_evidence_context.py": "198de30cabd647133d37a90f340f5d82d2958cc686d714383dd51742df689064"
+  },
+  "adoption_evidence": [
+    ".admin-console/evidence/validator-repair-20261023/independent-review.json",
+    "AGENTS.md",
+    "package.json"
+  ]
+}

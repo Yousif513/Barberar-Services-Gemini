@@ -1,0 +1,54 @@
+{
+  "reviewer": "hq_citation_independent_review",
+  "classification": "Independent local development browser acceptance, controlled isolated workspace fixtures only",
+  "startedAt": "2026-10-23T15:50:40.995Z",
+  "checks": [],
+  "captures": [],
+  "commands": [],
+  "receiptReads": [],
+  "blockedExternal": [],
+  "blockedBusiness": [],
+  "deviceCalls": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "httpFailures": [],
+  "findings": [
+    {
+      "message": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3113/hq\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3113/hq\", waiting until \"load\"\u001b[22m\n",
+      "stack": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3113/hq\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3113/hq\", waiting until \"load\"\u001b[22m\n\n    at visit (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-citation-draft-independent.mjs:39:48)\n    at C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-citation-draft-independent.mjs:50:47"
+    }
+  ],
+  "sourceHashes": {
+    "web_platform/src/components/hq/hq-overlays.tsx": {
+      "sha256_raw_bytes": "bab3c44af39a8230fb9143fab32bf2798254e3ac9d724df7b4241cd5a810ec02",
+      "sha256_utf8_crlf_to_lf": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4"
+    },
+    "web_platform/src/lib/hq/copy.ts": {
+      "sha256_raw_bytes": "67d09dc0c8bbfbc0294dad46f8696f8054aebfd4587fd95aad20bbbba3b00321",
+      "sha256_utf8_crlf_to_lf": "515530b6139b51c3edd10bdfed910355f581c7ec3505fb94b5204cc30f59c53d"
+    },
+    "web_platform/src/lib/hq/client.ts": {
+      "sha256_raw_bytes": "22e3c789c329b489e25aff0f616894dea0546ed696adfee746c1c931ee6f69b6",
+      "sha256_utf8_crlf_to_lf": "090754fde2b0f4c9aee383c65392cfb76c29d5a722425ae450d487770c40767b"
+    },
+    "web_platform/src/components/hq/hq-context.tsx": {
+      "sha256_raw_bytes": "9495c62453d035fb8ed2862bbee23308d8e13c988898b472a0a4df4c796c1651",
+      "sha256_utf8_crlf_to_lf": "2b99ccb5b9a273595c9116c8dc29d44f1b1b7eb77f2eef28afd442976be6f882"
+    },
+    "web_platform/src/lib/hq/server/local-store.mjs": {
+      "sha256_raw_bytes": "6c8dc556691d5cd9f22262d89e5a68d56a3ced54401b54c0095916fbd28d9da6",
+      "sha256_utf8_crlf_to_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+    },
+    "web_platform/src/lib/hq/server/handler.mjs": {
+      "sha256_raw_bytes": "57d2bd9cb1e5265a6edf7576fef911b805ab681b74630fec0b1e9d3b2e962dc4",
+      "sha256_utf8_crlf_to_lf": "5ea0d0efe958140e2d77002ce6e601aca8855b6d828cf6efa4612597d7834585"
+    }
+  },
+  "azure": "deferred",
+  "businessEmployees": "not activated",
+  "production": "not evaluated or changed",
+  "independentRedClaim": false,
+  "status": "failed",
+  "finishedAt": "2026-10-23T15:50:43.486Z",
+  "testHash": "0c96bc069b72dfca0fcdd9c5e546698def07a66b04e4af542357973241a1ff10"
+}

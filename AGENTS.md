@@ -154,10 +154,12 @@ that re-reads the code rather than recalling it.
 
 ## Completion gate
 
+Use the project-local validator accepted by the independent 2026-10-23 review. Read `tools/adminwright/README.md` before changing its evidence rules; the installed global copy stays unchanged. Retain failed release findings and compare both copies on the same manifest when changing the validator.
+
 Do not report completion until all of these hold:
 
-- `python "C:/Users/Yousif's PC/.claude/skills/adminwright/scripts/admin_console_manifest.py" validate --manifest .admin-console/manifest.json --project-root . --phase release` exits 0
-- `python "C:/Users/Yousif's PC/.claude/skills/adminwright/scripts/admin_console_manifest.py" coverage --manifest .admin-console/manifest.json --project-root .` exits 0
+- `python tools/adminwright/scripts/admin_console_manifest.py validate --manifest .admin-console/manifest.json --project-root . --phase release` exits 0
+- `python tools/adminwright/scripts/admin_console_manifest.py coverage --manifest .admin-console/manifest.json --project-root .` exits 0
 - `npm run build --workspace=web_platform` succeeds
 - `npm run typecheck:mobile` succeeds (repo-wide gate from section 3 above)
 - `npx eslint` succeeds in `web_platform`

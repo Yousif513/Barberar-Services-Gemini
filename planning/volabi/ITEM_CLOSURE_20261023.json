@@ -1,0 +1,276 @@
+{
+  "asOf": "2026-10-23",
+  "overall": "under-development",
+  "definition": "verified-local means implemented and supported by separate local test/review evidence; it does not mean deployed, activated, independently certified for production or fully operational. Prior evidence is attributed, not claimed as rerun today.",
+  "approvedScope": [
+    "CEO command",
+    "Agent directory",
+    "Agent profile and task readiness",
+    "Work register and detail",
+    "Decisions and approval detail",
+    "Knowledge and evidence"
+  ],
+  "scopeFamilies": 6,
+  "routePatterns": 9,
+  "sharedOverlays": 15,
+  "currentAuthorizedClosures": [
+    "TOOL-01",
+    "HQ-03"
+  ],
+  "items": [
+    {
+      "id": "TOOL-01",
+      "title": "Evidence validator fixture and negative-assertion handling",
+      "status": "verified-local",
+      "boundary": "Project-local validator accepted after separate security review and adopted in repository commands. Global copy unchanged. All119upstream/owner/independent tests pass; full regulated release still fails.",
+      "evidence": [
+        {
+          "path": "tools/adminwright/PROVENANCE.json",
+          "sha256_utf8_lf": "a521ab77fd797e16e80a5a51dbd6c4b4ebfb86a3837cb2daa41fcae8a8fda5e6"
+        },
+        {
+          "path": ".admin-console/evidence/validator-repair-20261023/independent-review.json",
+          "sha256_utf8_lf": "68aede5feb511acbee861257dcd5b23af9da14d14068baf8e4588d263d909092"
+        },
+        {
+          "path": ".admin-console/evidence/validator-repair-20261023/independent-adoption-review.json",
+          "sha256_utf8_lf": "5fb07f372563a2c0782301edcbeed1834961b25e874969f87a93c0c8a068e6f4"
+        },
+        {
+          "path": ".admin-console/evidence/validator-hq-closure-20261023/final-gate-comparison.json",
+          "sha256_utf8_lf": "121a40df3b2706d2562294633b510b0a3ae3699097d93cfefe1398ef8db6c9e2"
+        }
+      ]
+    },
+    {
+      "id": "HQ-01",
+      "title": "CEO overview and work/decision registers",
+      "status": "verified-local",
+      "boundary": "Existing six-family/nine-route first-loop implementation, independently exercised; not production or autonomous business operation.",
+      "evidence": [
+        {
+          "path": "web_platform/src/components/hq/hq-workspace.tsx",
+          "sha256_utf8_lf": "b7cd3de90bd9d293c55b71710abe0de39d661086041447d4468bf6cb275a77af"
+        },
+        {
+          "path": ".admin-console/evidence/volabi-first-loop/independent-frontend.json",
+          "sha256_utf8_lf": "9d993c73c949d2f9b283d98474e75bf1993faf6124693782e3d648468f99d3e2"
+        }
+      ]
+    },
+    {
+      "id": "HQ-02",
+      "title": "Persistent tasks, material revisions, receipts and audit",
+      "status": "verified-local",
+      "boundary": "Local SQLite transaction, restart, rollback, exact replay and workspace boundaries tested.",
+      "evidence": [
+        {
+          "path": "web_platform/src/lib/hq/server/local-store.mjs",
+          "sha256_utf8_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+        },
+        {
+          "path": ".admin-console/evidence/volabi-local/server-independent-review.json",
+          "sha256_utf8_lf": "820910c3501e3d3cba112928bacc16f914636e6d96c5409466f110443dbdfca1"
+        }
+      ]
+    },
+    {
+      "id": "HQ-03",
+      "title": "Source-linked recommendation editing",
+      "status": "verified-local",
+      "boundary": "Pending selected/typed quotation must be explicitly added or cleared before Save, Enter or direct submission. Exact source version/hash/UTF16 range, stale rejection and same-command uncertain receipt recovery independently exercised. Eight owner and ten independent browser groups pass.",
+      "evidence": [
+        {
+          "path": "web_platform/src/components/hq/hq-overlays.tsx",
+          "sha256_utf8_lf": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4"
+        },
+        {
+          "path": "web_platform/src/lib/hq/copy.ts",
+          "sha256_utf8_lf": "515530b6139b51c3edd10bdfed910355f581c7ec3505fb94b5204cc30f59c53d"
+        },
+        {
+          "path": ".admin-console/evidence/hq-citation-draft-owner/green.json",
+          "sha256_utf8_lf": "2ce50a18d80d207e4528f937d7171cc050ab0bcf1a13a0fab6da76ac65232d72"
+        },
+        {
+          "path": ".admin-console/evidence/hq-citation-draft-independent/source-review.json",
+          "sha256_utf8_lf": "05456d7e4f0f747582711dd94e6c2b7e8244557a24e1d5183f692d7a1a01d347"
+        },
+        {
+          "path": ".admin-console/evidence/hq-citation-draft-independent/results.json",
+          "sha256_utf8_lf": "54c680936a55817ce6b454c0974f5c53c6c67cb4bb9c0b2d8203c55d4710659b"
+        }
+      ]
+    },
+    {
+      "id": "HQ-04",
+      "title": "Exact CEO decision and auditable follow-up",
+      "status": "verified-local",
+      "boundary": "Approval binds exact current task/source material; stale source or material revision blocks old follow-up. All effects remain local records.",
+      "evidence": [
+        {
+          "path": "web_platform/src/lib/hq/server/local-store.mjs",
+          "sha256_utf8_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+        },
+        {
+          "path": "web_platform/tests/hq-independent-review.test.mjs",
+          "sha256_utf8_lf": "cddb4ee40cf7f94175fee30496c3b95eaf998832377fb957daf41f296cac9b9c"
+        }
+      ]
+    },
+    {
+      "id": "HQ-05",
+      "title": "Agent role skills and task-specific readiness",
+      "status": "verified-local",
+      "boundary": "Original role associations, current package availability/version/hash, missing instructions, evidence and permissions are distinct. Presence is not competence or activation.",
+      "evidence": [
+        {
+          "path": "docs/volabi-task-readiness-repair.md",
+          "sha256_utf8_lf": "ab448314978809472f6b88d384e40d78d989989edd4f653856a54cda3b8a8881"
+        },
+        {
+          "path": ".admin-console/evidence/hq-task-readiness/verification.json",
+          "sha256_utf8_lf": "7b3b62476dfebe1b97945eec391545f00619a7dc907b58fce94ffdc43a6108e3"
+        }
+      ]
+    },
+    {
+      "id": "HQ-06",
+      "title": "Knowledge intake, versions and proposed corrections",
+      "status": "verified-local",
+      "boundary": "Source versions/history, exact citations and affected-task invalidation are implemented locally. No live external connector.",
+      "evidence": [
+        {
+          "path": "web_platform/src/components/hq/hq-workspace.tsx",
+          "sha256_utf8_lf": "b7cd3de90bd9d293c55b71710abe0de39d661086041447d4468bf6cb275a77af"
+        },
+        {
+          "path": "web_platform/src/lib/hq/server/local-store.mjs",
+          "sha256_utf8_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+        },
+        {
+          "path": ".admin-console/evidence/volabi-first-loop/independent-frontend.json",
+          "sha256_utf8_lf": "9d993c73c949d2f9b283d98474e75bf1993faf6124693782e3d648468f99d3e2"
+        }
+      ]
+    },
+    {
+      "id": "HQ-07",
+      "title": "Original identities, characters and individual portraits",
+      "status": "verified-local",
+      "boundary": "All15 original identities/42proposed functions retained; portraits are fictional development assets with provenance.",
+      "evidence": [
+        {
+          "path": "planning/volabi/persona-and-skills/PERSONA_REGISTRY.json",
+          "sha256_utf8_lf": "7bdd8e081a2527f989aedfc668317ead714cdb298c63d6055e201d50f642caf3"
+        },
+        {
+          "path": "planning/volabi/persona-and-skills/VALIDATION.json",
+          "sha256_utf8_lf": "ba8368127b584fa6417e5dc35e96a71b51a349e5f17005d6003fc0e80d09d6a6"
+        }
+      ]
+    },
+    {
+      "id": "HQ-08",
+      "title": "Saudi male and Lebanese female live voices",
+      "status": "deferred",
+      "boundary": "Azure account setup and audio explicitly deferred. Existing offline English preview proposals do not satisfy regional accent or live-dialogue acceptance. Original SAR10all-in/100000aggregate-character/3round allowance retained without reset.",
+      "evidence": [
+        {
+          "path": "planning/volabi/VOICE_ACCENT_REQUIREMENTS.json",
+          "sha256_utf8_lf": "d54fb490edcf0adcd4a7d0165e0c99e2cc3f42a24560c3890d97f0a2555f805b"
+        },
+        {
+          "path": "planning/volabi/voice-auditions/EXECUTION_APPROVAL_20261022.md",
+          "sha256_utf8_lf": "69c0057d215ca513c08539739598ecd4c53a51c083342fe4b0e4fd4c460b4b1d"
+        }
+      ]
+    },
+    {
+      "id": "HQ-09",
+      "title": "Skill, evaluation and meeting requests",
+      "status": "verified-local-proposals-only",
+      "boundary": "Requests persist as review proposals. No skill adoption, behavioral evaluation runner, employee execution or live meeting room is claimed.",
+      "evidence": [
+        {
+          "path": "web_platform/src/components/hq/hq-overlays.tsx",
+          "sha256_utf8_lf": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4"
+        },
+        {
+          "path": "web_platform/src/lib/hq/server/local-store.mjs",
+          "sha256_utf8_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+        }
+      ]
+    },
+    {
+      "id": "HQ-10",
+      "title": "Production identity, multi-user access, backup/recovery and retention",
+      "status": "open-later-prerequisite",
+      "boundary": "Local development seat is not production identity/backup/retention architecture. Concrete requirements and independent acceptance still needed before production.",
+      "evidence": [
+        {
+          "path": "docs/volabi-local-operations.md",
+          "sha256_utf8_lf": "37f290203bb289b423142655451e7871d65f06aeccff7805d03960677198bf31"
+        },
+        {
+          "path": "docs/volabi-local-delivery-report.md",
+          "sha256_utf8_lf": "b7bcd8753ba9935945987ac8fcc7c90827474db359664b73c285cb705cb06bc1"
+        }
+      ]
+    },
+    {
+      "id": "HQ-11",
+      "title": "Executive Council, virtual office and broader management domains",
+      "status": "proposed-later-scope",
+      "boundary": "Broader twenty-template MVP and sixteen later surfaces remain inventory/planning. Detailed scope and visual approval must precede new screen families.",
+      "evidence": [
+        {
+          "path": "planning/volabi/HQ_SURFACE_INVENTORY.json",
+          "sha256_utf8_lf": "fb5eb2b133ebebc01d9cf4136529ddb504d73bbe26c1929fec0111b4effa8b37"
+        },
+        {
+          "path": "planning/volabi/LATER_SCOPE.md",
+          "sha256_utf8_lf": "b87b7e41bed9daf588a20f353c474fb1482072cb26ec3befc81ead012b1f0446"
+        },
+        {
+          "path": "planning/volabi/SCOPE_AND_THEME_APPROVAL.md",
+          "sha256_utf8_lf": "d61cbb9b5e0666b6af15ce116e4004e01fb70791af394baf4f32219533df8b73"
+        }
+      ]
+    },
+    {
+      "id": "HQ-12",
+      "title": "Business activation, permissions, integrations and financial execution",
+      "status": "approval-held",
+      "boundary": "Production deployment/merges, business employees, grants, external writes, financial transactions and new paid services remain held. Technical implementation does not substitute for activation approval.",
+      "evidence": [
+        {
+          "path": "planning/volabi/APPROVAL_20261022.md",
+          "sha256_utf8_lf": "c5b70dc6e1bb7a309bb6b4a80519b57ca894a55e14e09e9fea74ac21859926de"
+        },
+        {
+          "path": "docs/volabi-finance-refund-gaps.md",
+          "sha256_utf8_lf": "5fcf53db1d742b1e4af629f523cb1e015e93219eb3691ed772cd4f7700c9cb4a"
+        }
+      ]
+    }
+  ],
+  "nextProposedItem": {
+    "id": "HQ-NEXT-01",
+    "title": "Local Projects and Initiatives",
+    "status": "proposed-scope-awaiting-approval",
+    "packet": "planning/volabi/NEXT_HQ_ITEM_20261023.md",
+    "packet_sha256_utf8_lf": "4fa09f209c6003800a6d331cd98c8f210c2e3f8185f77f91aeae27510dba6e3a",
+    "scope": "Two route patterns, four overlay contracts, existing visual direction; no screen built or business activation."
+  },
+  "releaseGate": {
+    "profile": "regulated",
+    "planExitCode": 0,
+    "coverageExitCode": 0,
+    "localReleaseExitCode": 1,
+    "localErrors": 297,
+    "originalErrors": 318,
+    "warningsEach": 29,
+    "comparison": ".admin-console/evidence/validator-hq-closure-20261023/final-gate-comparison.json"
+  }
+}

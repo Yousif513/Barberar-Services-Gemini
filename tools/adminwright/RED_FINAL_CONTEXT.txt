@@ -1,0 +1,63 @@
+test_decoy_tokens_in_comments_imports_and_unrelated_literals_do_not_bind (test_evidence_context.EvidenceContextRegression.test_decoy_tokens_in_comments_imports_and_unrelated_literals_do_not_bind) ... ok
+test_implemented_queue_requires_relevant_linked_capability_test (test_evidence_context.EvidenceContextRegression.test_implemented_queue_requires_relevant_linked_capability_test) ... ok
+test_imports_comments_and_string_literals_are_not_assertions (test_evidence_context.EvidenceContextRegression.test_imports_comments_and_string_literals_are_not_assertions) ... ok
+test_invalid_utf8_evidence_is_not_accepted_with_replacement_decoding (test_evidence_context.EvidenceContextRegression.test_invalid_utf8_evidence_is_not_accepted_with_replacement_decoding) ... ok
+test_isolated_uuid_fixtures_are_valid_executable_test_evidence (test_evidence_context.EvidenceContextRegression.test_isolated_uuid_fixtures_are_valid_executable_test_evidence) ... ok
+test_non_executable_readme_cannot_be_test_evidence (test_evidence_context.EvidenceContextRegression.test_non_executable_readme_cannot_be_test_evidence) ... ok
+test_oversized_evidence_cannot_hide_reserved_text_after_read_limit (test_evidence_context.EvidenceContextRegression.test_oversized_evidence_cannot_hide_reserved_text_after_read_limit) ... ok
+test_path_traversal_is_not_eligible_for_test_context (test_evidence_context.EvidenceContextRegression.test_path_traversal_is_not_eligible_for_test_context) ... ok
+test_positive_fixture_fallback_identifier_in_tests_is_still_rejected (test_evidence_context.EvidenceContextRegression.test_positive_fixture_fallback_identifier_in_tests_is_still_rejected) ... ok
+test_real_dotted_operation_call_is_relevant_without_test_title_decoy (test_evidence_context.EvidenceContextRegression.test_real_dotted_operation_call_is_relevant_without_test_title_decoy) ... ok
+test_real_negative_security_assertions_may_name_prohibited_data (test_evidence_context.EvidenceContextRegression.test_real_negative_security_assertions_may_name_prohibited_data) ... ok
+test_review_denial_does_not_launder_another_positive_mock_claim (test_evidence_context.EvidenceContextRegression.test_review_denial_does_not_launder_another_positive_mock_claim) ... ok
+test_review_denial_with_prose_semicolon_keeps_its_context (test_evidence_context.EvidenceContextRegression.test_review_denial_with_prose_semicolon_keeps_its_context) ... FAIL
+test_review_prose_in_production_path_stays_strict (test_evidence_context.EvidenceContextRegression.test_review_prose_in_production_path_stays_strict) ... ok
+test_review_without_current_source_hash_is_not_eligible_for_context (test_evidence_context.EvidenceContextRegression.test_review_without_current_source_hash_is_not_eligible_for_context) ... ok
+test_same_test_path_in_runtime_binding_keeps_strict_placeholder_scan (test_evidence_context.EvidenceContextRegression.test_same_test_path_in_runtime_binding_keeps_strict_placeholder_scan) ... ok
+test_scoped_negative_review_clause_is_not_a_fixture (test_evidence_context.EvidenceContextRegression.test_scoped_negative_review_clause_is_not_a_fixture) ... ok
+test_test_directory_alone_does_not_make_a_production_fixture_a_test (test_evidence_context.EvidenceContextRegression.test_test_directory_alone_does_not_make_a_production_fixture_a_test) ... ok
+test_unknown_report_type_does_not_infer_negative_context (test_evidence_context.EvidenceContextRegression.test_unknown_report_type_does_not_infer_negative_context) ... ok
+test_uuid_template_interpolation_is_isolated_fixture_data (test_evidence_context.EvidenceContextRegression.test_uuid_template_interpolation_is_isolated_fixture_data) ... FAIL
+
+======================================================================
+FAIL: test_review_denial_with_prose_semicolon_keeps_its_context (test_evidence_context.EvidenceContextRegression.test_review_denial_with_prose_semicolon_keeps_its_context)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_evidence_context.py", line 138, in test_review_denial_with_prose_semicolon_keeps_its_context
+    self.assert_pass()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_evidence_context.py", line 30, in assert_pass
+    self.assertEqual(code, 0, out + err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Profile: regulated (manifest)
+Phase: release
+ERROR: [evidence-not-resolvable] entities[user].capabilities[user.list].evidence: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] entities[user].capabilities[user.list].evidence[0]: evidence file contains placeholder text: .admin-console/evidence/security-review.json
+Validation complete: 2 error(s), 0 warning(s)
+
+
+======================================================================
+FAIL: test_uuid_template_interpolation_is_isolated_fixture_data (test_evidence_context.EvidenceContextRegression.test_uuid_template_interpolation_is_isolated_fixture_data)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_evidence_context.py", line 134, in test_uuid_template_interpolation_is_isolated_fixture_data
+    self.assert_pass()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Yousif's PC\.codex\worktrees\booking-payment-reconciliation\Barberar Services-Gemini\tools\adminwright\tests\test_evidence_context.py", line 30, in assert_pass
+    self.assertEqual(code, 0, out + err)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Profile: regulated (manifest)
+Phase: release
+ERROR: [evidence-not-resolvable] crossCutting.authorization.policyTests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] crossCutting.authorization.policyTests[0]: evidence file contains placeholder text: tests/user.spec.ts
+ERROR: [evidence-not-resolvable] entities[user].capabilities[user.list].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] entities[user].capabilities[user.list].tests[0]: evidence file contains placeholder text: tests/user.spec.ts
+ERROR: [evidence-not-resolvable] screens[users].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[users].tests[0]: evidence file contains placeholder text: tests/user.spec.ts
+Validation complete: 6 error(s), 0 warning(s)
+
+
+----------------------------------------------------------------------
+Ran 20 tests in 6.334s
+
+FAILED (failures=2)

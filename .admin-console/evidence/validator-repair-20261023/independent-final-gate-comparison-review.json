@@ -1,0 +1,135 @@
+{
+  "classification": "Independent supplemental final paired gate comparison review",
+  "reviewer": "sec-validator-repair-independent",
+  "timestamp_utc": "2026-10-23T16:01:11.556746+00:00",
+  "verdict": "CONFIRMED_21_CONTEXT_FALSE_POSITIVES_REMOVED_NO_REAL_RELEASE_FAILURE_LOST",
+  "manifest_sha256_raw": "8d0e4d59cd9963d66be1afa5650eb33d58f839babd0f59024be9ead4cb771a45",
+  "final_manifest_matches_snapshot": true,
+  "original": {
+    "errors": 318,
+    "warnings": 29,
+    "exit_code": 1
+  },
+  "local": {
+    "errors": 297,
+    "warnings": 29,
+    "exit_code": 1
+  },
+  "plan": {
+    "errors": 0,
+    "warnings": 29,
+    "exitCode": 0
+  },
+  "coverage_exit_code": 0,
+  "counter_multiset_comparison": {
+    "removed": 21,
+    "added": 0,
+    "exact_reported_removed_findings_match": true
+  },
+  "removed_categories": [
+    {
+      "kind": "Narrow negative review prose",
+      "diagnostics": 5,
+      "reason": "One unchanged source-linked independent UI review explicitly rejects sample fallback; five crosscutting/capability evidence references were flagged only because the scanner ignored negation. All referenced canonical source hashes remain checked by the accepted classifier."
+    },
+    {
+      "kind": "Isolated executable UUID fixtures",
+      "diagnostics": 12,
+      "reason": "Seven held-checkout test references, three Headquarters HTTP-test references and the two new citation browser tests use standard randomUUID only for isolated local command/record identifiers. They contain real static assertions and explicit local endpoint/operation links, not release fallback rows."
+    },
+    {
+      "kind": "Dependent resolution/token findings",
+      "diagnostics": 4,
+      "reason": "The held-checkout queue no-resolvable-tests diagnostic and checkout/HQ capability plus screen token diagnostics were downstream effects of excluding the valid cited files. Actual test calls/routes now provide the static link; no token requirement was waived."
+    }
+  ],
+  "four_findings_beyond_earlier17": [
+    "Restored request-review-loop reference to hq-http.test.mjs UUID fixture.",
+    "New citation-draft owner browser test UUID fixture.",
+    "New citation-draft independent browser test UUID fixture.",
+    "Restored request-review-loop dependent test-token matching diagnostic."
+  ],
+  "reviewed_files": [
+    {
+      "path": "supabase/tests/db/held_checkout_queue.test.mjs",
+      "sha256_raw_bytes": "8a32b1dffcd56a288de24f0a84099a03ef4bba239215e3a844ff818c3990f9a7",
+      "sha256_utf8_crlf_to_lf": "8a32b1dffcd56a288de24f0a84099a03ef4bba239215e3a844ff818c3990f9a7"
+    },
+    {
+      "path": "supabase/tests/db/held_checkout_queue_independent.test.mjs",
+      "sha256_raw_bytes": "8ed879e431033696afc644deda776397566d955d51881e7937dfe0b5888cf1b2",
+      "sha256_utf8_crlf_to_lf": "8ed879e431033696afc644deda776397566d955d51881e7937dfe0b5888cf1b2"
+    },
+    {
+      "path": "web_platform/tests-browser/held-checkout-queue-independent.mjs",
+      "sha256_raw_bytes": "acc7fd1b27977ddcde0da7b71d6b614db6efbbcd71fcb9bb43e5b126f315819e",
+      "sha256_utf8_crlf_to_lf": "acc7fd1b27977ddcde0da7b71d6b614db6efbbcd71fcb9bb43e5b126f315819e"
+    },
+    {
+      "path": "web_platform/tests/hq-http.test.mjs",
+      "sha256_raw_bytes": "ea0f48ac60b391661ff0564da8b1ed631d27ce330806938a160218dc948a7852",
+      "sha256_utf8_crlf_to_lf": "75500e2f452d628fc789271edf76e382170ee7f39ef10e4904255cb86f8ddf22"
+    },
+    {
+      "path": "web_platform/tests-browser/hq-citation-draft-owner.mjs",
+      "sha256_raw_bytes": "d36ec4afd25ff3060830be4fc3be37be2949dcccd5411c2a5603341f8545a9f0",
+      "sha256_utf8_crlf_to_lf": "d36ec4afd25ff3060830be4fc3be37be2949dcccd5411c2a5603341f8545a9f0"
+    },
+    {
+      "path": "web_platform/tests-browser/hq-citation-draft-independent.mjs",
+      "sha256_raw_bytes": "a206a6140dbd276824a287b79dda956bb21c6a26a5404c24488ae8b7dc69a517",
+      "sha256_utf8_crlf_to_lf": "8caf1570a88a65c0784fb5466ffcb00a35655303785f38484b2e592d41ea9843"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/security-ui-source.json",
+      "sha256_raw_bytes": "f93f0c0e35a9beb8ac9249012ca97f2067748147ee8fbb2b2efa92bcbdffa70e",
+      "sha256_utf8_crlf_to_lf": "f93f0c0e35a9beb8ac9249012ca97f2067748147ee8fbb2b2efa92bcbdffa70e"
+    }
+  ],
+  "gate_artifact_hashes": [
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/final-gate-comparison.json",
+      "sha256_raw_bytes": "b3a91d9247dcd03bb55b70262e1ab418da44c23b9fabe28e38b7e4da0a91a20c"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/original-release.json",
+      "sha256_raw_bytes": "0507e1202f3238f40edb6a4a61aa46447d70f651f165700ff38c981b58dfa718"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/local-release.json",
+      "sha256_raw_bytes": "ee97929a36e9e226123ec82b3d03aaa631bd005f545d485688d59ca400ab5808"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/final-comparison-manifest.json",
+      "sha256_raw_bytes": "8d0e4d59cd9963d66be1afa5650eb33d58f839babd0f59024be9ead4cb771a45"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/original-release-result.json",
+      "sha256_raw_bytes": "a898dfbd516416a09b9803bb90d24270e6e8ad17f45c0d8da24a52c6a6b8a19c"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/local-release-result.json",
+      "sha256_raw_bytes": "8b78a271b11e33a610b153bc685e9d8dfb3a163a2af83f900539905853a65e0b"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/plan-result.json",
+      "sha256_raw_bytes": "ffbc96444274418b0d4c1b0df3f83b7616bbc5780a8006b041423b566c435af8"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/coverage-result.json",
+      "sha256_raw_bytes": "24d531833f84d24ea8da42d55cce971c23f5ac7355f7e315af7d832eeeb452b0"
+    }
+  ],
+  "unchanged_candidate_hashes": {
+    "tools/adminwright/scripts/admin_console_manifest.py": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597",
+    "tools/adminwright/scripts/evidence_context.py": "7082801832b9c476297f6fc0e82179696aa746702e031f22a3860aa229fecd6e"
+  },
+  "global_validator_unchanged": true,
+  "no_new_tests_run": true,
+  "boundaries": [
+    "This supplemental pass recomputed raw finding multiset differences and read the cited artifact/test source; it did not rerun tests or change the manifest, validator, application or source-review receipts.",
+    "Earlier305/288 results describe the temporary HQ in-progress model; final318/297 results describe the separately restored final Headquarters model and new test declarations. No status-based count change is credited as validator improvement.",
+    "All297 remaining regulated release errors and29warnings are retained. Structural coverage and plan exit0 do not establish full console or production readiness.",
+    "Azure setup/audio remains deferred and all production, business activation, permission, external-write, financial and paid-service holds remain."
+  ]
+}

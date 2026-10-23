@@ -1,0 +1,597 @@
+{
+  "classification": "Final delivery snapshot before authorized isolated-branch commit; self and later changelog commit excluded",
+  "applicationSourceFrozen": true,
+  "manifestSHA256Raw": "8d0e4d59cd9963d66be1afa5650eb33d58f839babd0f59024be9ead4cb771a45",
+  "files": [
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/arabic-375-keyboard-clear.html",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "35c7acc80b105ca32af316f8a9abda94da9d6e5427b271654d4d64cce0624cd3"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/arabic-375-keyboard-clear.png",
+      "basis": "exact-bytes",
+      "sha256": "7d74a82ce3013335699b8597a633c39583cada4c2a95c3b38fb89f5cbc32af3c"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/citation-limit-recovered.html",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "3efaa608cb061a8be80f4c45ebcb52fee389fea2290e647464d1e331467fd5ac"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/citation-limit-recovered.png",
+      "basis": "exact-bytes",
+      "sha256": "962ea6a829494207a7eeb75a4876d6cd7122279b92fe144f5a772f4700003392"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/english-375-keyboard-clear.html",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "188bc4716a0718abd2ee7ecd1f0b2c04212bf13c5e4afa4ea9262522c86ef8e1"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/english-375-keyboard-clear.png",
+      "basis": "exact-bytes",
+      "sha256": "3c6643becd88e7c6c67eeadde00d40f0a10368948773ade4aad51ee46aea82e4"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/english-pending.html",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "7ee6a08faabc27e0c0bc8943e168cfebb8d734ec44b7d6dbd55e7a9fdc92e9e0"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/english-pending.png",
+      "basis": "exact-bytes",
+      "sha256": "ec637755a7b360524bab6463602bb1e66c01315841f70a52a68e951423321d15"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/initial-harness-blank-origin-failure.html",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "a7fe83ec64bb23eb28090598db3d166ed98e52e39d1afbbfd74c579553f93e4e"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/initial-harness-blank-origin-failure.png",
+      "basis": "exact-bytes",
+      "sha256": "4cf820401ad622aa125d1d0bcbef6ed522495aed41c05bc5cd21ee1b1d1f8be1"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/initial-harness-blank-origin-results.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "099705cf761280285bed4dfbd35173d1a7b1925418dfae535de32aa6d91b7892"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/initial-preview-unavailable.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "0ac271e57e129f5521dcae8a0296c335cfb1f68196bb81ada014410ad8d239bf"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/results.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "54c680936a55817ce6b454c0974f5c53c6c67cb4bb9c0b2d8203c55d4710659b"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/source-review.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "05456d7e4f0f747582711dd94e6c2b7e8244557a24e1d5183f692d7a1a01d347"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/stale-source-retained.html",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "a880042f7cddf0180ba61dac561702bcacb480f8e05a7319acd5c8ccf9789bbb"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/stale-source-retained.png",
+      "basis": "exact-bytes",
+      "sha256": "ac42fd181fcd7121a3ad2bc8a176aecf07cdbce789c2ff1cae9d5944e441aa82"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/unknown-receipt-retained.html",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "fce44961fa0712706692ff50ae771876527bf54df0e11e2e5e5f674498573235"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-independent/unknown-receipt-retained.png",
+      "basis": "exact-bytes",
+      "sha256": "f88c2e4501675a657b01129d714b1a8e60b01a8cd18a8063c55f51743277bc22"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-owner/arabic-pending-recovery.png",
+      "basis": "exact-bytes",
+      "sha256": "dcd9701cd7b1d6401a7042bb445ec3ca2c9a011fe5c4823aeea3157e812f39f3"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-owner/green-failure.png",
+      "basis": "exact-bytes",
+      "sha256": "315a8c10ed544342afc76cbede641cb87c7d34759e55b9e93e86cf48d2c992eb"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-owner/green.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "2ce50a18d80d207e4528f937d7171cc050ab0bcf1a13a0fab6da76ac65232d72"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-owner/red-failure.png",
+      "basis": "exact-bytes",
+      "sha256": "a6d967770167de01f9c98f069e5dfdd57236cd888c8bdbad7d820bc4fa846bf3"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-owner/red.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "27f2dfbb75636adfda27deebb346dc0622a29baff382553b57db866bab5bec32"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-owner/setup-ar-context-unloaded.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "765c560effa734e25c6468da275427255f1ceacbad4838772a318bc594d66449"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-owner/setup-label-mismatch.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "b7c2998f06c3cc796f44dbbfaf3075a6d1c5bdea7361c06700dcba8abd86e8d5"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-owner/setup-selection-event-mismatch.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "a9bd0114cc350492d86fa14255de76b02b5ddb0035094df1f5c95990b0fc091b"
+    },
+    {
+      "path": ".admin-console/evidence/hq-citation-draft-owner/setup-server-unavailable.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "a983fcd3554e4f40e6a7880ace801dbfed75467e9e117e719d5aea0698921480"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/build-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "0f22473a6a0865e3f0f0558d3f4e79b087e65e6b4dc77fb7195e0647f8e35e7c"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/build.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "89484f36a9a7a0cb15b5b3c3f493bdbb628b7a9de55c7c5484f89c50a71af74b"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/coverage-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "a4f93906b99ca4d6bc58a304babd06e8a4bb964a18a8e383ba3d85240d1c20e5"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/coverage.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/coverage.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "b3c61bed0a94051febc16f948a40474b1c273303054fa806d1a4d93aad72d504"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/final-comparison-manifest.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8d0e4d59cd9963d66be1afa5650eb33d58f839babd0f59024be9ead4cb771a45"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/final-gate-comparison.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "121a40df3b2706d2562294633b510b0a3ae3699097d93cfefe1398ef8db6c9e2"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/focused-lint-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "839693e2f2519b74e00716ec82e349f5e356c7fd59e9d504168a74cc1ac34dd4"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/focused-lint.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/harvest-promotion-candidates.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "4e1523a16855e10b7c9eb83984b07db983dd4a7534cdb981bc96003c0429dbf1"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/lint-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8edf6d5e7e2ec4309d77be68dd949b4eff4759bef3070f41d4674ed9553bd1a6"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/lint.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "2809670607324f3af8103619500089ca6ce902f4a3f6db55e24867339f0ca525"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/local-release-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "cc4337a37e8d471303a0c3873bdec9fd75fb0b10852ddc29b78bc396087e8c45"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/local-release.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "652ba7b5ba438dd6ae45e2877b2b680f1dce8126659ac14db37f89eeb9817ad9"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/local-release.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/mobile-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "368bab3346c50d8581e42e4b60d5e82649b73be5bafca6b9bade4f7ffd25621e"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/mobile.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "499f27fa9365399aa25fba1f1948513982a46787c996e292ea462f7aed90c559"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/original-release-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "28532b17731e33f153f37b2aa2167df7dcd0dc71b0f85f07bc2095b538c9a5f1"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/original-release.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e5478d49e87c32a69f38e727d2d477aba37f4c1516bbef10283d8b8b2914cf0a"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/original-release.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/plan-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "0e9fbcbc4ffdcc6c6f1d234341757ae607c92345aa9387a3cb7ec6a35b5888e5"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/plan.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "db6f5d1f356778160a68238b747b069c080ce32ec286f4ff67580b7ec04c3ade"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/plan.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/provenance-check.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "7d16d456f3c315439d8a7d4d3b4c1bd2c69ebbcdf3122a3213c38d508b3127e3"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/raw-command-output-receipt.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "09edb22c11beb24c287f61fa2a5350123cbd56736571b741008ad5f4c65608c3"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/raw-command-outputs.zip",
+      "basis": "exact-bytes",
+      "sha256": "11d4da6c44292ebe33645e09d8ffb506ac9a644ed5b0bb7e87fd064911daa3ce"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/validator-tests-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8287997d0e896ec2457f867e5d949e0c20df22823b4b12d9a8bd542a3dfe6985"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/validator-tests.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8a300d6a4cb6afff5ef2ee9df835a70ed75ab10562fb1fa6378876510f4eb2ed"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/web-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "1595e8228248b17590aa50966b3d40b5546da152b8323f31e4cee1fa990b14c5"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/web.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "de8ee4cfbe83c3c720d4fe6c48ee3f861ffb172b31bed59b0b3b7a2131f27680"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-adoption-review.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "5fb07f372563a2c0782301edcbeed1834961b25e874969f87a93c0c8a068e6f4"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-comparison-candidate.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "6409b6a49bea65e9f356d0f593e1b30ac973f5ddcf065cdc5da47a28a3a73710"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-comparison-candidate.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-comparison-manifest.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "5d995882da2a976ec6e903ca3195494e3c06a228b55c5a9de5293be906c4e4cc"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-comparison-original.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "c52b8c799e78da71ed29059c44824ed7ecb715e61107760859d55851afc02640"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-comparison-original.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-comparison-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "a01d817b672f188fa177edb9c8e4d7ca3eccc278cad8ba430d29d97c7411868a"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-final-gate-comparison-review.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8a405065740d3bd49cfea4832032aff9c880567b413276327d9dc72cdd2a4863"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-first-observation.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "5c550c8115d641a41779f1441e004177449a887d174bc4c72ad6f75551c23772"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-original-release-receipt.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "de460604d79ccc4a2188730446a2f6ced355f952c4a98ce1265958719130cced"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-original-release.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "90a0bfbf325673e3897c1070629beaa4524500d57644725368b737a9024cc409"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-original-release.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-review.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "68aede5feb511acbee861257dcd5b23af9da14d14068baf8e4588d263d909092"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-tests-result.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "45c430eab9055d11bc44d51269c24f9ffa149e689d3eb93566e41b0a5b90626d"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-tests.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "dfc0bc281c4779a92bcc3796377d58ffd4fa50f49131ec8c1dc4e386ad73a76d"
+    },
+    {
+      "path": ".admin-console/evidence/validator-repair-20261023/independent-tests.stdout.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".admin-console/manifest.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8d0e4d59cd9963d66be1afa5650eb33d58f839babd0f59024be9ead4cb771a45"
+    },
+    {
+      "path": ".admin-console/worklog/harvest-validator-hq-20261023.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "bce71b54205cd89b08fe2acdaabceee9378f62a1263df66bc9c6475de569118e"
+    },
+    {
+      "path": ".admin-console/worklog/hq-citation-draft-repair.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e8ac05f33e2125f64a178581557460b242003d86b290ff35bcaf06e271327e27"
+    },
+    {
+      "path": ".admin-console/worklog/implement-local-evidence-validator-20261023.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "a3e8a2e95acea82c0d3261d77dfb20eda186e2433087e57b3bd90a9756b24aec"
+    },
+    {
+      "path": ".admin-console/worklog/independent-hq-citation-draft-20261023.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "5473883b20d9d491ddbb4c865eb9ba993bfdb51ac3142cd80da44eaa00c3b928"
+    },
+    {
+      "path": ".admin-console/worklog/sec-validator-repair-20261023.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "bcf13f851f045871efa04f5b764ebc6e32d915a6ee1be7273b73d21ea77dae48"
+    },
+    {
+      "path": ".gitattributes",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "a6561f3ffa337e4475e00ff6b4eb022f70f18ee5655075944eaa9fdfde18b872"
+    },
+    {
+      "path": "AGENTS.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "6ec92b92530c33831e39fa21e2d130b15003e596bd92da893406a09400500b26"
+    },
+    {
+      "path": "docs/volabi-item-closure-20261023.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "b590e4418a424aa1b9bbda37db862b173c4e953b3d4a0ee435105d34688cab50"
+    },
+    {
+      "path": "package.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "b4d9212e6c6eb1076d58106fe27c6e772c3cd480c6a7bcab59a76a17fafebff9"
+    },
+    {
+      "path": "planning/volabi/ITEM_CLOSURE_20261023.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e1087bf5c78a36c1904ca94ec3a8c75420cb4c4c5c6f7f43bb368e83aeb7c3a2"
+    },
+    {
+      "path": "planning/volabi/NEXT_HQ_ITEM_20261023.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "4fa09f209c6003800a6d331cd98c8f210c2e3f8185f77f91aeae27510dba6e3a"
+    },
+    {
+      "path": "planning/volabi/PACKAGE_RECEIPT.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "3277ff8ca62950b492defac9322e6ad3c6c318e89ca99a2ba7adf4e662bc6628"
+    },
+    {
+      "path": "planning/volabi/README.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "c012f7f8a44cebbc3a5da0d9140be8d3e20e854314aa92fc322de7e824b79739"
+    },
+    {
+      "path": "tools/adminwright/.gitignore",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "862263fa1f46c20f0d1e4dac5ffcc75abd55c08211b2c3864c5f8764b9d87793"
+    },
+    {
+      "path": "tools/adminwright/CANDIDATE_COVERAGE.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "b3c61bed0a94051febc16f948a40474b1c273303054fa806d1a4d93aad72d504"
+    },
+    {
+      "path": "tools/adminwright/GREEN.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "6634361367afa6dbaa84c0e726b252d07a8092cc0cb81ed514527d6c814a774d"
+    },
+    {
+      "path": "tools/adminwright/LICENSE",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "de30236b4c9c1f3bb7134577c71bec31ad246afabfbef9eb7ed75b42c4c1c3de"
+    },
+    {
+      "path": "tools/adminwright/NOTICE",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "4b94b1f791bf54560d130cbf0e9df938083c39e9ca3d62bb15020abe54e2d5df"
+    },
+    {
+      "path": "tools/adminwright/OWNER_VALIDATION.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "d377abe966241083be00a734c0c30b0037cd56b65e3fd0ae4f45225053b89722"
+    },
+    {
+      "path": "tools/adminwright/PROVENANCE.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "a521ab77fd797e16e80a5a51dbd6c4b4ebfb86a3837cb2daa41fcae8a8fda5e6"
+    },
+    {
+      "path": "tools/adminwright/README.md",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "5e6efad64886d10da7af7eb0a7b5231d5c5991ab29ccafeb32e99316aa49ff90"
+    },
+    {
+      "path": "tools/adminwright/RED.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "11ab611f4c7eacabd919cd52b285bed040109f3f7679dee9ac077f39d2545005"
+    },
+    {
+      "path": "tools/adminwright/RED_ADDITIONAL.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "40063266440e0b7cc4975f94ca8b1e2b3928499f3a606324f10481b46e8685c0"
+    },
+    {
+      "path": "tools/adminwright/RED_CORRECTED_REVIEW.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8cf4c91a09764c7fdaeaf59fc3778b6c9a2f997d411c85d29d55a9430befa189"
+    },
+    {
+      "path": "tools/adminwright/RED_FINAL_CONTEXT.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "f87f33f0791b16b7347389f3c3f287275ac554af864af44b7e92c118cfa84d23"
+    },
+    {
+      "path": "tools/adminwright/RED_RUNTIME_BINDINGS.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "ab93daf6ccf4f746b69e1601c9655418671af0c4d9be43771e12728a8ab6c955"
+    },
+    {
+      "path": "tools/adminwright/UPSTREAM_PATCH.diff",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "1f69e4f034b0053f880743f587a9af190b8d31a6692fc655cbdd478707f4f131"
+    },
+    {
+      "path": "tools/adminwright/UPSTREAM_TESTS.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "28325c0987f96ac63321a2bd9377fbe17b4f5b62ae72c988d06bff431c92492e"
+    },
+    {
+      "path": "tools/adminwright/assets/admin-console.manifest.schema.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e6f68c7d561ecacadce2f22d3515635e9fcabd8f0ecd29d6d51b085e27998b50"
+    },
+    {
+      "path": "tools/adminwright/assets/admin-console.manifest.template.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8b9f8e0e55c0c275f29a2ebc0a030093d225dc0707ca79463e0e65430096826b"
+    },
+    {
+      "path": "tools/adminwright/candidate-release.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "024c7087d0a4a9c7b4d2da0b2d03521af4b791f1e8045d81e8517f3eb62b7c42"
+    },
+    {
+      "path": "tools/adminwright/candidate-release.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/adminwright/original-release.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "90a0bfbf325673e3897c1070629beaa4524500d57644725368b737a9024cc409"
+    },
+    {
+      "path": "tools/adminwright/original-release.stderr.txt",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/adminwright/release-comparison.json",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8e7f302577f8fbf8bcf4edb9c6b4fe30166ebfa31238402a6bc8618f1164ad1d"
+    },
+    {
+      "path": "tools/adminwright/scripts/admin_console_manifest.py",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597"
+    },
+    {
+      "path": "tools/adminwright/scripts/evidence_context.py",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "b4be308877ebcf5d6876c7cf35bf3602edc00c5899402981b545fc327997a246"
+    },
+    {
+      "path": "tools/adminwright/tests/test_evidence_context.py",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "198de30cabd647133d37a90f340f5d82d2958cc686d714383dd51742df689064"
+    },
+    {
+      "path": "tools/adminwright/tests/test_evidence_context_independent.py",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "d8a4a58dae7620880bc3affeb970a7347ecd1d3d09794a525719b84160f82b1f"
+    },
+    {
+      "path": "tools/adminwright/tests/test_manifest.py",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "472045c15f0138762886950c406ef548aec0646b30691a11e5001fff170b05bf"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-overlays.tsx",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4"
+    },
+    {
+      "path": "web_platform/src/lib/hq/copy.ts",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "515530b6139b51c3edd10bdfed910355f581c7ec3505fb94b5204cc30f59c53d"
+    },
+    {
+      "path": "web_platform/tests-browser/hq-citation-draft-independent.mjs",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "8caf1570a88a65c0784fb5466ffcb00a35655303785f38484b2e592d41ea9843"
+    },
+    {
+      "path": "web_platform/tests-browser/hq-citation-draft-owner.mjs",
+      "basis": "strictUTF8 CRLF-to-LF",
+      "sha256": "d36ec4afd25ff3060830be4fc3be37be2949dcccd5411c2a5603341f8545a9f0"
+    }
+  ]
+}

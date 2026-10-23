@@ -1,0 +1,963 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 TarikAI
+"""Regression tests for admin_console_manifest.py.
+
+Standard library only (unittest), so `python -m unittest discover tests` works
+anywhere the skill itself works. No pytest, no fixtures package, no plugins.
+
+Every test here exists because something actually broke. The adversarial-review
+cases are grouped at the bottom and named for the bypass they close; deleting one
+re-opens a hole that shipped once already.
+
+Run:  python -m unittest discover -s tests -v
+"""
+
+import importlib.util
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+SKILL_ROOT = Path(__file__).resolve().parent.parent
+SCRIPT = SKILL_ROOT / "scripts" / "admin_console_manifest.py"
+
+
+def load_module():
+    spec = importlib.util.spec_from_file_location("acm", SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+acm = load_module()
+
+
+def run(*args, **kwargs):
+    """Invoke the CLI the way a user would, returning (exit_code, stdout, stderr)."""
+    env = dict(os.environ)
+    env.update(kwargs.pop("env", {}))
+    env["PYTHONIOENCODING"] = "utf-8"
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT)] + [str(a) for a in args],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        env=env,
+    )
+    return proc.returncode, proc.stdout, proc.stderr
+
+
+class TempProject(unittest.TestCase):
+    """Base class giving each test an isolated project directory."""
+
+    profile = "standard"
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="adminwright-test-"))
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.root = self.tmp / "project"
+        self.root.mkdir()
+        code, _out, err = run(
+            "init",
+            "--project-root", self.root,
+            "--name", "TestPlatform",
+            "--archetype", "b2b-saas",
+            "--profile", self.profile,
+        )
+        self.assertEqual(code, 0, err)
+        self.manifest = self.root / ".admin-console" / "manifest.json"
+
+    def read(self):
+        return json.loads(self.manifest.read_text(encoding="utf-8"))
+
+    def write(self, data):
+        self.manifest.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+    def validate(self, phase="release", profile=None):
+        args = ["validate", "--manifest", self.manifest, "--project-root", self.root, "--phase", phase]
+        if profile:
+            args += ["--profile", profile]
+        return run(*args)
+
+
+# ---------------------------------------------------------------------------
+# scaffolding
+# ---------------------------------------------------------------------------
+
+
+class TestInit(TempProject):
+    def test_init_creates_v2_manifest_and_schema(self):
+        data = self.read()
+        self.assertEqual(data["manifestVersion"], "2.0")
+        self.assertEqual(data["profile"], "standard")
+        self.assertTrue((self.root / ".admin-console" / "admin-console.manifest.schema.json").exists())
+
+    def test_plan_phase_passes_on_empty_model(self):
+        code, out, _err = self.validate(phase="plan")
+        self.assertEqual(code, 0, out)
+
+    def test_release_phase_fails_on_empty_model(self):
+        code, _out, _err = self.validate(phase="release")
+        self.assertEqual(code, 1)
+
+    def test_schema_and_template_agree(self):
+        schema = json.loads((SKILL_ROOT / "assets" / "admin-console.manifest.schema.json").read_text(encoding="utf-8"))
+        template = json.loads((SKILL_ROOT / "assets" / "admin-console.manifest.template.json").read_text(encoding="utf-8"))
+        for key in schema["required"]:
+            self.assertIn(key, template, "template is missing schema-required key " + key)
+
+
+# ---------------------------------------------------------------------------
+# incremental modelling — the deadlock that made the tool unusable
+# ---------------------------------------------------------------------------
+
+
+class TestIncrementalModelling(TempProject):
+    """A role is unused until its first capability exists.
+
+    Treating that as an error made `add` refuse the very first modelling step at
+    the default profile, with no documented way through.
+    """
+
+    def add(self, kind, payload, entity=None):
+        args = ["add", "--manifest", self.manifest, "--kind", kind, "--json", json.dumps(payload)]
+        if entity:
+            args += ["--entity", entity]
+        return run(*args)
+
+    def test_can_add_role_before_any_capability_exists(self):
+        code, _out, err = self.add("role", {
+            "id": "ops", "name": "Ops", "responsibilities": ["triage"],
+            "scopes": ["all"], "mfaRequired": True,
+        })
+        self.assertEqual(code, 0, err)
+
+    def test_can_add_entity_before_any_capability_exists(self):
+        code, _out, err = self.add("entity", {
+            "id": "user", "name": "User", "sourceOfTruth": "postgres:users",
+            "sensitivity": "confidential", "tenantScoped": True,
+            "lifecycleStates": ["active", "suspended"], "retention": "7y", "capabilities": [],
+        })
+        self.assertEqual(code, 0, err)
+
+    def test_malformed_edit_is_still_refused(self):
+        code, _out, err = self.add("role", {"id": "NOT VALID", "name": "x"})
+        self.assertNotEqual(code, 0)
+        self.assertIn("id", err.lower())
+
+    def test_duplicate_id_is_refused(self):
+        payload = {"id": "ops", "name": "Ops", "responsibilities": ["t"], "scopes": ["a"], "mfaRequired": True}
+        self.assertEqual(self.add("role", payload)[0], 0)
+        self.assertNotEqual(self.add("role", payload)[0], 0)
+
+
+# ---------------------------------------------------------------------------
+# batch add — atomic array appends
+# ---------------------------------------------------------------------------
+
+
+class TestBatchAdd(TempProject):
+    """`add --json` accepts an array; the batch is all-or-nothing.
+
+    code_review.py persists a whole findings payload as one array so that a
+    refused `record` leaves the manifest unmodified — that promise rests here.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.evidence = self.root / "evidence.txt"
+        self.evidence.write_text("x", encoding="utf-8")
+
+    def gap(self, gid):
+        return {
+            "id": gid, "severity": "low", "description": "d", "status": "open",
+            "rationale": "r", "evidence": ["evidence.txt"],
+        }
+
+    def add_raw(self, raw):
+        return run("add", "--manifest", self.manifest, "--kind", "gap", "--json", raw)
+
+    def test_array_add_writes_every_entry(self):
+        code, _out, err = self.add_raw(json.dumps([self.gap("g-one"), self.gap("g-two")]))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(
+            {g["id"] for g in self.read()["gaps"]}, {"g-one", "g-two"}
+        )
+
+    def test_one_duplicate_refuses_the_whole_batch(self):
+        code, _out, err = self.add_raw(json.dumps(self.gap("g-one")))
+        self.assertEqual(code, 0, err)
+        code, _out, err = self.add_raw(json.dumps([self.gap("g-two"), self.gap("g-one")]))
+        self.assertEqual(code, 2)
+        self.assertIn("already exists", err)
+        self.assertEqual(
+            {g["id"] for g in self.read()["gaps"]}, {"g-one"},
+            "a refused batch must not be half-written",
+        )
+
+    def test_duplicate_inside_the_batch_is_refused(self):
+        code, _out, err = self.add_raw(json.dumps([self.gap("g-one"), self.gap("g-one")]))
+        self.assertEqual(code, 2)
+        self.assertIn("twice in this batch", err)
+        self.assertEqual(self.read()["gaps"], [])
+
+    def test_empty_array_is_refused(self):
+        code, _out, err = self.add_raw("[]")
+        self.assertEqual(code, 2)
+        self.assertIn("array", err)
+        self.assertEqual(self.read()["gaps"], [])
+
+
+# ---------------------------------------------------------------------------
+# the no-mock guarantee
+# ---------------------------------------------------------------------------
+
+
+class TestConcurrentWrites(TempProject):
+    """Several agents write one manifest at once — the skill's core promise.
+
+    Two Windows-only failures used to surface here and nowhere else: os.replace
+    refused with Access Denied while an unlocked reader held the manifest, and
+    the lock died on [Errno 13] instead of retrying while the previous holder's
+    unlink was still pending. Eight concurrent adds lost roughly one in six.
+    """
+
+    def add_gap(self, index):
+        gap = {
+            "id": "concurrent-" + str(index), "severity": "low",
+            "description": "d", "status": "open", "rationale": "r", "evidence": [],
+        }
+        return run("add", "--manifest", self.manifest, "--kind", "gap",
+                   "--json", json.dumps(gap))[0]
+
+    def test_eight_concurrent_adds_all_land(self):
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            codes = list(pool.map(self.add_gap, range(8)))
+        self.assertEqual(codes, [0] * 8, "every concurrent add must succeed")
+        ids = {gap["id"] for gap in self.read().get("gaps", [])}
+        self.assertEqual(ids, {"concurrent-" + str(i) for i in range(8)},
+                         "no add may be lost to a write or lock race")
+
+    def test_temp_file_is_process_unique(self):
+        # A shared "<name>.tmp" lets two writers clobber each other's staging.
+        self.add_gap(0)
+        leftovers = list(Path(self.manifest).parent.glob("*.tmp"))
+        self.assertEqual(leftovers, [], "temp files must not survive a write")
+        source = (SKILL_ROOT / "scripts" / "admin_console_manifest.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('str(os.getpid()) + ".tmp"', source,
+                      "the staging file must carry the pid")
+
+
+class TestEvidenceRigor(unittest.TestCase):
+    """Path-and-non-emptiness checks certified a console whose tests were empty.
+
+    Field-tested: the project's own `saas-clean` fixture passed release at the
+    regulated profile with two `() => {}` test bodies and evidence logs reading
+    "command completed, exit 0". Everything traced; nothing was proven.
+    """
+
+    def test_empty_test_body_has_no_assertion(self):
+        self.assertFalse(acm.has_assertion("test('tenant.suspend', () => {});\n"))
+
+    def test_real_assertions_are_recognised_across_languages(self):
+        for body in (
+            "expect(res.status).toBe('suspended');",
+            "self.assertEqual(res.status, 'suspended')",
+            "assert res.status == 'suspended'",
+            "res.Status.Should().Be(\"suspended\");",
+            "require.NoError(t, err)",
+            "XCTAssertEqual(res.status, .suspended)",
+            "await expect(fn()).rejects.toThrow('forbidden');",
+        ):
+            self.assertTrue(acm.has_assertion(body), body)
+
+    def test_success_claims_are_not_evidence(self):
+        for body in ("command completed, exit 0\n", "All tests passed\n",
+                     "Recorded run output with assertions.\n", "ok\n", "done.\n"):
+            self.assertTrue(acm.is_uninformative(body), body)
+
+    def test_real_output_is_evidence(self):
+        for body in ("tsc --noEmit\n  0 errors in 214 files\n",
+                     "axe-core scan\n  0 violations, 47 checks passed\n",
+                     "http_req_duration p95=412ms (budget 800ms)\n"):
+            self.assertFalse(acm.is_uninformative(body), body)
+
+    def test_a_long_narrative_is_not_flagged_as_a_success_claim(self):
+        # Multi-line detail is the thing being asked for; never flag it.
+        body = ("Session policy review\n- MFA enforced for ops\n"
+                "- Idle timeout verified on 3 sessions\n")
+        self.assertFalse(acm.is_uninformative(body))
+
+
+class TestObservationClustering(unittest.TestCase):
+    """Two projects reported one defect in different words and never grouped.
+
+    `promote`'s bar is "seen on two or more distinct projects", and grouping by
+    an exact hash of the wording made that unreachable: the store held the same
+    finding twice and reported "3 distinct ideas, nothing clears the bar".
+    """
+
+    def observation(self, project, observation, proposed, category="friction",
+                    scope="SKILL.md"):
+        return {"project": project, "observation": observation, "date": "2026-08-09",
+                "proposedChange": proposed, "category": category, "scope": scope,
+                "fingerprint": acm.observation_fingerprint(
+                    {"scope": scope, "category": category, "proposedChange": proposed})}
+
+    def test_same_finding_in_different_words_groups(self):
+        records = [
+            self.observation(
+                "AIVORA",
+                "Audit modeled 7 entities and 5 gaps but zero roles, screens, capabilities;"
+                " harvest never ran",
+                "Audit guidance should require capabilities at discovered status so repair"
+                " mode has targets"),
+            self.observation(
+                "ZenithAPP",
+                "Build session modeled entities and screens but zero roles and zero"
+                " capabilities across two rounds; harvest never ran",
+                "Phase ordering nudge: roles and capabilities before screens; end-of-mode"
+                " harvest reminder"),
+        ]
+        clusters = acm.cluster_observations(records)
+        self.assertEqual(len(clusters), 1, "one finding, two projects")
+        self.assertEqual(
+            {r["project"] for r in clusters[0]}, {"AIVORA", "ZenithAPP"})
+
+    def test_unrelated_findings_stay_apart(self):
+        records = [
+            self.observation("A", "Audit hand-wrote manifest JSON and 83 errors hid",
+                             "emit must surface manifest health", category="tooling"),
+            self.observation("B", "Screens modelled with no roles or capabilities",
+                             "roles and capabilities before screens"),
+        ]
+        self.assertEqual(len(acm.cluster_observations(records)), 2)
+
+    def test_category_and_scope_gate_the_grouping(self):
+        # Identical wording, different target file: not the same change.
+        same = "roles and capabilities must exist before screens"
+        records = [
+            self.observation("A", same, same, scope="SKILL.md"),
+            self.observation("B", same, same, scope="references/discovery.md"),
+        ]
+        self.assertEqual(len(acm.cluster_observations(records)), 2)
+
+    def test_similarity_is_symmetric_and_bounded(self):
+        a = {"observation": "roles and capabilities missing", "proposedChange": "order them first"}
+        b = {"observation": "capabilities and roles absent", "proposedChange": "order first"}
+        self.assertAlmostEqual(acm.observation_similarity(a, b),
+                               acm.observation_similarity(b, a))
+        self.assertLessEqual(acm.observation_similarity(a, b), 1.0)
+        self.assertEqual(acm.observation_similarity(a, {"observation": "", "proposedChange": ""}), 0.0)
+
+
+class TestPlaceholderScanner(unittest.TestCase):
+    """Unit-level checks on the scanner itself.
+
+    Each 'flag' case is a bypass found by adversarial review; each 'pass' case is
+    a legitimate identifier that a blunter rule would have falsely rejected.
+    """
+
+    def hit(self, text):
+        folded = acm.fold_confusables(text)
+        squashed = folded.replace(" ", "").replace("-", "").replace("_", "")
+        return bool(
+            acm.PLACEHOLDER_PATTERN.search(acm.split_identifiers(folded))
+            or acm.substring_hit(squashed)
+            or acm.HARDCODE_PATTERN.search(acm.split_identifiers(folded))
+        )
+
+    def test_flags_obvious_placeholders(self):
+        for value in ("mockData", "FakeService", "stub_payment_gateway", "dummyUser", "hard-coded value"):
+            self.assertTrue(self.hit(value), "should flag " + value)
+
+    def test_flags_camelcase_embedded(self):
+        for value in ("mockSuspendUser", "HTTPMockClient", "APIStubGateway", "getSampleData"):
+            self.assertTrue(self.hit(value), "should flag " + value)
+
+    def test_flags_concatenated_without_case_boundary(self):
+        # Word boundaries miss these: no case transition to split on.
+        for value in ("gmockRepositoryImpl", "usemockdata", "zmockAdapter", "xfakeHandler"):
+            self.assertTrue(self.hit(value), "should flag " + value)
+
+    def test_flags_unicode_homoglyphs(self):
+        cyrillic_o = "postgres:users via mоckRepository.restore"
+        self.assertTrue(self.hit(cyrillic_o), "Cyrillic homoglyph should not evade the scan")
+
+    def test_does_not_flag_legitimate_identifiers(self):
+        for value in (
+            "postgres:orders via OrderRepository.findForAdmin",
+            "randomizeOrder", "stubbornRetry", "hammockService", "SamplerConfig",
+            "resampleAudio", "tests/e2e/admin/orders.spec.ts", "HTTPClient",
+            "AccountService.suspend", "policy/user.admin",
+        ):
+            self.assertFalse(self.hit(value), "should not flag " + value)
+
+    def test_nested_arrays_are_flattened(self):
+        pairs = list(acm.flatten_strings("f", ["real op", ["mockHandler"]]))
+        self.assertIn("mockHandler", [text for _path, text in pairs])
+
+    def test_short_capability_ids_still_produce_tokens(self):
+        tokens = acm.capability_tokens({"id": "a.b", "serverOperations": ["x"], "uiRoutes": []})
+        self.assertTrue(tokens, "short ids must not silently disable evidence-token matching")
+
+
+class TestEmitHealth(TempProject):
+    """Field-tested: a session hand-wrote the manifest, ran only emit, and
+    shipped a gap report while 83 validation errors sat invisible."""
+
+    def test_emit_warns_when_manifest_has_errors(self):
+        data = self.read()
+        data["gaps"] = [{"id": "g1", "severity": "error", "description": "x",
+                         "status": "open", "rationale": "", "evidence": []}]
+        self.write(data)
+        _code, _out, err = run("emit", "--manifest", self.manifest, "--format", "gap-report")
+        self.assertIn("validation error", err)
+
+    def test_gap_report_carries_a_health_line(self):
+        data = self.read()
+        data["gaps"] = [{"id": "g1", "severity": "error", "description": "x",
+                         "status": "open", "rationale": "", "evidence": []}]
+        self.write(data)
+        _code, out, _err = run("emit", "--manifest", self.manifest, "--format", "gap-report")
+        self.assertIn("Manifest health:", out)
+
+    def test_emit_nudges_when_feedback_is_empty(self):
+        _code, _out, err = run("emit", "--manifest", self.manifest, "--format", "nav-map")
+        self.assertIn("feedback[] is empty", err)
+
+    def test_emit_stays_quiet_on_recorded_feedback(self):
+        data = self.read()
+        data["feedback"] = [{"id": "fb.1", "observation": "o", "category": "gap",
+                             "proposedChange": "c", "evidence": [], "status": "open"}]
+        self.write(data)
+        _code, _out, err = run("emit", "--manifest", self.manifest, "--format", "nav-map")
+        self.assertNotIn("feedback[] is empty", err)
+
+
+class TestArchetypeResolution(unittest.TestCase):
+    """Field-tested: a trading platform typed --archetype financial and the
+    coverage check silently never ran."""
+
+    def test_common_money_words_resolve_to_fintech(self):
+        for word in ("financial", "finance", "trading", "crypto", "banking"):
+            self.assertEqual(acm.resolve_archetype(word), "fintech", word)
+
+    def test_unknown_archetype_resolves_to_none(self):
+        self.assertIsNone(acm.resolve_archetype("underwater-basket-weaving"))
+
+    def test_llm_gateway_spellings_resolve(self):
+        # Field-tested: API-management platforms kept receiving consoles with no
+        # way to add a key, a base URL, or a user. The archetype must catch every
+        # plausible spelling so its coverage check actually runs.
+        for word in ("llm-gateway", "model-gateway", "ai-gateway", "llm-api",
+                     "api-management", "llmops", "model-router", "llm-proxy"):
+            self.assertEqual(acm.resolve_archetype(word), "llm-gateway", word)
+
+    def test_llm_gateway_domains_include_the_missing_controls(self):
+        domains = acm.ARCHETYPE_DOMAINS["llm-gateway"]
+        for control in ("api key", "base url", "credential", "provider", "user"):
+            self.assertIn(control, domains, control)
+
+
+class TestInitArchetypeWarning(unittest.TestCase):
+    def test_unrecognised_archetype_warns_at_init(self):
+        tmp = Path(tempfile.mkdtemp(prefix="adminwright-arch-"))
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        _code, _out, err = run("init", "--project-root", tmp, "--name", "T",
+                               "--archetype", "underwater-basket-weaving")
+        self.assertIn("not a recognised key", err)
+        self.assertIn("fintech", err, "the warning must list the known keys")
+
+    def test_recognised_archetype_does_not_warn(self):
+        tmp = Path(tempfile.mkdtemp(prefix="adminwright-arch-"))
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        _code, _out, err = run("init", "--project-root", tmp, "--name", "T",
+                               "--archetype", "financial")
+        self.assertNotIn("not a recognised key", err,
+                         "aliased spellings are recognised, not warned about")
+
+
+class TestSchemaParity(TempProject):
+    """Fields the schema requires but the validator used to ignore."""
+
+    profile = "regulated"
+
+    def test_research_source_without_appliedTo_is_flagged(self):
+        data = self.read()
+        data["platform"]["researchSources"] = [{"topic": "t", "url": "https://example.dev"}]
+        self.write(data)
+        _code, out, _err = self.validate()
+        self.assertIn("research-source-incomplete", out)
+
+    def test_research_source_with_appliedTo_is_accepted(self):
+        data = self.read()
+        data["platform"]["researchSources"] = [
+            {"topic": "t", "url": "https://example.dev", "appliedTo": ["user.list"]}
+        ]
+        self.write(data)
+        _code, out, _err = self.validate()
+        self.assertNotIn("research-source-incomplete", out)
+
+    def test_declared_static_without_value_is_not_a_valid_escape(self):
+        data = self.read()
+        data["declaredStatic"] = [{
+            "id": "s1", "path": "entities[e].sourceOfTruth",
+            "reason": "fixed by contract", "approvedBy": "ops-lead",
+        }]
+        self.write(data)
+        _code, out, _err = self.validate()
+        self.assertIn("declared-static-incomplete", out)
+        self.assertIn("missing value", out)
+
+
+class TestReviewerIdentity(TempProject):
+    """`reviewed` is a claim; reviewedBy is what makes it checkable."""
+
+    profile = "regulated"
+
+    def capability(self, **overrides):
+        capability = {
+            "id": "e.list", "outcome": "Find", "kind": "query", "roles": [],
+            "risk": "low", "status": "implemented", "rationale": "",
+            "entityStates": {"from": ["a"], "to": []}, "uiRoutes": [],
+            "serverOperations": ["R.f"], "authorizationPolicies": ["p"],
+            "auditEvents": [], "safeguards": [], "dataBinding": "pg:e via R.f",
+            "tests": [], "evidence": [], "reviewStatus": "reviewed",
+        }
+        capability.update(overrides)
+        data = self.read()
+        data["entities"] = [{
+            "id": "e", "name": "E", "sourceOfTruth": "pg:e", "sensitivity": "internal",
+            "tenantScoped": False, "lifecycleStates": ["a"], "retention": "1y",
+            "capabilities": [capability],
+        }]
+        self.write(data)
+        return self.validate()
+
+    def test_review_without_a_reviewer_is_flagged(self):
+        _code, out, _err = self.capability(owner="agent-1")
+        self.assertIn("reviewer-identity", out)
+
+    def test_self_review_is_flagged(self):
+        _code, out, _err = self.capability(owner="agent-1", reviewedBy="agent-1")
+        self.assertIn("reviewer-identity", out)
+        self.assertIn("is the implementer", out)
+
+    def test_independent_review_is_accepted(self):
+        _code, out, _err = self.capability(owner="agent-1", reviewedBy="agent-2")
+        self.assertNotIn("reviewer-identity", out)
+
+    def test_reviewer_identity_is_advisory_below_regulated(self):
+        data = self.read()
+        data["entities"] = [{
+            "id": "e", "name": "E", "sourceOfTruth": "pg:e", "sensitivity": "internal",
+            "tenantScoped": False, "lifecycleStates": ["a"], "retention": "1y",
+            "capabilities": [{
+                "id": "e.list", "outcome": "Find", "kind": "query", "roles": [],
+                "risk": "low", "status": "implemented", "rationale": "",
+                "entityStates": {"from": ["a"], "to": []}, "uiRoutes": [],
+                "serverOperations": ["R.f"], "authorizationPolicies": ["p"],
+                "auditEvents": [], "safeguards": [], "dataBinding": "pg:e via R.f",
+                "tests": [], "evidence": [], "owner": "agent-1",
+                "reviewStatus": "reviewed", "reviewedBy": "agent-1",
+            }],
+        }]
+        self.write(data)
+        _code, out, _err = self.validate(profile="standard")
+        for line in out.splitlines():
+            if "reviewer-identity" in line:
+                self.assertTrue(line.startswith("WARN"), "must warn, not error, below regulated")
+
+
+class TestScreenEvidenceTokens(TempProject):
+    """A screen could cite a real but unrelated test file forever."""
+
+    profile = "regulated"
+
+    def screen_with_test(self, body):
+        (self.root / "tests").mkdir(exist_ok=True)
+        (self.root / "tests" / "screen.spec.ts").write_text(body, encoding="utf-8")
+        data = self.read()
+        data["roles"] = [{"id": "ops", "name": "O", "responsibilities": ["r"],
+                          "scopes": ["s"], "mfaRequired": True}]
+        data["screens"] = [{
+            "id": "users", "route": "/admin/users", "purpose": "p", "roles": ["ops"],
+            "dataSources": ["pg:users"], "capabilities": [], "actions": [],
+            "states": ["loading", "populated", "error", "forbidden"],
+            "responsive": True, "accessibilityStatus": "implemented",
+            "status": "implemented", "rationale": "", "tests": ["tests/screen.spec.ts"],
+        }]
+        self.write(data)
+        return self.validate()
+
+    def test_unrelated_test_file_is_flagged(self):
+        _code, out, _err = self.screen_with_test(
+            "test('something entirely unrelated', () => { expect(1).toBe(1); });")
+        self.assertIn("evidence-token-match", out)
+
+    def test_test_mentioning_the_route_is_accepted(self):
+        _code, out, _err = self.screen_with_test(
+            "test('/admin/users renders', () => { expect(render()).toBeTruthy(); });")
+        self.assertNotIn("evidence-token-match", out)
+
+    def test_assertion_free_test_is_caught_before_the_token_rule(self):
+        # An empty body is a defect regardless of which capability it names, so
+        # it is reported as such rather than as an unrelated-file problem.
+        _code, out, _err = self.screen_with_test("test('/admin/users renders', () => {});")
+        self.assertIn("test-asserts-nothing", out)
+
+
+class TestEvidenceIntegrity(TempProject):
+    def test_directory_is_not_evidence(self):
+        target = self.root / "evidence-dir"
+        (target / "nested").mkdir(parents=True)
+        (target / "nested" / "unrelated.txt").write_text("changelog", encoding="utf-8")
+        self.assertEqual(acm.path_state(target), "directory")
+
+    def test_whitespace_only_file_is_empty(self):
+        target = self.root / "blank.txt"
+        target.write_text("   \n\t\n   \n", encoding="utf-8")
+        self.assertEqual(acm.path_state(target), "empty")
+
+    def test_evidence_file_content_is_scanned(self):
+        target = self.root / "signoff.txt"
+        target.write_text("TODO: replace with real results. Fake mock data for now.", encoding="utf-8")
+        self.assertEqual(acm.path_state(target), "placeholder")
+
+    def test_genuine_evidence_is_ok(self):
+        target = self.root / "real.txt"
+        target.write_text("axe-core: 0 violations on /admin/users\n", encoding="utf-8")
+        self.assertEqual(acm.path_state(target), "ok")
+
+    def test_path_traversal_outside_project_is_rejected(self):
+        outside = self.tmp / "outside.txt"
+        outside.write_text("real content", encoding="utf-8")
+        self.assertTrue(acm.escapes_root(self.root / ".." / "outside.txt", self.root))
+
+    def test_path_inside_project_is_allowed(self):
+        inside = self.root / "inside.txt"
+        inside.write_text("real content", encoding="utf-8")
+        self.assertFalse(acm.escapes_root(inside, self.root))
+
+
+# ---------------------------------------------------------------------------
+# robustness — these used to emit tracebacks
+# ---------------------------------------------------------------------------
+
+
+class TestMalformedInput(TempProject):
+    def assert_clean_usage_error(self, path):
+        code, _out, err = run("validate", "--manifest", path, "--phase", "plan")
+        self.assertEqual(code, 2, "expected usage-error exit code, got " + str(code))
+        self.assertNotIn("Traceback", err)
+
+    def test_non_utf8_manifest(self):
+        target = self.tmp / "utf16.json"
+        target.write_bytes(json.dumps({"manifestVersion": "2.0"}).encode("utf-16"))
+        self.assert_clean_usage_error(target)
+
+    def test_deeply_nested_json(self):
+        target = self.tmp / "deep.json"
+        target.write_text('{"a":' + "[" * 60000 + "]" * 60000 + "}", encoding="utf-8")
+        self.assert_clean_usage_error(target)
+
+    def test_truncated_json(self):
+        target = self.tmp / "truncated.json"
+        target.write_text('{"manifestVersion": "2.0",', encoding="utf-8")
+        self.assert_clean_usage_error(target)
+
+    def test_json_array_as_root(self):
+        target = self.tmp / "array.json"
+        target.write_text("[1, 2, 3]", encoding="utf-8")
+        self.assert_clean_usage_error(target)
+
+    def test_missing_file(self):
+        self.assert_clean_usage_error(self.tmp / "nope.json")
+
+    def test_wrong_types_do_not_crash(self):
+        data = self.read()
+        data["roles"] = "not-an-array"
+        data["platform"] = "not-an-object"
+        self.write(data)
+        code, _out, err = self.validate(phase="plan")
+        self.assertIn(code, (1, 2))
+        self.assertNotIn("Traceback", err)
+
+
+# ---------------------------------------------------------------------------
+# multi-agent coordination
+# ---------------------------------------------------------------------------
+
+
+class TestClaims(TempProject):
+    def setUp(self):
+        super().setUp()
+        data = self.read()
+        data["roles"] = [{
+            "id": "ops", "name": "Ops", "responsibilities": ["t"], "scopes": ["a"], "mfaRequired": True,
+        }]
+        data["entities"] = [{
+            "id": "user", "name": "User", "sourceOfTruth": "postgres:users",
+            "sensitivity": "internal", "tenantScoped": False,
+            "lifecycleStates": ["active"], "retention": "7y",
+            "capabilities": [{
+                "id": "user.list", "outcome": "Find", "kind": "query", "roles": ["ops"],
+                "risk": "low", "status": "planned", "rationale": "",
+                "entityStates": {"from": ["active"], "to": []}, "uiRoutes": [],
+                "serverOperations": ["UserRepo.find"], "authorizationPolicies": ["p"],
+                "auditEvents": [], "safeguards": [],
+                "dataBinding": "postgres:users via UserRepo.find", "tests": [], "evidence": [],
+            }],
+        }]
+        self.write(data)
+
+    def test_second_agent_cannot_steal_a_claim(self):
+        first = run("claim", "--manifest", self.manifest, "--agent", "a1",
+                    "--role", "implementer", "--capability", "user.list")
+        self.assertEqual(first[0], 0, first[2])
+        second = run("claim", "--manifest", self.manifest, "--agent", "a2",
+                     "--role", "implementer", "--capability", "user.list")
+        self.assertEqual(second[0], 3, "a conflicting claim must exit 3")
+
+    def test_release_then_reclaim(self):
+        run("claim", "--manifest", self.manifest, "--agent", "a1",
+            "--role", "implementer", "--capability", "user.list")
+        released = run("release-claim", "--manifest", self.manifest, "--agent", "a1")
+        self.assertEqual(released[0], 0, released[2])
+        again = run("claim", "--manifest", self.manifest, "--agent", "a2",
+                    "--role", "implementer", "--capability", "user.list")
+        self.assertEqual(again[0], 0, again[2])
+
+    def test_force_steal_requires_reason(self):
+        run("claim", "--manifest", self.manifest, "--agent", "a1",
+            "--role", "implementer", "--capability", "user.list")
+        code, _out, _err = run("claim", "--manifest", self.manifest, "--agent", "a2",
+                               "--role", "qa", "--capability", "user.list", "--force-steal")
+        self.assertEqual(code, 2, "--force-steal without --reason must be refused")
+
+
+# ---------------------------------------------------------------------------
+# cross-project learning
+# ---------------------------------------------------------------------------
+
+
+class TestGlobalLearning(unittest.TestCase):
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="adminwright-learn-"))
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.store = self.tmp / "store"
+        self.env = {"ADMINWRIGHT_HOME": str(self.store)}
+
+    def make_project(self, name, observations):
+        root = self.tmp / name
+        root.mkdir()
+        run("init", "--project-root", root, "--name", name, "--profile", "standard")
+        manifest = root / ".admin-console" / "manifest.json"
+        data = json.loads(manifest.read_text(encoding="utf-8"))
+        for index, (category, observation, change) in enumerate(observations, start=1):
+            data["feedback"].append({
+                "id": "fb." + str(index), "observation": observation, "category": category,
+                "proposedChange": change, "evidence": ["docs/incident.md"],
+                "status": "open", "scope": "references/security-governance.md",
+            })
+        manifest.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        return manifest
+
+    def test_observation_seen_on_two_projects_clears_the_bar(self):
+        shared = ("gap", "Bulk action authorized once for the batch",
+                  "Require per-target authorization in bulk commands")
+        one_off = ("tooling", "Seed data lacked a cross-tenant neighbour",
+                   "Seed plan must include a cross-tenant neighbour")
+        a = self.make_project("ProjectA", [shared])
+        b = self.make_project("ProjectB", [shared, one_off])
+        for manifest in (a, b):
+            code, _out, err = run("harvest", "--manifest", manifest, "--date", "2026-08-07", env=self.env)
+            self.assertEqual(code, 0, err)
+
+        code, out, err = run("promote", "--json", env=self.env)
+        self.assertEqual(code, 0, err)
+        payload = json.loads(out)
+        scopes = {c["proposedChange"] for c in payload["candidates"]}
+        self.assertIn("Require per-target authorization in bulk commands", scopes)
+        self.assertNotIn("Seed plan must include a cross-tenant neighbour", scopes,
+                         "a single-project observation must not clear the bar")
+
+    def test_export_bundle_is_sanitised(self):
+        """Poisoned fixtures: nothing identifying may survive an export."""
+        manifest = self.make_project("AcmeBank Portal", [(
+            "gap",
+            r"Bulk suspend at C:\srv\acme\api\bulk.ts leaked rows; "
+            r"mail ops@acmebank.com or https://acme.atlassian.net/OPS-4417 on 10.2.14.8",
+            "Authorize per row; see db-prod-eu1.acmebank.internal runbook",
+        )])
+        run("harvest", "--manifest", manifest, "--date", "2026-08-08", env=self.env)
+        bundle_path = self.tmp / "bundle.json"
+        code, _out, err = run("promote", "--min-projects", "1",
+                              "--export", bundle_path, env=self.env)
+        self.assertEqual(code, 0, err)
+        raw = bundle_path.read_text(encoding="utf-8").lower()
+        for secret in ("acmebank", "atlassian", "10.2.14.8", "ops@", "srv", "c:\\",
+                       "prod-eu1", "ops-4417"):
+            self.assertNotIn(secret, raw, "export leaked " + secret)
+        self.assertIn("<path>", raw)
+        self.assertIn("p_", raw, "project names must become fingerprints")
+
+    def test_export_drops_evidence_paths(self):
+        manifest = self.make_project("Zenith", [("gap", "obs", "change")])
+        run("harvest", "--manifest", manifest, "--date", "2026-08-08", env=self.env)
+        bundle_path = self.tmp / "b.json"
+        run("promote", "--min-projects", "1", "--export", bundle_path, env=self.env)
+        bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+        for observation in bundle["observations"]:
+            self.assertNotIn("evidence", observation)
+
+    def test_community_records_corroborate_across_the_bar(self):
+        """One local project plus one community record clears a 2-project bar."""
+        skill_root = self.tmp / "skill"
+        (skill_root / "community" / "observations").mkdir(parents=True)
+        (skill_root / "community" / "observations" / "contrib.json").write_text(
+            json.dumps({
+                "bundleVersion": "1",
+                "observations": [{
+                    "fingerprint": "shared-fp", "category": "gap",
+                    "scope": "references/security-governance.md",
+                    "observation": "batch authorized once", "proposedChange": "per-row authz",
+                    "projects": ["p_other"], "projectCount": 1,
+                }],
+            }), encoding="utf-8")
+
+        manifest = self.make_project("LocalProj", [
+            ("gap", "batch authorized once", "per-row authz")])
+        run("harvest", "--manifest", manifest, "--date", "2026-08-08", env=self.env)
+
+        alone = json.loads(run("promote", "--json", env=self.env)[1])
+        self.assertEqual(alone["candidates"], [], "one project alone must not clear the bar")
+
+        with_community = json.loads(run(
+            "promote", "--json", "--include-community", "--skill-root", skill_root,
+            env=self.env)[1])
+        self.assertTrue(with_community["candidates"],
+                        "community evidence should corroborate across the bar")
+        self.assertEqual(with_community["communityRecords"], 1)
+
+    def test_harvest_is_idempotent(self):
+        manifest = self.make_project("ProjectC", [("gap", "obs", "change")])
+        run("harvest", "--manifest", manifest, "--date", "2026-08-07", env=self.env)
+        code, out, _err = run("harvest", "--manifest", manifest, "--date", "2026-08-07", env=self.env)
+        self.assertEqual(code, 0)
+        self.assertIn("Harvested 0", out, "already-harvested feedback must not duplicate")
+
+
+# ---------------------------------------------------------------------------
+# honest tiering — the property the whole design rests on
+# ---------------------------------------------------------------------------
+
+
+class TestHonestTiering(TempProject):
+    """A truthful build must be able to pass, or teams will falsify the manifest."""
+
+    def build_honest_manifest(self):
+        (self.root / "tests").mkdir(exist_ok=True)
+        (self.root / "evidence").mkdir(exist_ok=True)
+        (self.root / "tests" / "user.spec.ts").write_text(
+            "test('user.list via /admin/users', async () => {\n"
+            "  expect((await listUsers({tenantId: 't-1'})).length).toBe(3);\n"
+            "});\n", encoding="utf-8")
+        for name in ("authentication", "authorization", "audit", "safety", "data",
+                     "experience", "observability"):
+            (self.root / "evidence" / (name + ".md")).write_text(
+                name + " review 2026-08-20\n"
+                "- 12 operations exercised, 12 enforced server-side\n"
+                "- 0 findings outstanding\n", encoding="utf-8")
+        for name in ("build", "typecheck", "lint", "tests", "browser", "security",
+                     "accessibility", "performance"):
+            (self.root / "evidence" / (name + ".log")).write_text(
+                name + " run\n  0 errors across 118 files\n", encoding="utf-8")
+
+        data = self.read()
+        data["platform"].update({
+            "summary": "Internal operations console.",
+            "operationalObjectives": ["Suspend abusive accounts without engineering"],
+            "tenancy": "single-tenant", "sourceSystems": ["PostgreSQL primary"],
+            "regulatedData": [],
+            "stack": {"frontend": "React 18", "backend": "Node 20", "database": "PostgreSQL 16",
+                      "auth": "OIDC", "jobs": "BullMQ", "hosting": "Fly.io",
+                      "designSystem": "in-house", "adminFramework": "none"},
+            "researchSources": [{"topic": "Express middleware",
+                                 "url": "https://expressjs.com/en/guide/using-middleware.html",
+                                 "appliedTo": ["user.list"], "checkedOn": "2026-08-07"}],
+            "volumes": {"entityCounts": "40k users", "peakConcurrentOperators": "6",
+                        "retentionHorizon": "7 years"},
+        })
+        data["roles"] = [{"id": "ops", "name": "Operations", "responsibilities": ["Admin"],
+                          "scopes": ["all accounts"], "mfaRequired": True,
+                          "separationOfDuties": []}]
+        data["entities"] = [{
+            "id": "user", "name": "User", "sourceOfTruth": "postgres:users",
+            "sensitivity": "confidential", "tenantScoped": False,
+            "lifecycleStates": ["active"], "lifecycleTransitions": [],
+            "retention": "7 years", "capabilities": [{
+                "id": "user.list", "outcome": "Find an account", "kind": "query",
+                "roles": ["ops"], "risk": "low", "status": "implemented", "rationale": "",
+                "entityStates": {"from": ["active"], "to": []},
+                "uiRoutes": ["/admin/users"], "serverOperations": ["UserRepository.findForAdmin"],
+                "authorizationPolicies": ["policy/user.admin"], "auditEvents": [],
+                "safeguards": [], "dataBinding": "postgres:users via UserRepository.findForAdmin",
+                "tests": ["tests/user.spec.ts"], "evidence": ["evidence/tests.log"],
+                "owner": "impl", "reviewStatus": "reviewed", "reviewedBy": "qa",
+            }],
+        }]
+        data["screens"] = [{
+            "id": "users", "route": "/admin/users", "purpose": "Search accounts",
+            "roles": ["ops"], "dataSources": ["postgres:users via UserRepository.findForAdmin"],
+            "capabilities": ["user.list"], "actions": [],
+            "states": ["loading", "populated", "error", "forbidden"],
+            "responsive": True, "accessibilityStatus": "implemented",
+            "status": "implemented", "rationale": "", "tests": ["tests/user.spec.ts"],
+        }]
+        for section, values in data["crossCutting"].items():
+            for key, value in list(values.items()):
+                if isinstance(value, bool):
+                    values[key] = True
+            if "evidence" in values:
+                values["evidence"] = ["evidence/" + section + ".md"]
+        data["crossCutting"]["authorization"]["policyTests"] = ["tests/user.spec.ts"]
+        for gate in data["qualityGates"]:
+            gate["status"] = "passed"
+            gate["evidence"] = ["evidence/" + gate["id"] + ".log"]
+            gate["threshold"] = "command exits zero"
+        self.write(data)
+
+    def test_truthful_build_passes_at_every_profile(self):
+        self.build_honest_manifest()
+        for profile in ("internal", "standard", "regulated"):
+            code, out, err = self.validate(profile=profile)
+            self.assertEqual(code, 0, "honest manifest must pass at " + profile + "\n" + out + err)
+
+    def test_mock_data_fails_at_every_profile(self):
+        self.build_honest_manifest()
+        data = self.read()
+        data["entities"][0]["capabilities"][0]["dataBinding"] = "mockUserRepository.findAll"
+        self.write(data)
+        for profile in ("internal", "standard", "regulated"):
+            code, _out, _err = self.validate(profile=profile)
+            self.assertEqual(code, 1, "mock data must fail at " + profile)
+
+    def test_coverage_does_not_block_on_warnings_alone(self):
+        self.build_honest_manifest()
+        code, _out, err = run("coverage", "--manifest", self.manifest,
+                              "--project-root", self.root, "--profile", "internal")
+        self.assertEqual(code, 0, err)
+
+
+if __name__ == "__main__":
+    unittest.main()

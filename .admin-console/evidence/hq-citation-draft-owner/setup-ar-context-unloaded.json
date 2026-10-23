@@ -1,0 +1,112 @@
+{
+  "classification": "Owner local browser regression using an isolated development workspace, not independent acceptance",
+  "startedAt": "2026-10-23T15:45:45.469Z",
+  "phase": "green",
+  "checks": [
+    {
+      "name": "After one added citation, a typed pending quote blocks Save, Enter and direct requestSubmit",
+      "status": "passed"
+    },
+    {
+      "name": "Explicit Clear drops only pending quote and preserves previously added citation and recommendation text",
+      "status": "passed"
+    },
+    {
+      "name": "Mismatched and overlong exact quotes retain draft, existing citations and pending-submit block",
+      "status": "passed"
+    },
+    {
+      "name": "Selected second occurrence remains bound to original CRLF and UTF-16 source offsets, version and hash on actual publish",
+      "status": "passed"
+    },
+    {
+      "name": "Thirteenth Add is refused without losing pending draft; removing one enables explicit retry",
+      "status": "passed"
+    },
+    {
+      "name": "Server stale-source refusal preserves authored text and citations; later pending draft still blocks every submit path",
+      "status": "passed"
+    }
+  ],
+  "commands": [
+    {
+      "type": "source.add",
+      "commandId": "34aace26-e1c6-4744-a30a-926d9ce8a088"
+    },
+    {
+      "type": "task.create",
+      "commandId": "889ccb9d-6046-4703-9acb-924739aa8530"
+    },
+    {
+      "type": "recommendation.publish",
+      "commandId": "3395ce8d-6fa9-45ea-bff2-79b7670ccf3b"
+    },
+    {
+      "type": "task.create",
+      "commandId": "c557a7db-3ec4-4611-a053-cfe3d0f39b5b"
+    },
+    {
+      "type": "task.create",
+      "commandId": "447f67ee-2f7e-480c-8234-cf6d695bddeb"
+    },
+    {
+      "type": "source.correct",
+      "commandId": "c990bd06-2ca3-4550-b7a9-20b5be037b31"
+    },
+    {
+      "type": "recommendation.publish",
+      "commandId": "3dab1efe-58cb-4a0b-9fd8-5c8d3d694377"
+    }
+  ],
+  "blockedExternal": [],
+  "blockedBusiness": [],
+  "devices": [],
+  "pageErrors": [],
+  "consoleErrors": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/3395ce8d-6fa9-45ea-bff2-79b7670ccf3b"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/3dab1efe-58cb-4a0b-9fd8-5c8d3d694377"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "url": "http://127.0.0.1:3113/api/hq/commands"
+    }
+  ],
+  "expectedHttp": [
+    {
+      "path": "/api/hq/commands/3395ce8d-6fa9-45ea-bff2-79b7670ccf3b",
+      "status": 404,
+      "method": "GET",
+      "code": "not_found"
+    },
+    {
+      "path": "/api/hq/commands/3dab1efe-58cb-4a0b-9fd8-5c8d3d694377",
+      "status": 404,
+      "method": "GET",
+      "code": "not_found"
+    },
+    {
+      "path": "/api/hq/commands",
+      "status": 400,
+      "method": "POST",
+      "code": "invalid_citation"
+    }
+  ],
+  "unexpectedHttp": [],
+  "azure": "deferred",
+  "status": "failed",
+  "failure": {
+    "message": "page.evaluate: TypeError: Failed to execute 'fetch' on 'Window': Failed to parse URL from /api/hq/session\n    at eval (eval at evaluate (:303:30), <anonymous>:1:31)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+    "stack": "page.evaluate: TypeError: Failed to execute 'fetch' on 'Window': Failed to parse URL from /api/hq/session\n    at eval (eval at evaluate (:303:30), <anonymous>:1:31)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at command (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-citation-draft-owner.mjs:20:67)\n    at task (C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-citation-draft-owner.mjs:35:52)\n    at C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\hq-citation-draft-owner.mjs:58:90"
+  },
+  "finishedAt": "2026-10-23T15:45:54.070Z",
+  "sourceHashes": {
+    "web_platform/src/components/hq/hq-overlays.tsx": "8a87b61d634f8cda0652a37724d915684b983b4eb69b15e1754652888b14d6f4",
+    "web_platform/src/lib/hq/copy.ts": "515530b6139b51c3edd10bdfed910355f581c7ec3505fb94b5204cc30f59c53d",
+    "web_platform/tests-browser/hq-citation-draft-owner.mjs": "5ead871c3e2a3c967a7a341957ae6508496cf1ea3c80e5716223355a8b5b4d52"
+  }
+}

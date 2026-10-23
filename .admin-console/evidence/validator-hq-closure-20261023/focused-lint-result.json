@@ -1,0 +1,1 @@
+{"command": ["npx.cmd", "eslint", "src/components/hq/hq-overlays.tsx", "src/lib/hq/copy.ts", "tests-browser/hq-citation-draft-owner.mjs", "tests-browser/hq-citation-draft-independent.mjs"], "exitCode": 0, "output": "focused-lint.txt"}

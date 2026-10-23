@@ -1,0 +1,29 @@
+{
+  "command": [
+    "C:\\Python314\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/adminwright/tests",
+    "-p",
+    "test_evidence_context_independent.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "timestamp_utc": "2026-10-23T15:50:25.927235+00:00",
+  "files": [
+    {
+      "path": "tools\\adminwright\\scripts\\admin_console_manifest.py",
+      "sha256_raw_bytes": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597"
+    },
+    {
+      "path": "tools\\adminwright\\scripts\\evidence_context.py",
+      "sha256_raw_bytes": "7082801832b9c476297f6fc0e82179696aa746702e031f22a3860aa229fecd6e"
+    },
+    {
+      "path": "tools\\adminwright\\tests\\test_evidence_context_independent.py",
+      "sha256_raw_bytes": "d8a4a58dae7620880bc3affeb970a7347ecd1d3d09794a525719b84160f82b1f"
+    }
+  ]
+}

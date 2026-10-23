@@ -1,0 +1,33 @@
+{
+  "captured_at_utc": "2026-10-23T15:50:58.375402+00:00",
+  "owner": "validator-repair-implementer",
+  "independent_review_claimed": false,
+  "status": "OWNER_GREEN_INDEPENDENT_ACCEPTANCE_PENDING",
+  "source_files_sha256_raw_bytes": {
+    "scripts/admin_console_manifest.py": "fdea989758f4db65ccee37687e6e5036e06caa181be2334d8bad6e96d1065597",
+    "scripts/evidence_context.py": "7082801832b9c476297f6fc0e82179696aa746702e031f22a3860aa229fecd6e",
+    "tests/test_manifest.py": "472045c15f0138762886950c406ef548aec0646b30691a11e5001fff170b05bf",
+    "tests/test_evidence_context.py": "0a94b007732d9ecf80a9bb3062c367fcd1ac4a368ca60075356af0e5c76b7e96"
+  },
+  "owner_cases": 21,
+  "owner_failures": 0,
+  "owner_skips": 0,
+  "upstream_original_cases": 73,
+  "upstream_tests_byte_identical": true,
+  "candidate_coverage_exit": 0,
+  "same_manifest_original_errors": 305,
+  "same_manifest_candidate_errors": 288,
+  "same_manifest_removed_findings": 17,
+  "same_manifest_added_findings": 0,
+  "gate_adopted": false,
+  "installed_script_sha256_raw_bytes": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316",
+  "holds": [
+    "Azure setup/audio deferred",
+    "production deployment and merge held",
+    "HQ business employee activation held",
+    "business permission grants held",
+    "external business writes held",
+    "financial transactions held",
+    "new paid services held"
+  ]
+}

@@ -1,5 +1,7 @@
 # Volabi HQ - approved local development
 
+Current item closure (23 October): [delivery report](../../docs/volabi-item-closure-20261023.md), [source-linked item ledger](ITEM_CLOSURE_20261023.json), and [next proposed Projects and Initiatives item](NEXT_HQ_ITEM_20261023.md). The approved local first loop works; the full management Headquarters remains under development. Validator and pending-citation repairs are independently accepted; full regulated release remains failed.
+
 Current vocal requirement: [Saudi male / Lebanese female direction](VOICE_ACCENT_REQUIREMENTS.json), approved by the CEO on2026-10-22. Existing English audition files remain unchanged and do not demonstrate those requested accents. Reports end with a next step and ready-to-send prompt.
 
 New proposal: [Bangla/Urdu/Hindi rollout and regional management-voice auditions](../../docs/primora-multilingual-and-voice-proposal.md). Scripts are prepared for all15; the local language pilot is now implemented and the capped Azure audition allowance is approved. Azure signup and actual Saudi/Lebanese synthesis are now deferred at the CEO request; the approved allowance is preserved. Native evaluation remains pending. Local development continues with the [task-specific readiness repair](../../docs/volabi-task-readiness-repair.md). See [current delivery status](../../docs/primora-local-multilingual-pilot-report.md) and [execution approval](voice-auditions/EXECUTION_APPROVAL_20261022.md). German and French remain later expansion proposals.

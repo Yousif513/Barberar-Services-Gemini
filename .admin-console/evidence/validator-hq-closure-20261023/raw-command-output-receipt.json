@@ -1,0 +1,31 @@
+{
+  "archive": "raw-command-outputs.zip",
+  "policy": "Exact original command bytes retained in zip. Readable text removes terminal trailing whitespace and excess final blank lines only; exits and evidence statements unchanged. Unified upstream patch keeps required context-prefix spaces.",
+  "files": [
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/build.txt",
+      "originalRawSHA256": "2c91c39a91fad2bd7abbeed70c46cd436c7f69941f07cec761f4769fbb50c10c",
+      "readableSHA256": "89484f36a9a7a0cb15b5b3c3f493bdbb628b7a9de55c7c5484f89c50a71af74b"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/lint.txt",
+      "originalRawSHA256": "0a0146390aecad703714802768ce7ded9cf3e4548b5cb0153b13e3262bb29055",
+      "readableSHA256": "2809670607324f3af8103619500089ca6ce902f4a3f6db55e24867339f0ca525"
+    },
+    {
+      "path": ".admin-console/evidence/validator-hq-closure-20261023/mobile.txt",
+      "originalRawSHA256": "5ba5f82d500ce735184b16d71fdd8685b8d51c91d3e1e17360c3e21bbaf8beb1",
+      "readableSHA256": "499f27fa9365399aa25fba1f1948513982a46787c996e292ea462f7aed90c559"
+    },
+    {
+      "path": "tools/adminwright/RED.txt",
+      "originalRawSHA256": "98f3620ea6f5c4fb03991c9cf5f65500797d396a79dbdfdc2a4cdf1e6a547501",
+      "readableSHA256": "11ab611f4c7eacabd919cd52b285bed040109f3f7679dee9ac077f39d2545005"
+    },
+    {
+      "path": "tools/adminwright/RED_RUNTIME_BINDINGS.txt",
+      "originalRawSHA256": "45274aa74640b8f9f81a257826f0e6c8bdcfe7ff1f0f17893ab5c6f86b32b38f",
+      "readableSHA256": "ab93daf6ccf4f746b69e1601c9655418671af0c4d9be43771e12728a8ab6c955"
+    }
+  ]
+}
