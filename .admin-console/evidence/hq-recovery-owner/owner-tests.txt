@@ -1,0 +1,13 @@
+✔ REC-01/02/04/07/08 complete coherent fixture backup excludes sessions and restores inert exact history (29192.7722ms)
+✔ REC-03 envelope rejects wrong secrets, altered metadata/tag and truncation before payload interpretation (251.512ms)
+✔ REC-03/05 no-clobber and authentication failure never publish a plaintext restore (19451.3324ms)
+✔ REC-03/05 fixture guard, unknown schema, broken history and source mutation are rejected (19454.6729ms)
+✔ REC-09 interrupted package publication cannot be consumed without its completed creation journal (18066.6241ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 86525.4699

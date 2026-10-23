@@ -1,0 +1,1 @@
+Exit 2. Refusing to write: change introduces validation errors. reviewer-identity: reviewStatus reviewed requires reviewedBy first. No manifest mutation occurred. Corrected by setting reviewer identity before reviewed status.

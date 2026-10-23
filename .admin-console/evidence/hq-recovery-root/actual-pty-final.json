@@ -1,0 +1,22 @@
+{
+  "operation": "actual Windows PTY final synthetic create",
+  "exit_code": 0,
+  "maskedPassphrase": true,
+  "passphraseEchoed": false,
+  "fixture": {
+    "fixtureRoot": "C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji",
+    "outputRoot": "C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji-pty-package",
+    "cancelRoot": "C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji-pty-cancel",
+    "finalRoot": "C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji-pty-final"
+  },
+  "transcript": "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m\u001b[HPassphrase (12–256 UTF-8 bytes, masked): / عبارة المرور:\u001b[1C\u001b]0;C:\\Users\\Yousif's PC\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\u0007\u001b[?25h********************************\r\nType SYNTHETIC ONLY to confirm fixture-only operation: / أكّد العملية التجريبية: SYNTHETIC ONLY\r\nSynthetic verification complete / اكتمل التحقق التجريبي\r\n{\"format\":\"volabi-recovery-receipt-1\",\"operationId\":\"3f3f76dd-eb99-4a7f-bca2-822607f5dc51\",\"operation\":\"create\",\"startedAt\":\"2026-10-23T18:00:39.174Z\",\"completedAt\":\"2026-10-23T18:00:47.573Z\",\"elapsedMs\":8398,\"operator\":\"S-1-5-21-3726424940-2349069440-3801112765-1001\",\"outcome\":\"completed\",\"cleanup\":\"complete\",\"inert\":true,\"authority\":\"historical-only\",\"sessionCount\":0,\"snapshotId\":\"af7c9d21-6d53-458b-a9f6-adad329f3a84\",\"capture\":{\"startedAt\":\"2026-10-23T18:00:40.614Z\",\"completedAt\":\"2026-10-23T18:00:40.634Z\",\"eventWatermark\":71,\"dependencyStartedAt\":\"2026-10-23T18:00:40.639Z\",\"dependencyCompletedAt\":\"2026-10-23T18:00:44.042Z\"},\"packagePath\":\"C:\\\\Users\\\\YOUSIF~1\\\\AppData\\\\Local\\\\Temp\\\\volabi-recovery-owner-0awHji-pty-final\\\\backup.vhq\",\"packageDigest\":\"6565fd2e06dfea6da6d0e679eb4a65403e07944c2fedc2779a5f42885628d275\",\"schemaFingerprint\":\"40affd3125dc7c0dcfe343e37e64f91cf156b77256cd00c9fabedeb511568916\",\"dataDigest\":\"6b19fa228f926396ede729fd3e1491de07ca0f01aeb9c3b0d094b6a9fe6459b3\",\"counts\":{\"workspaces\":2,\"sessions\":0,\"records\":38,\"record_versions\":72,\"commands\":32,\"events\":71},\"workspaceCount\":2,\"kindCounts\":{\"council-classification\":6,\"council-packet\":2,\"decision\":5,\"followup\":1,\"meeting\":1,\"milestone\":1,\"project\":1,\"project-closure\":2,\"recommendation\":5,\"recovery-fixture-proof\":2,\"source\":7,\"task\":5},\"dataIntegrity\":\"passed\",\"dependencies\":{\"status\":\"passed\",\"gaps\":[]},\"fullFidelity\":true,\"limitations\":[\"synthetic-fixtures-only\",\"historical-records-only\",\"passphrase-is-not-an-identity-signatu\r\n\u001b[23;80Hure\",\"source-prose-is-sensitive\",\"same-disk-is-not-disaster-recovery\"]}\r\n\u001b[?9001l\u001b[?1004l",
+  "oldFailureReceipt": ".admin-console/evidence/hq-recovery-root/actual-pty.json",
+  "cancelCode": "cancelled; no output target created",
+  "scope": "No real data or credentials; final successful path after sidecar repair.",
+  "finalArtifacts": [
+    "backup.vhq",
+    "journal.json",
+    "receipt.json"
+  ],
+  "receiptCleanup": "complete"
+}

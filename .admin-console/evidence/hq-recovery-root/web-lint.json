@@ -1,0 +1,11 @@
+{
+  "check": "web-lint",
+  "argv": [
+    "npm.cmd",
+    "run",
+    "lint",
+    "--workspace=web_platform"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 32.282
+}

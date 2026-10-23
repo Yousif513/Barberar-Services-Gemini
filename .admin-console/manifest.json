@@ -240,6 +240,22 @@
         "appliedTo": [
           "hq-local.council"
         ]
+      },
+      {
+        "topic": "Node24.15 SQLite online consistent snapshot, read-only/defensive connections and backup lifecycle",
+        "url": "https://nodejs.org/download/release/v24.15.0/docs/api/sqlite.html",
+        "checkedOn": "2026-10-23",
+        "appliedTo": [
+          "hq-local.recovery"
+        ]
+      },
+      {
+        "topic": "Node24.15 AES-GCM AAD/tag and bounded scrypt KDF platform cryptography",
+        "url": "https://nodejs.org/download/release/v24.15.0/docs/api/crypto.html",
+        "checkedOn": "2026-10-23",
+        "appliedTo": [
+          "hq-local.recovery"
+        ]
       }
     ],
     "volumes": {
@@ -7647,6 +7663,80 @@
           "owner": "",
           "reviewStatus": "reviewed",
           "reviewedBy": "qa-hq-council"
+        },
+        {
+          "id": "hq-local.recovery",
+          "outcome": "Create encrypted development-instance packages and independently verify isolated read-only recovery using synthetic fixtures",
+          "kind": "command",
+          "roles": [
+            "local-development-reviewer"
+          ],
+          "risk": "high",
+          "status": "implemented",
+          "rationale": "CEO approved HQ-NEXT-03. Local CLI only; all record kinds/workspaces/versions/receipts/audit preserved, sessions excluded; real data, live replacement and seat reclaim held. List/search/bulk/edit/delete/scheduling/browser export not required in this bounded CLI; package creation/inspection/new isolated restore and truthful redacted history required.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [
+            "scripts/hq-recovery/cli.mjs",
+            "scripts/hq-recovery/common.mjs",
+            "scripts/hq-recovery/dependencies.mjs",
+            "scripts/hq-recovery/envelope.mjs",
+            "scripts/hq-recovery/index.mjs",
+            "scripts/hq-recovery/paths.mjs",
+            "scripts/hq-recovery/schema.mjs",
+            "scripts/hq-recovery/worker.mjs",
+            "createBackup",
+            "inspectBackup",
+            "restoreBackup"
+          ],
+          "authorizationPolicies": [
+            "Synthetic fixture marker and matching full workspace proof inventory; no live roots or operational sessions",
+            "Local masked TTY plus SYNTHETIC ONLY confirmation; no credential arguments/environment; trusted ephemeral library Buffer only"
+          ],
+          "auditEvents": [
+            "recovery.create",
+            "recovery.inspect",
+            "recovery.restore",
+            "recovery.failure"
+          ],
+          "safeguards": [
+            "Synthetic-only source roots outside project; no application integration or session restoration",
+            "Owner-restricted storage and bounded authenticated encryption",
+            "No-clobber isolated targets, no network or business executors"
+          ],
+          "dataBinding": "sqlite:synthetic-development-instance -> encrypted local VHQREC01 package -> isolated inert SQLite; no live HQ or production binding",
+          "idempotency": "Existing output target refused; final encrypted file requires matching creation receipt/journal and no incomplete marker; no command replay",
+          "concurrency": "SQLite online backup coherent committed cut with bounded progress; exact rows and allocator retained; dependency capture separately bounded and stable-checked",
+          "recovery": "New isolated inert database only; trusted schema fresh rebuild, application_id guard and marker; owned known-file cleanup with truthful incomplete notice",
+          "tests": [
+            "web_platform/tests/hq-recovery-owner.test.mjs",
+            "web_platform/tests/hq-recovery-independent.test.mjs",
+            "web_platform/tests/hq-recovery-security.test.mjs"
+          ],
+          "evidence": [
+            "planning/volabi/APPROVAL_RECOVERY_20261023.md",
+            "planning/volabi/RECOVERY_SCOPE_20261023.md",
+            "docs/volabi-recovery-contract.md",
+            ".admin-console/worklog/impl-hq-recovery.md",
+            ".admin-console/evidence/hq-recovery-owner/owner-tests.txt",
+            ".admin-console/evidence/hq-recovery-owner/red-evidence.json",
+            ".admin-console/evidence/hq-recovery-owner/sidecar-regression-red.txt",
+            ".admin-console/evidence/hq-recovery-owner/owner-tests-after-sidecar-fix.txt",
+            ".admin-console/evidence/hq-recovery-independent/independent-review.json",
+            ".admin-console/evidence/hq-recovery-independent/qa-final.txt",
+            ".admin-console/evidence/hq-recovery-independent/rowid-continuity-result.json",
+            ".admin-console/evidence/hq-recovery-security/source-review.json",
+            ".admin-console/evidence/hq-recovery-root/web-test-partition.json",
+            ".admin-console/evidence/hq-recovery-root/actual-pty-final.json"
+          ],
+          "owner": "",
+          "reviewStatus": "reviewed",
+          "interfaceKind": "cli",
+          "cliEntrypoint": "scripts/hq-recovery/cli.mjs",
+          "reviewedBy": "qa-hq-recovery"
         }
       ]
     }
@@ -11354,6 +11444,33 @@
       ],
       "status": "confirmed",
       "appliesTo": []
+    },
+    {
+      "id": "ceo-hq-next-03-approved",
+      "decision": "Build CEO-approved HQ-NEXT-03 encrypted fixture-only backup and inert isolated restore-verification CLI; independent tests/review and development branch commit/push.",
+      "reason": "Explicit current CEO instruction. No real HQ backup/restore, live replacement or account reclamation; all business and production holds persist. Preserve scope as plan of record; freeze technical bounds then capture/encrypt/verify, owner tests, independent review, full checks and delivery.",
+      "evidence": [
+        "planning/volabi/APPROVAL_RECOVERY_20261023.md",
+        "planning/volabi/RECOVERY_SCOPE_20261023.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "hq-local.recovery"
+      ]
+    },
+    {
+      "id": "hq-recovery-explicit-cli-interface",
+      "decision": "Use independently accepted explicit CLI interface metadata for approved HQ-NEXT-03, with no invented web route/screen. Extend project-local validator and schema; leave installed global tool unchanged.",
+      "reason": "Verified plan/schema mismatch: all implemented capabilities previously required webuiRoutes despite CEO-approved CLI-only scope. Checked local entrypoint substitutes only web applicability, not security/evidence/review requirements. Eight owner and seven separate adversarial groups pass; baseline fullrelease failures retained.",
+      "evidence": [
+        ".admin-console/evidence/hq-recovery-security/cli-validator-review.json",
+        "tools/adminwright/CLI_INTERFACE_PATCH.diff",
+        "tools/adminwright/PROVENANCE.json"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "hq-local.recovery"
+      ]
     }
   ],
   "gaps": [
@@ -14782,10 +14899,40 @@
       "severity": "medium",
       "description": "HQ evidence-context scanner still rejects passing transcripts, truthful chronology/denial descriptions and computed detail-route evidence. Executable tests and independent runtime/source acceptance pass. Raw evidence and failed release gate preserved.",
       "status": "open",
-      "rationale": "Future separate independent tooling repair; includes previous zero-pending-test summary plus four Council context matches and one computed-route token linkage limitation. No test renaming, evidence obfuscation or release override.",
+      "rationale": "Future separate independent tooling repair. Prior Projects zero-pending summary, Council chronology/denial descriptions and computed-route limitation retained. HQ recovery independent gate sanity classifies fifteen additional evidence contexts: native cryptographic randomBytes/randomUUID and salt/nonce prose, no-mock-data regression filename, isolated fixture assertions and raw Node todo 0 summaries including preserved RED provenance. Actual exported/called operation names corrected one genuine metadata trace defect. Four unused source-path static registrations remain valid applicability warnings, with no exception credited. Raw files, tests and failed regulated release gate preserved; no obfuscation, renaming, scanner bypass or release waiver.",
       "evidence": [
         ".admin-console/evidence/hq-projects-independent/source-review.json",
-        ".admin-console/evidence/hq-council-independent/gate-sanity.json"
+        ".admin-console/evidence/hq-council-independent/gate-sanity.json",
+        ".admin-console/evidence/hq-recovery-security/gate-sanity.json"
+      ]
+    },
+    {
+      "id": "hq-recovery-interrupted-publication",
+      "severity": "high",
+      "description": "A package published before its completion receipt/journal can be accepted by readPackage without creation completion checks, contrary to the frozen usability contract.",
+      "status": "fixed",
+      "rationale": "Corrected completion binding independently verified after implementation handoff: final eleven security groups pass, exact source freeze unchanged. Missing journal, INCOMPLETE marker and altered package digest refuse package_not_complete; intact creator completion accepted. Full QA/regulated gate remain separately reported.",
+      "evidence": [
+        "scripts/hq-recovery/index.mjs",
+        "docs/volabi-recovery-contract.md",
+        ".admin-console/evidence/hq-recovery-security/publication-finding.json",
+        ".admin-console/evidence/hq-recovery-security/interrupted-publication-red.txt",
+        ".admin-console/evidence/hq-recovery-security/source-review.json",
+        ".admin-console/evidence/hq-recovery-security/independent-final.txt"
+      ]
+    },
+    {
+      "id": "hq-recovery-plaintext-sidecar-cleanup",
+      "severity": "high",
+      "description": "Successful snapshot validation can leave native snapshot WAL/SHM sidecars while reporting cleanup complete; scratch allowlist omits them.",
+      "status": "fixed",
+      "rationale": "Corrected finite known-sidecar inventory independently verified after reopened implementation claim release. Final eleven security groups pass with exact success backup/restore artifact sets and failed-ENOSPC artifact sets, no native WAL/SHM residue. Cleanup lock remains explicit cleanup-needed failure. Eleven source hashes unchanged; root QA/full gates separately pending.",
+      "evidence": [
+        "scripts/hq-recovery/index.mjs",
+        ".admin-console/evidence/hq-recovery-security/sqlite-readonly-sidecar-probe.mjs",
+        ".admin-console/evidence/hq-recovery-security/sqlite-readonly-sidecar-probe.txt",
+        ".admin-console/evidence/hq-recovery-security/source-review.json",
+        ".admin-console/evidence/hq-recovery-security/independent-post-sidecar.txt"
       ]
     }
   ],
@@ -15101,6 +15248,50 @@
       "approvedBy": "CEO HQ-NEXT-02 approval2026-10-23 and authorized routine technical choices",
       "evidence": [
         "planning/volabi/APPROVAL_COUNCIL_20261023.md"
+      ]
+    },
+    {
+      "id": "hq-recovery-protocol",
+      "path": "scripts/hq-recovery/common.mjs",
+      "value": "Fixed synthetic-only recovery format, finite technical limits, refusal vocabulary and inert application identifier",
+      "reason": "Technical protocol/UI constants for explicitly approved HQ-NEXT-03; no business records, invented activity, account authority or financial values. Synthetic fixture data stays exclusively in test helpers. Cryptographic entropy is generated at runtime, not declared as static business data.",
+      "approvedBy": "CEO HQ-NEXT-03 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_RECOVERY_20261023.md",
+        "docs/volabi-recovery-contract.md"
+      ]
+    },
+    {
+      "id": "hq-recovery-envelope",
+      "path": "scripts/hq-recovery/envelope.mjs",
+      "value": "Fixed AES-256-GCM/scrypt algorithm identifiers, versioned envelope fields and bounded KDF parameters",
+      "reason": "Technical protocol/UI constants for explicitly approved HQ-NEXT-03; no business records, invented activity, account authority or financial values. Synthetic fixture data stays exclusively in test helpers. Cryptographic entropy is generated at runtime, not declared as static business data.",
+      "approvedBy": "CEO HQ-NEXT-03 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_RECOVERY_20261023.md",
+        "docs/volabi-recovery-contract.md"
+      ]
+    },
+    {
+      "id": "hq-recovery-schema",
+      "path": "scripts/hq-recovery/schema.mjs",
+      "value": "Trusted application-compatible SQLite DDL allowlist and known structural relationship field names",
+      "reason": "Technical protocol/UI constants for explicitly approved HQ-NEXT-03; no business records, invented activity, account authority or financial values. Synthetic fixture data stays exclusively in test helpers. Cryptographic entropy is generated at runtime, not declared as static business data.",
+      "approvedBy": "CEO HQ-NEXT-03 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_RECOVERY_20261023.md",
+        "docs/volabi-recovery-contract.md"
+      ]
+    },
+    {
+      "id": "hq-recovery-cli-vocabulary",
+      "path": "scripts/hq-recovery/cli.mjs",
+      "value": "Fixed development-only operation names, confirmation text and bilingual CLI diagnostic vocabulary",
+      "reason": "Technical protocol/UI constants for explicitly approved HQ-NEXT-03; no business records, invented activity, account authority or financial values. Synthetic fixture data stays exclusively in test helpers. Cryptographic entropy is generated at runtime, not declared as static business data.",
+      "approvedBy": "CEO HQ-NEXT-03 approval2026-10-23 and authorized routine technical choices",
+      "evidence": [
+        "planning/volabi/APPROVAL_RECOVERY_20261023.md",
+        "docs/volabi-recovery-contract.md"
       ]
     }
   ],
@@ -16347,6 +16538,39 @@
       ],
       "status": "promoted",
       "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-recovery-native-artifact-inventory",
+      "observation": "A supported readonly SQLite snapshot probe on actual Windows produced WAL/SHM sidecars. Logical table equality and connection.close did not prove plaintext cleanup. Independent exact final artifact inventories exposed a false cleanup-complete receipt; finite owned lifecycle cleanup repaired it.",
+      "category": "new-pattern",
+      "proposedChange": "Verify physical artifact inventories on supported runtime and failure/interruption boundaries, in addition to logical recovery equality.",
+      "evidence": [
+        ".admin-console/evidence/hq-recovery-security/source-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-cli-interface-applicability",
+      "observation": "An approved CLI-only capability could not be represented honestly by a validator requiring web routes/screens for every implemented capability. Explicit CLI metadata now checks a bounded project-local entrypoint and no web binding while retaining role/audit/test/review gates. Both add/set before-after validations require actual project-root context.",
+      "category": "new-pattern",
+      "proposedChange": "Model approved interface types explicitly, including incremental write paths; never invent a screen or weaken evidence/security gates to fit a web-only model.",
+      "evidence": [
+        ".admin-console/evidence/hq-recovery-security/cli-validator-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-hq-negative-test-baseline-reason",
+      "observation": "Windows custody failure initially caused generic negative assertions to pass before intended parser/security boundaries. Independent suites now require a healthy same-fixture baseline and exact refusal code, with proof of real concurrent writer overlap rather than a fast completed writer.",
+      "category": "new-pattern",
+      "proposedChange": "Pair denial tests with verified positive setup and intended refusal reasons; demonstrate concurrent overlap using observed capture boundaries.",
+      "evidence": [
+        ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
     }
   ],
   "agents": [
@@ -16981,6 +17205,60 @@
       "status": "done",
       "notes": "DEVELOPMENT-ONLY final learning pass; no capability implementation/review or business authority.",
       "worklog": ".admin-console/worklog/harvest-hq-council.md"
+    },
+    {
+      "id": "hq-recovery-architect",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY architect; no business permission or activation.",
+      "worklog": ".admin-console/worklog/hq-recovery-architect.md"
+    },
+    {
+      "id": "impl-hq-recovery",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY HQ-NEXT-03 fixture-only CLI; no management activation or authority.",
+      "worklog": ".admin-console/worklog/impl-hq-recovery.md"
+    },
+    {
+      "id": "sec-hq-recovery",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent HQ-NEXT-03 recovery security review; no business authority.",
+      "worklog": ".admin-console/worklog/sec-hq-recovery.md"
+    },
+    {
+      "id": "qa-hq-recovery",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent synthetic HQ-NEXT-03 recovery QA; no implementation or business authority.",
+      "worklog": ".admin-console/worklog/qa-hq-recovery.md"
+    },
+    {
+      "id": "impl-hq-cli-manifest",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY project-local validator/schema support; independent security review accepted. No recovery implementation self-review or business authority.",
+      "worklog": ".admin-console/worklog/impl-hq-cli-manifest.md"
+    },
+    {
+      "id": "harvest-hq-recovery",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY final learning pass; no business activation or global guidance change.",
+      "worklog": ".admin-console/worklog/harvest-hq-recovery.md"
     }
   ]
 }

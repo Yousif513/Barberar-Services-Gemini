@@ -1,0 +1,59 @@
+{
+  "reviewer": "sec-hq-recovery",
+  "independent": true,
+  "implementationOwner": "impl-hq-recovery",
+  "scope": "development-only synthetic fixture recovery tooling",
+  "securityDisposition": "passed",
+  "sourceFreezeUnchanged": true,
+  "sourceMismatches": [],
+  "tests": {
+    "command": "node --test web_platform/tests/hq-recovery-security.test.mjs",
+    "exitCode": 0,
+    "tests": 11,
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "rawEvidence": ".admin-console/evidence/hq-recovery-security/independent-post-sidecar.txt",
+    "elapsedSeconds": 115.564
+  },
+  "verified": [
+    "fixed canonical AES256GCM+scrypt envelope bounds, fresh salt/nonce and UTF8 secret rules",
+    "authentication before payload parsing and physical session/canary exclusion",
+    "actual Windows junction/hardlink rejection and denied-parent ACL behavior",
+    "inert read-only restore and moved-database store refusal",
+    "partial-write ENOSPC truthful failure and blocked-cleanup attention state",
+    "completion journal/receipt package links and no-clobber custody",
+    "server-free sessionless historical-only architecture; no external or financial executor",
+    "all known snapshot/sanitized/restore main,journal,WAL,SHM removed after connections close and before successful publication; failure/interruption finite checked cleanup covers same inventory"
+  ],
+  "limitations": [
+    "Not a real-data recovery or seat-reclaim approval",
+    "Not a global regulated-console gate clearance",
+    "Safe ENOSPC injection is not an actual disk-fill experiment",
+    "Whole-history provenance requires previously trusted independent digests; not a creator signature",
+    "Same OS owner/administrator outside local custody guarantee",
+    "Full rich-record/WAL/semantic acceptance is independently owned by QA",
+    "Root independently owns final real interactive PTY/masking/cancellation/watchdog evidence and global QA gates; this receipt clears no global gate"
+  ],
+  "holds": [
+    "management identities inactive",
+    "Azure/audio deferred",
+    "production merge/deploy held",
+    "business grants/activation held",
+    "external business writes/financial/new paid services held"
+  ],
+  "sourceFreezeEvidence": ".admin-console/evidence/hq-recovery-security/final-source-freeze-post-sidecar.json",
+  "supersedes": "source-review-before-sidecar-finding.json and initial contested sidecar disposition",
+  "correctedFindings": [
+    {
+      "id": "hq-recovery-interrupted-publication",
+      "severity": "high",
+      "independentRegression": "passed missing journal / INCOMPLETE / altered package digest refuse package_not_complete; intact creator completion accepted"
+    },
+    {
+      "id": "hq-recovery-plaintext-sidecar-cleanup",
+      "severity": "high",
+      "independentRegression": "passed exact backup artifacts backup.vhq/journal.json/receipt.json; exact restore INERT-RESTORE.json/hq.sqlite/journal.json/receipt.json; partial-write failure only INCOMPLETE.json/failure-journal.json; no raw native WAL/SHM residue; blocked cleanup remains explicitly failed/attention"
+    }
+  ]
+}

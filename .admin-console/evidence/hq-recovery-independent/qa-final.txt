@@ -1,0 +1,33 @@
+✔ independent recovery REC01/02/08: whole-instance exact historical bytes survive rich WAL capture and remain inert (21120.5952ms)
+✔ independent recovery REC01: open multi-record transaction is excluded without checkpointing or source mutation (20874.812ms)
+✔ independent recovery REC02/09: non-contiguous audit sequence and reserved high-water mark survive exactly (20759.4579ms)
+✔ independent recovery REC06: installed-skill pins remain unresolved metadata and never imply complete dependencies (19010.9539ms)
+✔ independent recovery REC03: malformed fixture refuses orphan-task-source (17612.1311ms)
+✔ independent recovery REC03: malformed fixture refuses cross-workspace-task-source (17824.7675ms)
+✔ independent recovery REC03: malformed fixture refuses missing-current-history (17727.7914ms)
+✔ independent recovery REC03: malformed fixture refuses missing-intermediate-history (17453.1209ms)
+✔ independent recovery REC03: malformed fixture refuses historical-citation-mismatch (17718.463ms)
+✔ independent recovery REC03: malformed fixture refuses wrong-source-hash (18183.1695ms)
+✔ independent recovery REC03: malformed fixture refuses wrong-citation (17549.9892ms)
+✔ independent recovery REC03: malformed fixture refuses bad-command-receipt (17310.6076ms)
+✔ independent recovery REC03: malformed fixture refuses bad-watermark (17122.5306ms)
+✔ independent recovery REC03: malformed fixture refuses foreign-schema-table (17255.4524ms)
+✔ independent recovery REC03: malformed fixture refuses changed-immutability-trigger (17583.9206ms)
+✔ independent recovery REC03/04: package authentication failure wrong-password publishes no database (17053.8079ms)
+✔ independent recovery REC03/04: package authentication failure header publishes no database (12334.6416ms)
+✔ independent recovery REC03/04: package authentication failure ciphertext publishes no database (17194.5696ms)
+✔ independent recovery REC03/04: package authentication failure tag publishes no database (16929.3774ms)
+✔ independent recovery REC03/04: package authentication failure truncated publishes no database (12051.3841ms)
+✔ independent recovery REC05: output aliases, existing targets, fixture-internal output and hard links refuse (26201.3441ms)
+✔ independent recovery REC07: fixture markers cannot select an unmarked or incomplete workspace inventory (23659.4333ms)
+✔ independent recovery CLI REC04/07: piped input and secret arguments are refused without printing supplied material (244.3715ms)
+✔ independent recovery REC01: competing supported commands are captured atomically across all durable tables (40670.3983ms)
+✔ independent recovery REC07/09: disposable derivative proves immutable history uniqueness and allocator continuity (20705.1136ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 462237.5908

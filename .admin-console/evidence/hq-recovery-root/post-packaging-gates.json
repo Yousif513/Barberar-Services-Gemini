@@ -1,0 +1,60 @@
+{
+  "manifest_sha256_raw": "f21432e75aec46e6a883de2b07e92b669b6c03e379cb85be632f03fa057a6245",
+  "security_source_pins": 11,
+  "portable_receipt_current_readme": "matched",
+  "preparation_note": "Metadata checker assumptions corrected: package-relative README, explicit JSON output, integer error/warning counts. Initial checker exceptions changed no runtime or tests. Gates below are fresh actual subprocess exits.",
+  "results": {
+    "plan": {
+      "exit_code": 0,
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\tools\\adminwright\\scripts\\admin_console_manifest.py",
+        "validate",
+        "--manifest",
+        "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\manifest.json",
+        "--project-root",
+        "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini",
+        "--phase",
+        "plan",
+        "--json"
+      ],
+      "errors": 0,
+      "warnings": 35
+    },
+    "release": {
+      "exit_code": 1,
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\tools\\adminwright\\scripts\\admin_console_manifest.py",
+        "validate",
+        "--manifest",
+        "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\manifest.json",
+        "--project-root",
+        "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini",
+        "--phase",
+        "release",
+        "--json"
+      ],
+      "errors": 318,
+      "warnings": 35
+    },
+    "coverage": {
+      "exit_code": 0,
+      "command": [
+        "C:\\Python314\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\tools\\adminwright\\scripts\\admin_console_manifest.py",
+        "coverage",
+        "--manifest",
+        "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\manifest.json",
+        "--project-root",
+        "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini"
+      ]
+    }
+  }
+}

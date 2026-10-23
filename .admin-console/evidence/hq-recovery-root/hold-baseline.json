@@ -1,0 +1,25 @@
+{
+  "baseline_commit": "bf8c233db333e3b09d033ea2fc013e911cb549ff",
+  "canonical_management_identities": 15,
+  "all_management_identities_inactive": true,
+  "unchanged_hold_files": [
+    {
+      "path": "planning/volabi/persona-and-skills/PERSONA_REGISTRY.json",
+      "sha256_utf8_lf": "7bdd8e081a2527f989aedfc668317ead714cdb298c63d6055e201d50f642caf3"
+    },
+    {
+      "path": "planning/volabi/VOICE_ACCENT_REQUIREMENTS.json",
+      "sha256_utf8_lf": "d54fb490edcf0adcd4a7d0165e0c99e2cc3f42a24560c3890d97f0a2555f805b"
+    },
+    {
+      "path": "planning/volabi/voice-auditions/EXECUTION_APPROVAL_20261022.md",
+      "sha256_utf8_lf": "69c0057d215ca513c08539739598ecd4c53a51c083342fe4b0e4fd4c460b4b1d"
+    },
+    {
+      "path": "planning/volabi/RECOVERY_SCOPE_20261023.md",
+      "sha256_utf8_lf": "1713e226613d257ce45bc27fcf4647642c287875aba2ca15daec99f1c895b2e2"
+    }
+  ],
+  "live_database_read": false,
+  "no_runtime_metadata_inferred_from_this_receipt": true
+}

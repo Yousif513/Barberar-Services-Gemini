@@ -1,0 +1,39 @@
+{
+  "profile": "regulated",
+  "results": {
+    "manifest-plan": {
+      "check": "manifest-plan",
+      "exit_code": 0,
+      "manifest_sha256_raw": "f21432e75aec46e6a883de2b07e92b669b6c03e379cb85be632f03fa057a6245",
+      "manifest_unchanged": true,
+      "errors": 0,
+      "warnings": 35
+    },
+    "manifest-release": {
+      "check": "manifest-release",
+      "exit_code": 1,
+      "manifest_sha256_raw": "f21432e75aec46e6a883de2b07e92b669b6c03e379cb85be632f03fa057a6245",
+      "manifest_unchanged": true,
+      "errors": 318,
+      "warnings": 35
+    },
+    "manifest-coverage": {
+      "check": "manifest-coverage",
+      "exit_code": 0,
+      "manifest_sha256_raw": "f21432e75aec46e6a883de2b07e92b669b6c03e379cb85be632f03fa057a6245",
+      "manifest_unchanged": true
+    },
+    "installed-release-comparison": {
+      "check": "installed-release-comparison",
+      "exit_code": 1,
+      "manifest_sha256_raw": "f21432e75aec46e6a883de2b07e92b669b6c03e379cb85be632f03fa057a6245",
+      "manifest_unchanged": true,
+      "errors": 361,
+      "warnings": 35
+    }
+  },
+  "module_acceptance": "independently accepted bounded synthetic development tooling",
+  "production_release": "failed and approval-held",
+  "waiver": false,
+  "context_review": ".admin-console/evidence/hq-recovery-security/gate-sanity.json"
+}

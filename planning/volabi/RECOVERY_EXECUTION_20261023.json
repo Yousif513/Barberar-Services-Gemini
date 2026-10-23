@@ -1,0 +1,123 @@
+{
+  "item": "HQ-NEXT-03",
+  "status": "verified-development-synthetic-only",
+  "approval": "planning/volabi/APPROVAL_RECOVERY_20261023.md",
+  "plan_of_record": "planning/volabi/RECOVERY_SCOPE_20261023.md",
+  "approved_scope_sha256_utf8_lf": "1713e226613d257ce45bc27fcf4647642c287875aba2ca15daec99f1c895b2e2",
+  "initial_frozen_technical_contract": "docs/volabi-recovery-contract.md",
+  "initial_frozen_contract_sha256_utf8_lf": "680384b7e1ce49d18544928a47cad8de487d261156bad87482538d4231baac5c",
+  "scope_changes": "Only routine reversible technical choices under approved scope; independent findings may tighten contract without widening authority.",
+  "surface_changes": {
+    "routes": 0,
+    "overlays": 0,
+    "reason": "Approved development-only CLI; no HQ recovery screen proposed or rendered."
+  },
+  "operations": [
+    "create encrypted synthetic whole-instance backup",
+    "authenticate and inspect package",
+    "new isolated inert read-only restore verification"
+  ],
+  "record_coverage": [
+    "task",
+    "source",
+    "recommendation",
+    "decision",
+    "followup",
+    "project",
+    "milestone",
+    "project-closure",
+    "meeting",
+    "council-packet",
+    "council-classification",
+    "all permitted opaque kinds",
+    "all workspaces, exact versions, receipts and audit sequence"
+  ],
+  "excluded": [
+    "all sessions and operational secrets",
+    "real HQ source data",
+    "live replacement, merging and account-seat reclamation",
+    "network, media, business executor and production operations"
+  ],
+  "acceptance_rows": [
+    {
+      "id": "REC-01",
+      "status": "passed",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    },
+    {
+      "id": "REC-02",
+      "status": "passed",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    },
+    {
+      "id": "REC-03",
+      "status": "passed",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    },
+    {
+      "id": "REC-04",
+      "status": "passed-local-synthetic",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    },
+    {
+      "id": "REC-05",
+      "status": "passed-QA-with-separate-security-evidence",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    },
+    {
+      "id": "REC-06",
+      "status": "passed-honest-limitations",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    },
+    {
+      "id": "REC-07",
+      "status": "passed-local-synthetic",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    },
+    {
+      "id": "REC-08",
+      "status": "passed",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    },
+    {
+      "id": "REC-09",
+      "status": "passed",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    },
+    {
+      "id": "REC-10",
+      "status": "passed-bounded-local-development",
+      "independent_evidence": ".admin-console/evidence/hq-recovery-independent/independent-review.json"
+    }
+  ],
+  "full_headquarters_status": "under-development",
+  "holds_unchanged": true,
+  "final_technical_contract_sha256_utf8_lf": "fb64a368eb646e32b366fea89dcefb89f46077cd57ac8582a08f2a8162e87e20",
+  "reviewer": "qa-hq-recovery",
+  "implementation_owner": "impl-hq-recovery",
+  "delivery_report": "docs/volabi-recovery-delivery.md",
+  "source_pins": {
+    "scripts/hq-recovery/cli.mjs": "bfcf613fe47164f54dfb67f01ef00231183795785b4ccac03c4cf9f8ab7ab1db",
+    "scripts/hq-recovery/common.mjs": "8ada9b0b70992311b3205442efc31f2cfe70f82ed42dc1c638290932b48f0891",
+    "scripts/hq-recovery/dependencies.mjs": "2fd43784d5f82af83944ab79e7cb1d66fa3a09e706fd2da6287eac3b3348203d",
+    "scripts/hq-recovery/envelope.mjs": "d1f7b2b0e767e64ab99a772baa8ce099549204064ec790bd7ba787ed9155806c",
+    "scripts/hq-recovery/index.mjs": "080bd14815971cdf7d31897d8226dbccf19eaa57e631c5dd2f080f62aa0f9085",
+    "scripts/hq-recovery/paths.mjs": "900b995be6ef47426dc8adfa1d4072d2f7604c14d4b72126928ca2c44000ecb1",
+    "scripts/hq-recovery/schema.mjs": "e764bc3146637eae4291bc5696ad05675bb67c2461b1c1d42d1a718b0d47ecd7",
+    "scripts/hq-recovery/worker.mjs": "73e3a031c6e4ccd0949c5a2aa4a23c9cdf1cd339283cc0331267caee7eca1e1b",
+    "web_platform/src/lib/hq/server/local-store.mjs": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687",
+    "web_platform/tests/hq-recovery-independent.test.mjs": "ac05b87828a25c6a4f52cca2999646737c1a9dad24097a69ba474947d6b2bd7b",
+    "web_platform/tests/hq-recovery-independent-fixture.mjs": "42682032be30bdb71de1106a3d754d1f9ffe701771dccc31316616d2ec4fc1f3"
+  },
+  "test_results": {
+    "owner": 6,
+    "independent_qa": 25,
+    "independent_security": 11,
+    "existing_web": 1078,
+    "web_union": 1120,
+    "python": 136,
+    "failed": 0,
+    "skipped": 0
+  },
+  "global_release_status": "failed; no waiver"
+}

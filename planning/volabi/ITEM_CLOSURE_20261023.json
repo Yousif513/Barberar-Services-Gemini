@@ -10,24 +10,25 @@
     "Decisions and approval detail",
     "Knowledge and evidence",
     "Projects and Initiatives",
-    "Executive Council preparation and meeting records"
+    "Executive Council preparation and meeting records",
+    "Development-only encrypted backup and inert restore verification (CLI; synthetic fixtures only)"
   ],
   "scopeFamilies": 8,
   "routePatterns": 13,
   "sharedOverlays": 25,
   "currentAuthorizedClosures": [
-    "HQ-NEXT-02"
+    "HQ-NEXT-03"
   ],
   "items": [
     {
       "id": "TOOL-01",
       "title": "Evidence validator fixture and negative-assertion handling",
       "status": "verified-local",
-      "boundary": "Project-local validator accepted after separate security review and adopted in repository commands. Global copy unchanged. All119upstream/owner/independent tests pass; full regulated release still fails.",
+      "boundary": "Project-local evidence/CLI-interface validator independently accepted. All136upstream/owner/independent cases pass; installed copy unchanged and full regulated release failed.",
       "evidence": [
         {
           "path": "tools/adminwright/PROVENANCE.json",
-          "sha256_utf8_lf": "a521ab77fd797e16e80a5a51dbd6c4b4ebfb86a3837cb2daa41fcae8a8fda5e6"
+          "sha256_utf8_lf": "c8224ba7afbcef18f2e0d7fe36553e83893a6e37fc7b9ef9cdee5f97bbd35bff"
         },
         {
           "path": ".admin-console/evidence/validator-repair-20261023/independent-review.json",
@@ -67,7 +68,7 @@
       "evidence": [
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf"
+          "sha256_utf8_lf": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687"
         },
         {
           "path": ".admin-console/evidence/volabi-local/server-independent-review.json",
@@ -111,7 +112,7 @@
       "evidence": [
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf"
+          "sha256_utf8_lf": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687"
         },
         {
           "path": "web_platform/tests/hq-independent-review.test.mjs",
@@ -147,7 +148,7 @@
         },
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf"
+          "sha256_utf8_lf": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687"
         },
         {
           "path": ".admin-console/evidence/volabi-first-loop/independent-frontend.json",
@@ -199,7 +200,7 @@
         },
         {
           "path": "web_platform/src/lib/hq/server/local-store.mjs",
-          "sha256_utf8_lf": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf"
+          "sha256_utf8_lf": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687"
         }
       ]
     },
@@ -207,7 +208,7 @@
       "id": "HQ-10",
       "title": "Production identity, multi-user access, backup/recovery and retention",
       "status": "open-later-prerequisite",
-      "boundary": "Local development seat is not production identity/backup/retention architecture. Concrete requirements and independent acceptance still needed before production.",
+      "boundary": "Fixture-only encrypted backup and inert restore independently verified under HQ-NEXT-03. Secure founder continuity, missing-live-database detection, production identity/access, live restoration and retention remain open.",
       "evidence": [
         {
           "path": "docs/volabi-local-operations.md",
@@ -302,25 +303,53 @@
           "sha256_utf8_lf": "9df9f7f441d6b12ac53f0c75865b70832b196b8c9c25a5827d8144cde31ed0fd"
         }
       ]
+    },
+    {
+      "id": "HQ-NEXT-03",
+      "title": "Encrypted synthetic backup and inert recovery verification",
+      "status": "verified-development-synthetic-only",
+      "boundary": "Three development CLI operations; no new routes/overlays, real HQ backup, live replacement, seat reclaim or business activation. Complete history/domain fidelity independently accepted; all holds retained.",
+      "evidence": [
+        {
+          "path": "docs/volabi-recovery-delivery.md",
+          "sha256_utf8_lf": "28b5cbb43a7a93eef10bf3dfbdbb590bee615df4eefe976470fb83af393be3fd"
+        },
+        {
+          "path": "scripts/hq-recovery/index.mjs",
+          "sha256_utf8_lf": "080bd14815971cdf7d31897d8226dbccf19eaa57e631c5dd2f080f62aa0f9085"
+        },
+        {
+          "path": ".admin-console/evidence/hq-recovery-independent/independent-review.json",
+          "sha256_utf8_lf": "9f30a6f20421cc175fbb474140d9169992882a9820b41803197436f7edc1846c"
+        },
+        {
+          "path": ".admin-console/evidence/hq-recovery-security/source-review.json",
+          "sha256_utf8_lf": "9b5ebd102731d405a0a71123c2b8688c533a5ca0f0b33d7746dad71589efc9d4"
+        },
+        {
+          "path": ".admin-console/evidence/hq-recovery-security/cli-validator-review.json",
+          "sha256_utf8_lf": "8142b49056e4d59a1f8611858456a3756a5554691d66d82dd98e03bc8195c649"
+        }
+      ]
     }
   ],
   "nextProposedItem": {
-    "id": "HQ-NEXT-02",
-    "title": "Local Council preparation and meeting records",
-    "status": "verified-local",
-    "packet": "planning/volabi/COUNCIL_SCOPE_20261023.md",
-    "packet_sha256_utf8_lf": "1455f27e46712305d6e059be510d8699c7ce2e37a6b46e7eefe7ee558b47819e",
-    "approval": "planning/volabi/APPROVAL_COUNCIL_20261023.md",
-    "scope": "Two routes/six editors; local records only, no live AI attendance or business execution."
+    "id": "HQ-NEXT-03",
+    "title": "Encrypted synthetic backup and inert recovery verification",
+    "status": "verified-development-synthetic-only",
+    "packet": "planning/volabi/RECOVERY_SCOPE_20261023.md",
+    "packet_sha256_utf8_lf": "1713e226613d257ce45bc27fcf4647642c287875aba2ca15daec99f1c895b2e2",
+    "approval": "planning/volabi/APPROVAL_RECOVERY_20261023.md",
+    "scope": "Three CLI operations, zero routes/overlays. Next founder-seat continuity scope remains to prepare."
   },
   "releaseGate": {
     "profile": "regulated",
     "planExitCode": 0,
     "coverageExitCode": 0,
     "localReleaseExitCode": 1,
-    "localErrors": 303,
-    "warnings": 31,
-    "evidence": ".admin-console/evidence/hq-council/manifest-release.json",
-    "note": "Prior298 plus4Council evidence-context findings and1computed-route matching limitation; independently classified, retained."
+    "localErrors": 318,
+    "warnings": 35,
+    "evidence": ".admin-console/evidence/hq-recovery-root/manifest-release.json",
+    "note": "Prior303 plus15 independently verified scanner-context findings retained; four new static applicability warnings. Exact final source/gate evidence separate; no waiver."
   }
 }

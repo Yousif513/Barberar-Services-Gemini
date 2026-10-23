@@ -1,0 +1,9 @@
+{
+  "command": [
+    "node",
+    ".admin-console\\evidence\\hq-recovery-independent\\rowid-continuity-probe.mjs"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 21.053638219833374,
+  "checks": "hidden rowid+exact data and actual read-only Council source selector for permitted/revoked/latest/private/restricted/unknown/stale derived data"
+}

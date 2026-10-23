@@ -1,0 +1,8 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "web_platform/tests/hq-recovery-independent.test.mjs"
+  ],
+  "exitCode": 0
+}

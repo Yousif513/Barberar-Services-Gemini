@@ -1,0 +1,17 @@
+{
+  "reviewer": "sec-hq-recovery",
+  "kind": "static-source-control-flow",
+  "finding": "hq-recovery-interrupted-publication",
+  "status": "open-until-independent-regression",
+  "source": "scripts\\hq-recovery\\index.mjs",
+  "sha256Canonical": "3ba550d1902d5e2d0afbfbe21e0fc2de627c9433772996443c1c700d4f03120b",
+  "observations": [
+    "createBackup publishes backup.vhq before operation completion receipt/journal",
+    "readPackage currently validates ciphertext/payload without checking sibling completion records"
+  ],
+  "dynamicAttempt": {
+    "evidence": "interrupted-publication-red.txt",
+    "result": "blocked by valid-capture stage_timeout before publication; not a dynamic reproduction"
+  },
+  "acceptance": "contested; no waiver"
+}

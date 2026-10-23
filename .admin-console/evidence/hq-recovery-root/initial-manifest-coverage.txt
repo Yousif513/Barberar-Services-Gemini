@@ -1,0 +1,5 @@
+# Structural coverage audit
+
+Profile: regulated (manifest)
+
+No unresolved structural gaps.

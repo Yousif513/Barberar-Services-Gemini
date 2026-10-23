@@ -1,0 +1,19 @@
+✔ security: independent two-workspace capture strips physical auth and restored moved DB remains inert (21534.8226ms)
+✔ security: hostile fixed KDF configuration and unknown envelope members refuse before expensive work (4457.2331ms)
+✔ security: authentication failure precedes payload interpretation and never publishes plaintext (12630.1308ms)
+✔ security: tampered ciphertext and truncated envelope refuse (7473.843ms)
+✔ security: actual Windows junction and hard-linked package aliases refuse (613.2486ms)
+✔ security: oversized sparse package, existing output and secret argv are refused (2297.432ms)
+✔ security: incomplete publication and altered creator completion links cannot become usable (34346.3661ms)
+✔ security: injected storage exhaustion after actual partial package write is truthful and unusable (12171.3446ms)
+✔ security: actual Windows denied parent write refuses without touching the retained package (15500.7333ms)
+✔ security: blocked plaintext cleanup remains explicit attention required with no usable package (12170.85ms)
+✔ security: encryption uses fresh salt and nonce while rejecting invalid UTF-8 passphrases (262.7662ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 123559.1962

@@ -1,0 +1,5 @@
+{
+  "command": "node --test web_platform/tests/hq-recovery-security.test.mjs",
+  "exitCode": 0,
+  "elapsedSeconds": 123.617
+}

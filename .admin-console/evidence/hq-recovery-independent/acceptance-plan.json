@@ -1,0 +1,16 @@
+{
+  "scope": "HQ-NEXT-03 independently generated synthetic instances only",
+  "status": "prepared; not an implementation acceptance",
+  "fixture": "web_platform/tests/hq-recovery-independent-fixture.mjs",
+  "tests": "web_platform/tests/hq-recovery-independent.test.mjs",
+  "REC-01": ["committed WAL preservation", "open transaction excluded", "competing supported atomic commands"],
+  "REC-02": ["two workspaces", "all 11 product record kinds and opaque future kind", "byte-exact all tables and versions"],
+  "REC-03": ["independent platform AES envelope decode", "malformed rows/history/links/hashes/receipts/watermark/schema refusal", "wrong passphrase/header/ciphertext/tag/truncation"],
+  "REC-04": ["synthetic tokens/hashes physically absent", "native SQLite pages absent from logical package", "no secrets or source prose in reports", "CLI pipe and secret argument refusal"],
+  "REC-05": ["no-clobber and aliases", "fixture-contained target refusal", "hardlinked package refusal", "security review owns resource/custody/interruptions"],
+  "REC-06": ["externally unresolved installed-skill pins block full-fidelity status", "root/security review dependency mismatch tests"],
+  "REC-07": ["post-capture source sentinel unchanged", "HqStore refuses recovered marker", "no sessions", "fixture proof/inventory guard"],
+  "REC-08": ["Arabic/English/emoji/CRLF UTF16 citation fidelity", "Council dissent/corrections/transitive classification pins", "historical approval preserved as data and stale closures retained"],
+  "REC-09": ["complete greater-than-100 event history", "non-contiguous sequence plus reserved highwater", "separate derivative history immutability/uniqueness/allocator continuity"],
+  "REC-10": ["independent execution after implementer handoff", "root owns complete regression/build/mobile/lint/manifest gates", "no production readiness claim"]
+}

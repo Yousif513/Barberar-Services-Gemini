@@ -1,0 +1,21 @@
+{
+  "format": "owner-red-green-evidence-1",
+  "initialRed": {
+    "command": "node --test web_platform/tests/hq-recovery-owner.test.mjs",
+    "exit": 1,
+    "observedFailure": "ERR_MODULE_NOT_FOUND scripts/hq-recovery/index.mjs before implementation existed"
+  },
+  "publicationRegressionRed": {
+    "command": "node --test --test-name-pattern='interrupted package' web_platform/tests/hq-recovery-owner.test.mjs",
+    "exit": 1,
+    "observedFailure": "AssertionError: Missing expected rejection; valid synthetic create succeeded and inspection accepted absent creation journal plus INCOMPLETE marker",
+    "fix": "readPackage now verifies linked creation receipt/journal and absence of incomplete marker before success"
+  },
+  "diagnosticFailures": [
+    "Native PowerShell Set-Acl optional module unavailable; replaced by parameter-safe .NET ACL APIs",
+    "Per-dependency PowerShell reparse invocation exhausted deadline; replaced by batched native checks with retained file handle/lstat checks",
+    "Owner test held readonly verification DB open during cleanup; corrected test finally-close ordering",
+    "Changing implementation while capture ran correctly refused dependency_changed_during_capture"
+  ],
+  "rawOutputNote": "Initial RED observations are recorded from executed tool output; owner-tests.txt is the final captured command transcript, not a reconstructed raw RED transcript."
+}

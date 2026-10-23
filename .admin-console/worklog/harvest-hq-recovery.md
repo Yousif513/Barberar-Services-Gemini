@@ -1,0 +1,3 @@
+# Final recovery harvester
+
+Mode extend; profile regulated. Three previously unrecorded observations from real synthetic tests and independent review: native SQLite physical sidecar lifecycle, explicit CLI interface applicability including incremental write-root context, and intended-boundary negative tests with healthy baselines/real concurrency proof. Recorded via project CLI and banked in existing project-local lessons store; read-only promotion used, no global guidance adoption/export/sync. Recovery implementation, QA and security passes separate; no business employee activation. Root owns final gate/report/commit/push.

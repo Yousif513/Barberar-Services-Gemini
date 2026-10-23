@@ -1,0 +1,26 @@
+✖ security: incomplete publication and altered creator completion links cannot become usable (38563.4402ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 38683.4674
+
+✖ failing tests:
+
+test at web_platform\tests\hq-recovery-security.test.mjs:45:1
+✖ security: incomplete publication and altered creator completion links cannot become usable (38563.4402ms)
+  Error [RecoveryError]: stage_timeout
+      at refuse (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/common.mjs:5:34)
+      at file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/common.mjs:27:93
+      at captureDependencies (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/dependencies.mjs:22:3)
+      at file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/index.mjs:62:22
+      at async operation (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/index.mjs:21:16)
+      at async TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-recovery-security.test.mjs:45:161)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    code: 'stage_timeout',
+    cleanup: 'complete'
+  }

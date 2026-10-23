@@ -1,0 +1,8 @@
+{
+  "check": "manifest-plan",
+  "exit_code": 0,
+  "manifest_sha256_raw": "f21432e75aec46e6a883de2b07e92b669b6c03e379cb85be632f03fa057a6245",
+  "manifest_unchanged": true,
+  "errors": 0,
+  "warnings": 35
+}

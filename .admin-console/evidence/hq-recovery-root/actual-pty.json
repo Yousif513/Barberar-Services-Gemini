@@ -1,0 +1,38 @@
+{
+  "fixture": {
+    "fixtureRoot": "C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji",
+    "outputRoot": "C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji-pty-package",
+    "cancelRoot": "C:\\Users\\YOUSIF~1\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji-pty-cancel"
+  },
+  "kind": "real Windows PTY synthetic-only CLI test",
+  "createExitCode": 0,
+  "createPromptTranscript": "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m\u001b[HPassphrase (12–256 UTF-8 bytes, masked): / عبارة المرور:\u001b[1C\u001b]0;C:\\Users\\Yousif's PC\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\u0007\u001b[?25h********************************\r\nType SYNTHETIC ONLY to confirm fixture-only operation: / أكّد العملية التجريبية: SYNTHETIC ONLY\r\n\r\n\u001b[?25l\u001b[5;1H\u001b[?25h",
+  "cancelPromptTranscript": "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m\u001b[HPassphrase (12–256 UTF-8 bytes, masked): / عبارة المرور:\u001b[1C\u001b]0;C:\\Users\\Yousif's PC\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\u0007\u001b[?25h***************************\r\nRecovery refused / رُفضت الاستعادة: cancelled\r\nHQ synthetic recovery: create --fixture PATH --output NEW | inspect/restore --package PATH --output NEW / استعادة تجريبية فقط\r\n\u001b[?9001l\u001b[?1004l",
+  "passphraseEchoed": false,
+  "cancelCanaryEchoed": false,
+  "maskedStarsObserved": true,
+  "cancelExitCode": 1,
+  "cancelledDiagnosticObserved": true,
+  "scope": "Prompt-phase transcripts captured; successful completion observed separately from exec exit0 and verified from fixture-only receipt.json; no real credentials.",
+  "create_receipt_observed": {
+    "outcome": "completed",
+    "counts": {
+      "commands": 32,
+      "events": 71,
+      "record_versions": 72,
+      "records": 38,
+      "sessions": 0,
+      "workspaces": 2
+    },
+    "dataIntegrity": "passed"
+  },
+  "observed_output_members": [
+    "backup.vhq",
+    "journal.json",
+    "receipt.json",
+    "snapshot.native-shm",
+    "snapshot.native-wal"
+  ],
+  "create_semantic_acceptance": "superseded by independently discovered snapshot WAL/SHM cleanup defect; actual masking/cancellation evidence only",
+  "cancel_created_output": false
+}

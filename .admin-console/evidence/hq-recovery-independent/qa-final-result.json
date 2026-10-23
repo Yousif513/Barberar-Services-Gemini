@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "web_platform/tests/hq-recovery-independent.test.mjs"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 462.294016122818,
+  "sourceHashesUnchanged": true,
+  "pins": "final-source-pins.json"
+}

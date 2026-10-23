@@ -1,0 +1,63 @@
+{
+  "reviewer": "sec-hq-recovery",
+  "independent": true,
+  "scope": "read-only evidence packaging verification; no runtime or test rerun/change",
+  "archive": ".admin-console/evidence/hq-recovery-root/raw-log-bytes.zip",
+  "archiveRawSha256": "876527d3fc8747de8cdd1a6cd9bec55f6e3eca2cec92769efec7135daf793269",
+  "rawLogCount": 32,
+  "allArchiveRawHashesMatch": true,
+  "normalizedDisplayCount": 6,
+  "allDisplaySemanticsPreserved": true,
+  "changes": [
+    {
+      "path": ".admin-console/evidence/hq-recovery-root/validator-cli-red.log",
+      "archiveMember": "hq-recovery-root/validator-cli-red.log",
+      "rawSha256": "897455de2dffd747783d5ecf9905e0284670285a0946a3e2408fd05198e4e9ca",
+      "displaySha256": "0b75181007a1373f80b3375749facea7a901a270cf3b3cef64229e1f386e7d2b",
+      "trailingDisplayWhitespaceOnly": true,
+      "nonemptyOutputLinesUnchanged": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-owner/sidecar-regression-red.txt",
+      "archiveMember": "hq-recovery-owner/sidecar-regression-red.txt",
+      "rawSha256": "e5982e918795c0fcfe49dd8860544758ecbfed399c3feaef6c49910606231e1c",
+      "displaySha256": "710a10381191db895ad0ecf13ef3e81a4bae4f72fdc5a577a33a6f29c91fdbec",
+      "trailingDisplayWhitespaceOnly": true,
+      "nonemptyOutputLinesUnchanged": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-root/mobile.log",
+      "archiveMember": "hq-recovery-root/mobile.log",
+      "rawSha256": "5ba5f82d500ce735184b16d71fdd8685b8d51c91d3e1e17360c3e21bbaf8beb1",
+      "displaySha256": "499f27fa9365399aa25fba1f1948513982a46787c996e292ea462f7aed90c559",
+      "trailingDisplayWhitespaceOnly": true,
+      "nonemptyOutputLinesUnchanged": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-root/web-build.log",
+      "archiveMember": "hq-recovery-root/web-build.log",
+      "rawSha256": "252da1254f4bed5f78d1582e3c58a9940a4fe63005f5c2ee2c4b94e35ec5e480",
+      "displaySha256": "c6e82da383fe3540386f5839b451472c3944df8ec64061cfaea4e07035ce4d7f",
+      "trailingDisplayWhitespaceOnly": true,
+      "nonemptyOutputLinesUnchanged": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-root/web-lint-final.log",
+      "archiveMember": "hq-recovery-root/web-lint-final.log",
+      "rawSha256": "be538c627504512a66612df6a6ea243c61ffe6b5fc8bf4aab3bd619e8d7bfe1f",
+      "displaySha256": "753f078ccaa3c096e17163558242d854c772b189527767c0db1489cbcadcf820",
+      "trailingDisplayWhitespaceOnly": true,
+      "nonemptyOutputLinesUnchanged": true
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-root/web-lint.log",
+      "archiveMember": "hq-recovery-root/web-lint.log",
+      "rawSha256": "be538c627504512a66612df6a6ea243c61ffe6b5fc8bf4aab3bd619e8d7bfe1f",
+      "displaySha256": "753f078ccaa3c096e17163558242d854c772b189527767c0db1489cbcadcf820",
+      "trailingDisplayWhitespaceOnly": true,
+      "nonemptyOutputLinesUnchanged": true
+    }
+  ],
+  "normalization": "Strict UTF8; normalize CRLF pairs for text comparison; strip spaces/tabs only at each line end; ignore blank EOF. Leading indentation, diagnostic lines, assertions, failures and counts retained. Authoritative raw bytes remain in ZIP.",
+  "noRuntimeSourceOrTestChange": true
+}

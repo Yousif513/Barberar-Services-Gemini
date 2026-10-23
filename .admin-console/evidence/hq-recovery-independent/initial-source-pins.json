@@ -1,0 +1,13 @@
+{
+  "scripts/hq-recovery/cli.mjs": "bfcf613fe47164f54dfb67f01ef00231183795785b4ccac03c4cf9f8ab7ab1db",
+  "scripts/hq-recovery/common.mjs": "8ada9b0b70992311b3205442efc31f2cfe70f82ed42dc1c638290932b48f0891",
+  "scripts/hq-recovery/dependencies.mjs": "2fd43784d5f82af83944ab79e7cb1d66fa3a09e706fd2da6287eac3b3348203d",
+  "scripts/hq-recovery/envelope.mjs": "d1f7b2b0e767e64ab99a772baa8ce099549204064ec790bd7ba787ed9155806c",
+  "scripts/hq-recovery/index.mjs": "8a8206b1e03e429df151feeb89fead3dbcffeb862e1c51ff26eadc473315b62b",
+  "scripts/hq-recovery/paths.mjs": "900b995be6ef47426dc8adfa1d4072d2f7604c14d4b72126928ca2c44000ecb1",
+  "scripts/hq-recovery/schema.mjs": "e764bc3146637eae4291bc5696ad05675bb67c2461b1c1d42d1a718b0d47ecd7",
+  "scripts/hq-recovery/worker.mjs": "73e3a031c6e4ccd0949c5a2aa4a23c9cdf1cd339283cc0331267caee7eca1e1b",
+  "web_platform/src/lib/hq/server/local-store.mjs": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687",
+  "web_platform/tests/hq-recovery-independent.test.mjs": "44aa946a6ce3dc78bc1138b6a48d6fd07e7acd958434b17c02fc865acf3e96f6",
+  "web_platform/tests/hq-recovery-independent-fixture.mjs": "42682032be30bdb71de1106a3d754d1f9ffe701771dccc31316616d2ec4fc1f3"
+}

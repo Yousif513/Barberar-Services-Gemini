@@ -1,0 +1,10 @@
+{
+  "check": "mobile",
+  "argv": [
+    "npm.cmd",
+    "run",
+    "typecheck:mobile"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 3.458
+}

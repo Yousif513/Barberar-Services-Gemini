@@ -1,0 +1,62 @@
+{
+  "reviewer": "sec-hq-recovery",
+  "implementationOwner": "impl-hq-recovery",
+  "independent": true,
+  "files": [
+    {
+      "path": "scripts/hq-recovery/cli.mjs",
+      "sha256Canonical": "bfcf613fe47164f54dfb67f01ef00231183795785b4ccac03c4cf9f8ab7ab1db",
+      "bytes": 4800
+    },
+    {
+      "path": "scripts/hq-recovery/common.mjs",
+      "sha256Canonical": "8ada9b0b70992311b3205442efc31f2cfe70f82ed42dc1c638290932b48f0891",
+      "bytes": 2184
+    },
+    {
+      "path": "scripts/hq-recovery/dependencies.mjs",
+      "sha256Canonical": "2fd43784d5f82af83944ab79e7cb1d66fa3a09e706fd2da6287eac3b3348203d",
+      "bytes": 6408
+    },
+    {
+      "path": "scripts/hq-recovery/envelope.mjs",
+      "sha256Canonical": "d1f7b2b0e767e64ab99a772baa8ce099549204064ec790bd7ba787ed9155806c",
+      "bytes": 3045
+    },
+    {
+      "path": "scripts/hq-recovery/index.mjs",
+      "sha256Canonical": "080bd14815971cdf7d31897d8226dbccf19eaa57e631c5dd2f080f62aa0f9085",
+      "bytes": 12452
+    },
+    {
+      "path": "scripts/hq-recovery/paths.mjs",
+      "sha256Canonical": "900b995be6ef47426dc8adfa1d4072d2f7604c14d4b72126928ca2c44000ecb1",
+      "bytes": 7637
+    },
+    {
+      "path": "scripts/hq-recovery/schema.mjs",
+      "sha256Canonical": "e764bc3146637eae4291bc5696ad05675bb67c2461b1c1d42d1a718b0d47ecd7",
+      "bytes": 16101
+    },
+    {
+      "path": "scripts/hq-recovery/worker.mjs",
+      "sha256Canonical": "73e3a031c6e4ccd0949c5a2aa4a23c9cdf1cd339283cc0331267caee7eca1e1b",
+      "bytes": 588
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256Canonical": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687",
+      "bytes": 28232
+    },
+    {
+      "path": "docs/volabi-recovery-contract.md",
+      "sha256Canonical": "fb64a368eb646e32b366fea89dcefb89f46077cd57ac8582a08f2a8162e87e20",
+      "bytes": 11491
+    },
+    {
+      "path": "web_platform/tests/hq-recovery-security.test.mjs",
+      "sha256Canonical": "334f7e6d0d613e4cc4454725ba6993e1b742424b284d9bcf61cbe0cfa2ae363b",
+      "bytes": 15587
+    }
+  ]
+}

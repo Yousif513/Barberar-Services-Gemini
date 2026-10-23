@@ -1,0 +1,20 @@
+[
+  {
+    "selector": "entities[headquarters-local].capabilities[hq-local.recovery].reviewedBy",
+    "exitCode": 0,
+    "stdout": "entities[headquarters-local].capabilities[hq-local.recovery].reviewedBy: null -> \"qa-hq-recovery\"\n",
+    "stderr": ""
+  },
+  {
+    "selector": "entities[headquarters-local].capabilities[hq-local.recovery].reviewStatus",
+    "exitCode": 0,
+    "stdout": "entities[headquarters-local].capabilities[hq-local.recovery].reviewStatus: \"contested\" -> \"reviewed\"\n",
+    "stderr": ""
+  },
+  {
+    "selector": "agents[qa-hq-recovery].status",
+    "exitCode": 0,
+    "stdout": "agents[qa-hq-recovery].status: \"active\" -> \"done\"\n",
+    "stderr": ""
+  }
+]

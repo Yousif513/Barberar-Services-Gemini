@@ -1,0 +1,30 @@
+{
+  "candidateRun": {
+    "tests": 25,
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "elapsedMs": 466039.1155,
+    "evidence": "qa-initial.txt"
+  },
+  "disposition": "NOT ACCEPTED; superseded by stronger artifact cleanup and concurrency overlap assertions",
+  "confirmedDefect": {
+    "evidence": "sidecar-probe.txt",
+    "operation": "createBackup on newly generated minimal synthetic instance",
+    "returnedCleanup": "complete",
+    "actualUnexpectedMembers": [
+      "snapshot.native-shm",
+      "snapshot.native-wal"
+    ],
+    "canaryBytesLeakage": "not asserted; full-create probe only enumerated final artifact names"
+  },
+  "qaHarnessStrengthening": [
+    "Healthy baseline before each malformed fixture/path/inventory negative",
+    "Specific documented refusal codes",
+    "Exact three-file success artifact set",
+    "Exact failure-journal artifact set and truthful code/cleanup",
+    "Concurrent writer timestamps must enclose snapshot capture interval",
+    "Specific inert_restore startup refusal code"
+  ],
+  "holds": "All unchanged; no real HQ database, production, business activation/permission, external business, financial, Azure or paid operations"
+}

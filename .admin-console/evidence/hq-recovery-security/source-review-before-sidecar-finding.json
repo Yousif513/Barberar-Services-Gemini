@@ -1,0 +1,48 @@
+{
+  "reviewer": "sec-hq-recovery",
+  "independent": true,
+  "implementationOwner": "impl-hq-recovery",
+  "scope": "development-only synthetic fixture recovery tooling",
+  "securityDisposition": "passed",
+  "sourceFreezeUnchanged": true,
+  "sourceMismatches": [],
+  "tests": {
+    "command": "node --test web_platform/tests/hq-recovery-security.test.mjs",
+    "exitCode": 0,
+    "tests": 11,
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "rawEvidence": ".admin-console/evidence/hq-recovery-security/independent-final.txt"
+  },
+  "correctedFinding": {
+    "id": "hq-recovery-interrupted-publication",
+    "severity": "high",
+    "independentRegression": "passed missing journal / INCOMPLETE / altered package digest refuse package_not_complete; intact creator completion accepted"
+  },
+  "verified": [
+    "fixed canonical AES256GCM+scrypt envelope bounds, fresh salt/nonce and UTF8 secret rules",
+    "authentication before payload parsing and physical session/canary exclusion",
+    "actual Windows junction/hardlink rejection and denied-parent ACL behavior",
+    "inert read-only restore and moved-database store refusal",
+    "partial-write ENOSPC truthful failure and blocked-cleanup attention state",
+    "completion journal/receipt package links and no-clobber custody",
+    "server-free sessionless historical-only architecture; no external or financial executor"
+  ],
+  "limitations": [
+    "Not a real-data recovery or seat-reclaim approval",
+    "Not a global regulated-console gate clearance",
+    "Safe ENOSPC injection is not an actual disk-fill experiment",
+    "Real interactive PTY masking/cancellation/watchdog evidence is owned by root",
+    "Whole-history provenance requires previously trusted independent digests; not a creator signature",
+    "Same OS owner/administrator outside local custody guarantee",
+    "Full rich-record/WAL/semantic acceptance is independently owned by QA"
+  ],
+  "holds": [
+    "management identities inactive",
+    "Azure/audio deferred",
+    "production merge/deploy held",
+    "business grants/activation held",
+    "external business writes/financial/new paid services held"
+  ]
+}

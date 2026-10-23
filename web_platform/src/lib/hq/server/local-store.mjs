@@ -1,5 +1,5 @@
 import { DatabaseSync } from "node:sqlite";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { randomBytes, randomUUID } from "node:crypto";
 import { HqError, hash, canonical, csrfForSession } from "./local-boundary.mjs";
@@ -36,8 +36,10 @@ const scope = () => ({ environment:"local", effects:["record-only"], employeeAct
 const allowedKinds = new Set(["task", "source", "recommendation", "decision", "followup", "project", "milestone", "project-closure", "meeting", "council-packet", "council-classification"]);
 export class HqStore {
   constructor({ filePath, initialSources = [], agents = [], skills = [] }) {
+    if (existsSync(path.join(path.dirname(filePath), "INERT-RESTORE.json"))) throw new HqError("inert_restore",403);
     mkdirSync(path.dirname(filePath), { recursive:true });
     this.db = new DatabaseSync(filePath);
+    if (this.db.prepare("PRAGMA application_id").get().application_id === 0x56485152) { this.db.close(); throw new HqError("inert_restore",403); }
     this.agents = agents; this.skills = skills; this.initialSources = initialSources;
     this.db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA busy_timeout=5000;
       CREATE TABLE IF NOT EXISTS workspaces(id TEXT PRIMARY KEY,actor_id TEXT NOT NULL,created_at TEXT NOT NULL);

@@ -1,0 +1,1 @@
+{"result":"passed","checked":"exact hidden rowid and stored columns for workspaces/records/record_versions/commands, including actual read-only Council materials selector with permitted and revoked classification controls","rowCounts":{"workspaces":2,"records":43,"record_versions":78,"commands":37},"sessionRows":0}

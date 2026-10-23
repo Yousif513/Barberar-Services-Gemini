@@ -1,0 +1,227 @@
+{
+  "reviewer": "qa-hq-recovery",
+  "implementer": "impl-hq-recovery",
+  "status": "accepted-bounded-development-only",
+  "reviewedAt": "2026-10-23T18:05:49.705606+00:00",
+  "scope": "HQ-NEXT-03 development-only encrypted synthetic whole-instance backup and inert isolated read-only verification; no live data or account recovery",
+  "testResult": {
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 462237.5908,
+    "supplementalHiddenRowidAndActualCouncilSelector": "passed"
+  },
+  "sourcePins": {
+    "scripts/hq-recovery/cli.mjs": "bfcf613fe47164f54dfb67f01ef00231183795785b4ccac03c4cf9f8ab7ab1db",
+    "scripts/hq-recovery/common.mjs": "8ada9b0b70992311b3205442efc31f2cfe70f82ed42dc1c638290932b48f0891",
+    "scripts/hq-recovery/dependencies.mjs": "2fd43784d5f82af83944ab79e7cb1d66fa3a09e706fd2da6287eac3b3348203d",
+    "scripts/hq-recovery/envelope.mjs": "d1f7b2b0e767e64ab99a772baa8ce099549204064ec790bd7ba787ed9155806c",
+    "scripts/hq-recovery/index.mjs": "080bd14815971cdf7d31897d8226dbccf19eaa57e631c5dd2f080f62aa0f9085",
+    "scripts/hq-recovery/paths.mjs": "900b995be6ef47426dc8adfa1d4072d2f7604c14d4b72126928ca2c44000ecb1",
+    "scripts/hq-recovery/schema.mjs": "e764bc3146637eae4291bc5696ad05675bb67c2461b1c1d42d1a718b0d47ecd7",
+    "scripts/hq-recovery/worker.mjs": "73e3a031c6e4ccd0949c5a2aa4a23c9cdf1cd339283cc0331267caee7eca1e1b",
+    "web_platform/src/lib/hq/server/local-store.mjs": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687",
+    "web_platform/tests/hq-recovery-independent.test.mjs": "ac05b87828a25c6a4f52cca2999646737c1a9dad24097a69ba474947d6b2bd7b",
+    "web_platform/tests/hq-recovery-independent-fixture.mjs": "42682032be30bdb71de1106a3d754d1f9ffe701771dccc31316616d2ec4fc1f3"
+  },
+  "reviewedFiles": [
+    {
+      "path": "scripts/hq-recovery/cli.mjs",
+      "disposition": "reviewed from disk; no QA implementation changes"
+    },
+    {
+      "path": "scripts/hq-recovery/common.mjs",
+      "disposition": "reviewed from disk; no QA implementation changes"
+    },
+    {
+      "path": "scripts/hq-recovery/dependencies.mjs",
+      "disposition": "reviewed from disk; no QA implementation changes"
+    },
+    {
+      "path": "scripts/hq-recovery/envelope.mjs",
+      "disposition": "reviewed from disk; no QA implementation changes"
+    },
+    {
+      "path": "scripts/hq-recovery/index.mjs",
+      "disposition": "reviewed from disk; no QA implementation changes"
+    },
+    {
+      "path": "scripts/hq-recovery/paths.mjs",
+      "disposition": "reviewed from disk; no QA implementation changes"
+    },
+    {
+      "path": "scripts/hq-recovery/schema.mjs",
+      "disposition": "reviewed from disk; no QA implementation changes"
+    },
+    {
+      "path": "scripts/hq-recovery/worker.mjs",
+      "disposition": "reviewed from disk; no QA implementation changes"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "disposition": "reviewed from disk; no QA implementation changes"
+    }
+  ],
+  "acceptance": {
+    "REC-01": {
+      "status": "passed",
+      "proof": [
+        "committed WAL preserved, open transaction excluded, source unchanged",
+        "500-command competing writer demonstrably overlaps capture interval; every captured record/version/receipt/audit tuple complete"
+      ],
+      "evidence": [
+        "qa-final.txt"
+      ]
+    },
+    "REC-02": {
+      "status": "passed",
+      "proof": [
+        "all 11 product kinds plus compatible opaque future kind across two workspaces",
+        "exact complete stored values, versions, receipts, audit, hidden rowids and source IDs"
+      ],
+      "evidence": [
+        "qa-final.txt",
+        "rowid-continuity-probe.txt"
+      ]
+    },
+    "REC-03": {
+      "status": "passed",
+      "proof": [
+        "independent AES envelope decode",
+        "wrong password/header/ciphertext/tag/truncation refused",
+        "11 malformed source/history/citation/receipt/watermark/schema cases use healthy baselines and exact documented refusal codes"
+      ],
+      "evidence": [
+        "qa-final.txt"
+      ]
+    },
+    "REC-04": {
+      "status": "passed-local-synthetic",
+      "proof": [
+        "captured authentication tokens/hashes absent from decrypted logical package",
+        "no raw SQLite pages in logical payload; final successful backup exactly package+two redacted metadata files",
+        "CLI requires TTY, rejects secret args/piping without echoing canary; security/root separately verify custody and actual PTY"
+      ],
+      "evidence": [
+        "qa-final.txt",
+        "sidecar-probe.txt"
+      ],
+      "note": "Initial sidecar defect independently confirmed; fixed and exact artifact regressions pass. No general source-prose DLP claim."
+    },
+    "REC-05": {
+      "status": "passed-QA-with-separate-security-evidence",
+      "proof": [
+        "no-clobber/alias/nested fixture/hardlink refusals with positive setup",
+        "failed malformed creates leave only truthful INCOMPLETE and failure journal, no plaintext residue"
+      ],
+      "evidence": [
+        "qa-final.txt"
+      ],
+      "separateReview": "Security owns actual OS custody/junction/ENOSPC/interruption/bounds evidence; root composes final gate."
+    },
+    "REC-06": {
+      "status": "passed-honest-limitations",
+      "proof": [
+        "unverified installed-skill pins explicitly block dependency completeness while data integrity passes"
+      ],
+      "evidence": [
+        "qa-final.txt"
+      ],
+      "note": "Git dirty means tracked-file changes only; hash references do not certify included untracked dependencies committed. Root documents this limitation."
+    },
+    "REC-07": {
+      "status": "passed-local-synthetic",
+      "proof": [
+        "zero recovered sessions, historical-only authority, exact inert_restore startup denial",
+        "post-capture source sentinel and logical state/file identity unchanged",
+        "fixture inventory/proof guards deny unmarked/incomplete selection"
+      ],
+      "evidence": [
+        "qa-final.txt"
+      ]
+    },
+    "REC-08": {
+      "status": "passed",
+      "proof": [
+        "Arabic/English/emoji/CRLF UTF16 citations survive exactly",
+        "Council preparation/minutes, dissent/corrections/cancel/reopen, stale closure history and transitive privacy pins preserved",
+        "actual readonly Council selector retains allowed source and excludes latest-restricted control after restore; hidden insertion rowids match"
+      ],
+      "evidence": [
+        "qa-final.txt",
+        "rowid-continuity-probe.txt"
+      ]
+    },
+    "REC-09": {
+      "status": "passed",
+      "proof": [
+        "complete 202-event history exceeds UI pagination; non-contiguous sequence and reserved allocator highwater preserved",
+        "separate disposable derivative enforces immutable versions/receipts/audit, receipt uniqueness, allocator continuity without modifying recovered evidence",
+        "truthful failure journals and exact successful artifact sets checked"
+      ],
+      "evidence": [
+        "qa-final.txt"
+      ]
+    },
+    "REC-10": {
+      "status": "passed-bounded-local-development",
+      "evidence": [
+        "qa-final-result.json",
+        "final-source-pins.json",
+        "rowid-continuity-result.json",
+        "../hq-recovery-root/existing-web-regression.json",
+        "../hq-recovery-root/web-test-partition.json",
+        "../hq-recovery-root/mobile.json",
+        "../hq-recovery-root/web-build.json",
+        "../hq-recovery-root/web-lint.json",
+        "../hq-recovery-root/validator-all-final.json",
+        "../hq-recovery-root/actual-pty-final.json",
+        "../hq-recovery-security/source-review.json"
+      ],
+      "proof": [
+        "25/25 independent QA +supplemental exact-rowid/actualCouncil-selector probe",
+        "6/6 owner +11/11 separate independent security;1078/1078 existingweb regression",
+        "All73 npmwebglobfiles partition70existing+3recovery, zero missing/overlap; no scripts/test exemptions changed",
+        "Rootmobile/build/fullweblint/Python tests exit0; actualWindowsmaskedTTYcreate/cancellation/cleanup verified",
+        "Exact implementation+independenttest sourcehashes stillmatch at finalreview"
+      ],
+      "remaining": "Root owns final regulated manifest gate/report, finaldocumentation, commit/push. Global regulatedrelease remains failed; this bounded local acceptance clears no production/business hold."
+    }
+  },
+  "findings": [
+    {
+      "id": "hq-recovery-plaintext-sidecar-cleanup",
+      "severity": "high",
+      "initial": "confirmed; successful create falsely reported cleanup complete with native WAL/SHM retained",
+      "final": "fixed and independently accepted by QA and security; exact successful/failure artifact regressions pass"
+    },
+    {
+      "id": "tracked-dirty-provenance-semantics",
+      "severity": "low",
+      "disposition": "documented limitation; dirty field covers tracked changes; exact allowlisted hashes authoritative"
+    }
+  ],
+  "holds": [
+    "No real HQ backup/restore",
+    "No live replacement or seat reclamation",
+    "Management identities inactive",
+    "Azure/audio deferred",
+    "Production merge/deploy, business permissions, external business writes, financial transactions, new paid services held"
+  ],
+  "notClaimed": [
+    "Production readiness",
+    "Off-device redundancy",
+    "Creator identity signature",
+    "Generic sensitive prose sanitization",
+    "Resumption of old approvals",
+    "Regulated global release success"
+  ],
+  "sourceHashesStillMatch": true,
+  "rootTestPartitionVerified": {
+    "allFiles": 73,
+    "existingExecuted": 70,
+    "recoveryExecuted": 3,
+    "missing": [],
+    "duplicates": []
+  }
+}

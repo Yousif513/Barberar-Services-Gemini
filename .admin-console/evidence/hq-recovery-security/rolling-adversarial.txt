@@ -1,0 +1,46 @@
+✖ security: independent two-workspace capture strips physical auth and restored moved DB remains inert (2781.6169ms)
+✔ security: hostile fixed KDF configuration and unknown envelope members refuse before expensive work (8600.1908ms)
+✖ security: authentication failure precedes payload interpretation and never publishes plaintext (4187.6465ms)
+✔ security: tampered ciphertext and truncated envelope refuse (4292.6499ms)
+✔ security: actual Windows junction and hard-linked package aliases refuse (593.2263ms)
+✔ security: oversized sparse package, existing output and secret argv are refused (1074.2547ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 4
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21632.7741
+
+✖ failing tests:
+
+test at web_platform\tests\hq-recovery-security.test.mjs:32:1
+✖ security: independent two-workspace capture strips physical auth and restored moved DB remains inert (2781.6169ms)
+  Error [RecoveryError]: custody_failed
+      at refuse (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/common.mjs:5:34)
+      at powershell (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/paths.mjs:11:246)
+      at restrictDirectory (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/paths.mjs:37:16)
+      at createOwnedRoot (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/paths.mjs:48:18)
+      at operation (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/index.mjs:17:14)
+      at createBackup (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/scripts/hq-recovery/index.mjs:48:9)
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-recovery-security.test.mjs:32:255)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17) {
+    code: 'custody_failed'
+  }
+
+test at web_platform\tests\hq-recovery-security.test.mjs:36:1
+✖ security: authentication failure precedes payload interpretation and never publishes plaintext (4187.6465ms)
+  AssertionError [ERR_ASSERTION]: authentication failure must be distinct from authenticated invalid payload
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-recovery-security.test.mjs:36:537)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'custody_failed',
+    expected: 'custody_failed',
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }

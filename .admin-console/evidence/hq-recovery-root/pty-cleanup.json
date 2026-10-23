@@ -1,0 +1,24 @@
+{
+  "canonical_temp_parent": "C:\\Users\\Yousif's PC\\AppData\\Local\\Temp",
+  "targets": [
+    {
+      "target": "C:\\Users\\Yousif's PC\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji",
+      "outcome": "removed-owned-synthetic-only-root"
+    },
+    {
+      "target": "C:\\Users\\Yousif's PC\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji-pty-package",
+      "outcome": "removed-owned-synthetic-only-root"
+    },
+    {
+      "target": "C:\\Users\\Yousif's PC\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji-pty-cancel",
+      "outcome": "absent"
+    },
+    {
+      "target": "C:\\Users\\Yousif's PC\\AppData\\Local\\Temp\\volabi-recovery-owner-0awHji-pty-final",
+      "outcome": "removed-owned-synthetic-only-root"
+    }
+  ],
+  "cleanup": "complete",
+  "live_instance_touched": false,
+  "forensic_erasure_claim": false
+}

@@ -1,0 +1,10 @@
+{
+  "qa_source_pins": 11,
+  "cli_validator_pins": 5,
+  "mismatches": 0,
+  "hold_files_unchanged": 4,
+  "management_identities_inactive": 15,
+  "current_development_workers_done_and_claims_released": 6,
+  "live_database_read": false,
+  "actual_pty_owned_temporary_roots_cleaned": true
+}

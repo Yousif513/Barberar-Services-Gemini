@@ -1,0 +1,508 @@
+{
+  "title": "Independent HQ-NEXT-03 final gate sanity attestation",
+  "reviewer": "sec-hq-recovery",
+  "classification": "source review and retained failing-gate analysis",
+  "reviewedAt": "2026-10-23T18:13:40.193011+00:00",
+  "manifestSnapshot": {
+    "path": ".admin-console/manifest.json",
+    "sha256_raw": "858b12200a857c25a8832cba78dc464a0f4befaf8464606ca5abec12d39393d0",
+    "sha256_utf8_crlf_to_lf": "858b12200a857c25a8832cba78dc464a0f4befaf8464606ca5abec12d39393d0",
+    "bytes": 1031349,
+    "scope": "Snapshot before adding this supplemental gate-sanity receipt to the open tooling gap; later metadata journal updates may change its hash."
+  },
+  "gatePreserved": {
+    "releaseExit": 1,
+    "baselineErrors": 303,
+    "baselineWarnings": 31,
+    "initialRecoveryErrors": 319,
+    "initialRecoveryWarnings": 35,
+    "afterOperationTraceCorrectionErrors": 318,
+    "afterOperationTraceCorrectionWarnings": 35,
+    "waiver": false
+  },
+  "metadataCorrection": {
+    "assessment": "One genuine traceability defect corrected: path-only serverOperations did not identify called executable exports. Actual exported/called createBackup, inspectBackup, restoreBackup now declared, while CLI path and all source entries remain. No test or function was renamed to satisfy the scanner. Independent rerun removes exactly one recovery evidence-token-match error.",
+    "serverOperations": [
+      "scripts/hq-recovery/cli.mjs",
+      "scripts/hq-recovery/common.mjs",
+      "scripts/hq-recovery/dependencies.mjs",
+      "scripts/hq-recovery/envelope.mjs",
+      "scripts/hq-recovery/index.mjs",
+      "scripts/hq-recovery/paths.mjs",
+      "scripts/hq-recovery/schema.mjs",
+      "scripts/hq-recovery/worker.mjs",
+      "createBackup",
+      "inspectBackup",
+      "restoreBackup"
+    ],
+    "sourceExportLines": {
+      "scripts/hq-recovery/index.mjs": [
+        50,
+        94,
+        95
+      ]
+    },
+    "workerCalls": "scripts/hq-recovery/worker.mjs imports those exports and chooses them for create/inspect/restore; owner, QA and security tests call them."
+  },
+  "newDiagnostics": [
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[12]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-root/web-test-partition.json",
+      "file": ".admin-console/evidence/hq-recovery-root/web-test-partition.json",
+      "processedMatches": [
+        "mock"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 50,
+          "text": "    \"web_platform/tests/no-mock-data.test.mjs\","
+        },
+        {
+          "line": 122,
+          "text": "    \"web_platform/tests/no-mock-data.test.mjs\","
+        }
+      ],
+      "assessment": "Context-only diagnostic: actual no-mock-data.test.mjs regression filename appears in the complete executed test inventory, not substituted application records.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[1]",
+      "message": "evidence file contains placeholder text: planning/volabi/RECOVERY_SCOPE_20261023.md",
+      "file": "planning/volabi/RECOVERY_SCOPE_20261023.md",
+      "processedMatches": [
+        "random"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 45,
+          "text": "Use a versioned authenticated-encryption envelope and vetted platform cryptography; no custom cipher. Proposed implementation contract: AES-256-GCM with a fresh random salt and nonce per package, scrypt-derived key, explicit bounded KDF parameters, authenticated format/schema metadata, and test vectors. Independent security review must validate nonce/key handling and password input before acceptance. The passphrase is masked in a local interactive prompt; never a command-line argument, environment variable, chat message, file tracked in Git, diagnostic, command receipt or log. Passphrase custody is separate from the package; no key escrow or recovery promise if it is lost."
+        }
+      ],
+      "assessment": "Context-only diagnostic: required fresh random cryptographic salt/nonce is security protocol prose, not a placeholder implementation or invented business data.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[2]",
+      "message": "evidence file contains placeholder text: docs/volabi-recovery-contract.md",
+      "file": "docs/volabi-recovery-contract.md",
+      "processedMatches": [
+        "random"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 15,
+          "text": "Binary envelope: 8-byte magic `VHQREC01`, 4-byte unsigned big-endian header length, canonical UTF-8 JSON header (maximum 1024 bytes), ciphertext, 16-byte GCM tag. Fixed header keys: format=1, cipher=`aes-256-gcm`, kdf=`scrypt`, N=32768, r=8, p=1, salt=16 random bytes base64, nonce=12 random bytes base64, plaintextBytes. The whole prefix including magic/header length/header is authenticated additional data. Scrypt uses 64 MiB maxmem, a 32-byte key and a 12–256-byte UTF-8 passphrase. Fresh salt and nonce per package. Authenticated decryption completes before JSON interpretation, schema rebuilding or extraction. The finite fixed KDF is deliberately not attacker-configurable. No archive compression or arbitrary members."
+        }
+      ],
+      "assessment": "Context-only diagnostic: required fresh random cryptographic salt/nonce is security protocol prose, not a placeholder implementation or invented business data.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[4]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-owner/owner-tests.txt",
+      "file": ".admin-console/evidence/hq-recovery-owner/owner-tests.txt",
+      "processedMatches": [
+        "todo"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 12,
+          "text": "ℹ todo 0"
+        }
+      ],
+      "assessment": "Context-only diagnostic: literal Node test runner todo 0 summary, including deliberately retained prior RED evidence. Preserved failure provenance is labelled superseded and is not the final passing result.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[6]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-owner/sidecar-regression-red.txt",
+      "file": ".admin-console/evidence/hq-recovery-owner/sidecar-regression-red.txt",
+      "processedMatches": [
+        "todo"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 8,
+          "text": "ℹ todo 0"
+        }
+      ],
+      "assessment": "Context-only diagnostic: literal Node test runner todo 0 summary, including deliberately retained prior RED evidence. Preserved failure provenance is labelled superseded and is not the final passing result.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[7]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-owner/owner-tests-after-sidecar-fix.txt",
+      "file": ".admin-console/evidence/hq-recovery-owner/owner-tests-after-sidecar-fix.txt",
+      "processedMatches": [
+        "todo"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 13,
+          "text": "ℹ todo 0"
+        }
+      ],
+      "assessment": "Context-only diagnostic: literal Node test runner todo 0 summary, including deliberately retained prior RED evidence. Preserved failure provenance is labelled superseded and is not the final passing result.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].evidence[9]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-independent/qa-final.txt",
+      "file": ".admin-console/evidence/hq-recovery-independent/qa-final.txt",
+      "processedMatches": [
+        "todo"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 32,
+          "text": "ℹ todo 0"
+        }
+      ],
+      "assessment": "Context-only diagnostic: literal Node test runner todo 0 summary, including deliberately retained prior RED evidence. Preserved failure provenance is labelled superseded and is not the final passing result.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].tests[1]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-recovery-independent.test.mjs",
+      "file": "web_platform/tests/hq-recovery-independent.test.mjs",
+      "processedMatches": [
+        "random"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 6,
+          "text": "import {createDecipheriv,scryptSync,randomBytes} from 'node:crypto';"
+        },
+        {
+          "line": 15,
+          "text": "const secret=()=>Buffer.from(randomBytes(32).toString('hex'));"
+        },
+        {
+          "line": 66,
+          "text": " const id=crypto.randomUUID();s.store.db.prepare('INSERT INTO records VALUES(?,?,?,?,?)').run(s.seat.workspaceId,'independent-uncommitted',id,1,JSON.stringify({id,uncommitted:true}));"
+        },
+        {
+          "line": 83,
+          "text": " if(corruption==='orphan-task-source')alterRecord(s.store.db,'task',r=>({...r,sourceIds:[crypto.randomUUID()]}));"
+        },
+        {
+          "line": 121,
+          "text": " const code=`import {parentPort,workerData} from 'node:worker_threads';import {randomUUID} from 'node:crypto';import {HqStore} from ${JSON.stringify(new URL('../src/lib/hq/server/local-store.mjs',import.meta.url).href)};const store=new HqStore(workerData.options);let first=true;const beganAt=Date.now();for(let n=0;n<500;n++){store.command(workerData.seat,{commandId:randomUUID(),type:'task.create',payload:{title:'Concurrent synthetic task '+n,request:'One complete command',outcome:'Atomic receipt and audit',acceptance:'No partial capture',limits:'Synthetic fixture only',sourceIds:[]}});if(first){parentPort.postMessage({state:'started',at:beganAt});first=false;}await new Promise(r=>setTimeout(r,50));}store.close();parentPort.postMessage({state:'done',at:Date.now()});`;"
+        },
+        {
+          "line": 133,
+          "text": " const event=original.events[0];db.prepare('INSERT INTO events(id,workspace_id,action,target_type,target_id,actor_id,command_id,at,details) VALUES(?,?,?,?,?,?,?,?,?)').run(crypto.randomUUID(),event.workspace_id,'independent.derivative.constraint','workspace',event.workspace_id,event.actor_id,null,new Date().toISOString(),JSON.stringify({syntheticDerivativeOnly:true}));assert.ok(db.prepare('SELECT max(seq) n FROM events').get().n>original.sequence);"
+        }
+      ],
+      "assessment": "Context-only diagnostic: cryptographic randomBytes creates temporary encryption test secrets/salt/nonce; UUIDs are isolated synthetic fixture/conflict/allocator cases. Meaningful executable assertions and independent runs exist; these files are not live data sources.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "entities[headquarters-local].capabilities[hq-local.recovery].tests[2]",
+      "message": "evidence file contains placeholder text: web_platform/tests/hq-recovery-security.test.mjs",
+      "file": "web_platform/tests/hq-recovery-security.test.mjs",
+      "processedMatches": [
+        "random"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 8,
+          "text": "import { createCipheriv, createDecipheriv, scryptSync, randomBytes, randomUUID, createHash } from \"node:crypto\";"
+        },
+        {
+          "line": 22,
+          "text": " const salt=randomBytes(16),nonce=randomBytes(12),plaintext=Buffer.from(body);"
+        },
+        {
+          "line": 31,
+          "text": "function fixture(root){const fixtureRoot=path.join(root,\"fixture\");mkdirSync(fixtureRoot);const store=new HqStore({filePath:path.join(fixtureRoot,\"hq.sqlite\")});const sessions=[store.createSession(),store.createSession()],fixtureId=randomUUID();for(const session of sessions){store.put(session,\"recovery-fixture-proof\",{id:randomUUID(),fixtureId,workspaceId:session.workspaceId,actorId:session.actorId,syntheticOnly:true});}writeFileSync(path.join(fixtureRoot,\"fixture.json\"),JSON.stringify({format:\"volabi-synthetic-fixture-1\",fixtureId,workspaces:sessions.map(s=>({id:s.workspaceId,actorId:s.actorId}))}));const authCanaries=sessions.map(s=>digest(s.token));store.close();return{fixtureRoot,authCanaries,sessions};}"
+        }
+      ],
+      "assessment": "Context-only diagnostic: cryptographic randomBytes creates temporary encryption test secrets/salt/nonce; UUIDs are isolated synthetic fixture/conflict/allocator cases. Meaningful executable assertions and independent runs exist; these files are not live data sources.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-interrupted-publication].evidence[0]",
+      "message": "evidence file contains placeholder text: scripts/hq-recovery/index.mjs",
+      "file": "scripts/hq-recovery/index.mjs",
+      "processedMatches": [
+        "random"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 4,
+          "text": "import {randomUUID} from 'node:crypto';"
+        },
+        {
+          "line": 20,
+          "text": " const startedAt=time(),started=Date.now(),operationId=options.operationId||randomUUID();if(!isUuid(operationId))refuse('invalid_operation_id');let published=[];"
+        },
+        {
+          "line": 69,
+          "text": "  const manifest={snapshotId:randomUUID(),capture,schemaFingerprint:SCHEMA_FINGERPRINT,dataDigest:summary.dataDigest,counts:summary.counts,dependencies};"
+        }
+      ],
+      "assessment": "Context-only diagnostic: native node:crypto randomUUID allocates genuine operation/snapshot identifiers; it is not a fabricated customer, financial or business record. This runtime source is cited as corrected-gap evidence.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-interrupted-publication].evidence[1]",
+      "message": "evidence file contains placeholder text: docs/volabi-recovery-contract.md",
+      "file": "docs/volabi-recovery-contract.md",
+      "processedMatches": [
+        "random"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 15,
+          "text": "Binary envelope: 8-byte magic `VHQREC01`, 4-byte unsigned big-endian header length, canonical UTF-8 JSON header (maximum 1024 bytes), ciphertext, 16-byte GCM tag. Fixed header keys: format=1, cipher=`aes-256-gcm`, kdf=`scrypt`, N=32768, r=8, p=1, salt=16 random bytes base64, nonce=12 random bytes base64, plaintextBytes. The whole prefix including magic/header length/header is authenticated additional data. Scrypt uses 64 MiB maxmem, a 32-byte key and a 12–256-byte UTF-8 passphrase. Fresh salt and nonce per package. Authenticated decryption completes before JSON interpretation, schema rebuilding or extraction. The finite fixed KDF is deliberately not attacker-configurable. No archive compression or arbitrary members."
+        }
+      ],
+      "assessment": "Context-only diagnostic: required fresh random cryptographic salt/nonce is security protocol prose, not a placeholder implementation or invented business data.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-interrupted-publication].evidence[3]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-security/interrupted-publication-red.txt",
+      "file": ".admin-console/evidence/hq-recovery-security/interrupted-publication-red.txt",
+      "processedMatches": [
+        "todo"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 8,
+          "text": "ℹ todo 0"
+        }
+      ],
+      "assessment": "Context-only diagnostic: literal Node test runner todo 0 summary, including deliberately retained prior RED evidence. Preserved failure provenance is labelled superseded and is not the final passing result.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-interrupted-publication].evidence[5]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-security/independent-final.txt",
+      "file": ".admin-console/evidence/hq-recovery-security/independent-final.txt",
+      "processedMatches": [
+        "todo"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 18,
+          "text": "ℹ todo 0"
+        }
+      ],
+      "assessment": "Context-only diagnostic: literal Node test runner todo 0 summary, including deliberately retained prior RED evidence. Preserved failure provenance is labelled superseded and is not the final passing result.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-plaintext-sidecar-cleanup].evidence[0]",
+      "message": "evidence file contains placeholder text: scripts/hq-recovery/index.mjs",
+      "file": "scripts/hq-recovery/index.mjs",
+      "processedMatches": [
+        "random"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 4,
+          "text": "import {randomUUID} from 'node:crypto';"
+        },
+        {
+          "line": 20,
+          "text": " const startedAt=time(),started=Date.now(),operationId=options.operationId||randomUUID();if(!isUuid(operationId))refuse('invalid_operation_id');let published=[];"
+        },
+        {
+          "line": 69,
+          "text": "  const manifest={snapshotId:randomUUID(),capture,schemaFingerprint:SCHEMA_FINGERPRINT,dataDigest:summary.dataDigest,counts:summary.counts,dependencies};"
+        }
+      ],
+      "assessment": "Context-only diagnostic: native node:crypto randomUUID allocates genuine operation/snapshot identifiers; it is not a fabricated customer, financial or business record. This runtime source is cited as corrected-gap evidence.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "placeholder-scan",
+      "severity": "error",
+      "path": "gaps[hq-recovery-plaintext-sidecar-cleanup].evidence[4]",
+      "message": "evidence file contains placeholder text: .admin-console/evidence/hq-recovery-security/independent-post-sidecar.txt",
+      "file": ".admin-console/evidence/hq-recovery-security/independent-post-sidecar.txt",
+      "processedMatches": [
+        "todo"
+      ],
+      "rawMatchedLines": [
+        {
+          "line": 18,
+          "text": "ℹ todo 0"
+        }
+      ],
+      "assessment": "Context-only diagnostic: literal Node test runner todo 0 summary, including deliberately retained prior RED evidence. Preserved failure provenance is labelled superseded and is not the final passing result.",
+      "genuineRuntimeDefect": false
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/cli.mjs' does not match any scanned manifest field",
+      "assessment": "Valid retained registry applicability warning: declaredStatic uses a source-file path while the scanner indexes manifest-field identifiers. These entries do not suppress a checked field and are not credited as a working waiver. No registry deletion or broad exception applied.",
+      "genuineRegistryDiagnostic": true
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/common.mjs' does not match any scanned manifest field",
+      "assessment": "Valid retained registry applicability warning: declaredStatic uses a source-file path while the scanner indexes manifest-field identifiers. These entries do not suppress a checked field and are not credited as a working waiver. No registry deletion or broad exception applied.",
+      "genuineRegistryDiagnostic": true
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/envelope.mjs' does not match any scanned manifest field",
+      "assessment": "Valid retained registry applicability warning: declaredStatic uses a source-file path while the scanner indexes manifest-field identifiers. These entries do not suppress a checked field and are not credited as a working waiver. No registry deletion or broad exception applied.",
+      "genuineRegistryDiagnostic": true
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'scripts/hq-recovery/schema.mjs' does not match any scanned manifest field",
+      "assessment": "Valid retained registry applicability warning: declaredStatic uses a source-file path while the scanner indexes manifest-field identifiers. These entries do not suppress a checked field and are not credited as a working waiver. No registry deletion or broad exception applied.",
+      "genuineRegistryDiagnostic": true
+    }
+  ],
+  "files": [
+    {
+      "path": ".admin-console/evidence/hq-recovery-root/web-test-partition.json",
+      "sha256_raw": "59a31f7228a42cb477eca10b5093099c4bc084a6f1b09d7c46a7508e08b0c195",
+      "sha256_utf8_crlf_to_lf": "edcbd70a0886d8fc8e75aff93d37f64165089671cdce91e18290d0775c00225a"
+    },
+    {
+      "path": "planning/volabi/RECOVERY_SCOPE_20261023.md",
+      "sha256_raw": "d1e784821fad02540ac43954f26caf19f7e82be8f4cd31f2b2a4b951733be414",
+      "sha256_utf8_crlf_to_lf": "1713e226613d257ce45bc27fcf4647642c287875aba2ca15daec99f1c895b2e2"
+    },
+    {
+      "path": "docs/volabi-recovery-contract.md",
+      "sha256_raw": "fb64a368eb646e32b366fea89dcefb89f46077cd57ac8582a08f2a8162e87e20",
+      "sha256_utf8_crlf_to_lf": "fb64a368eb646e32b366fea89dcefb89f46077cd57ac8582a08f2a8162e87e20"
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-owner/owner-tests.txt",
+      "sha256_raw": "06877fb8cef19e9bcb311a50746b0ff7fed72e53b3eb32183a5ce57b49382970",
+      "sha256_utf8_crlf_to_lf": "ff90b6e691a86710865077550d4fcdc11ddb7f5182ef03d10a005c23bc977496"
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-owner/sidecar-regression-red.txt",
+      "sha256_raw": "e5982e918795c0fcfe49dd8860544758ecbfed399c3feaef6c49910606231e1c",
+      "sha256_utf8_crlf_to_lf": "f75b385f494fb4f850c0bdf2f7ad252fe5dfb992c44fc7fc37fad56faba5f328"
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-owner/owner-tests-after-sidecar-fix.txt",
+      "sha256_raw": "01bba4549dfbee118fff1ac991ce2ef02db62746652e29d10599cb233e6f1a39",
+      "sha256_utf8_crlf_to_lf": "047d045ac39fa791e69d490210ffda1de9df3423111e37c77cef59644d9075ac"
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-independent/qa-final.txt",
+      "sha256_raw": "8dfe6a478ca2aaf0c65b5ee8a3fcdd1537cd5effaf22b345c6728b5f86be6ba9",
+      "sha256_utf8_crlf_to_lf": "8dfe6a478ca2aaf0c65b5ee8a3fcdd1537cd5effaf22b345c6728b5f86be6ba9"
+    },
+    {
+      "path": "web_platform/tests/hq-recovery-independent.test.mjs",
+      "sha256_raw": "6a1d7563522c269174bab4a5767720b5863d16bf4d014d9092c790fc2f979cf5",
+      "sha256_utf8_crlf_to_lf": "ac05b87828a25c6a4f52cca2999646737c1a9dad24097a69ba474947d6b2bd7b"
+    },
+    {
+      "path": "web_platform/tests/hq-recovery-security.test.mjs",
+      "sha256_raw": "e730a8c971863645bbf51c29b28bb1bcf9956be7728fce9b1cd77563755dfaac",
+      "sha256_utf8_crlf_to_lf": "334f7e6d0d613e4cc4454725ba6993e1b742424b284d9bcf61cbe0cfa2ae363b"
+    },
+    {
+      "path": "scripts/hq-recovery/index.mjs",
+      "sha256_raw": "080bd14815971cdf7d31897d8226dbccf19eaa57e631c5dd2f080f62aa0f9085",
+      "sha256_utf8_crlf_to_lf": "080bd14815971cdf7d31897d8226dbccf19eaa57e631c5dd2f080f62aa0f9085"
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-security/interrupted-publication-red.txt",
+      "sha256_raw": "ee3cf5adbe9576457efe4241f6179cdc7a6fa21383eb0d9fa9c3103c022567d3",
+      "sha256_utf8_crlf_to_lf": "96cfd257b8a6f3b60b3c89115c6d08a6d3e8b0ec5d27ad7b1b76afa72a7b9fe8"
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-security/independent-final.txt",
+      "sha256_raw": "b850f59baceb3057a8b72c3029149aff93cbead012569c83b33b38962f5e1cc0",
+      "sha256_utf8_crlf_to_lf": "b850f59baceb3057a8b72c3029149aff93cbead012569c83b33b38962f5e1cc0"
+    },
+    {
+      "path": ".admin-console/evidence/hq-recovery-security/independent-post-sidecar.txt",
+      "sha256_raw": "3e0e6f6cdd75c01cdc56b7e12ba3dd5c0dcbabc23589487886bd27ef7a9c3a6d",
+      "sha256_utf8_crlf_to_lf": "3e0e6f6cdd75c01cdc56b7e12ba3dd5c0dcbabc23589487886bd27ef7a9c3a6d"
+    },
+    {
+      "path": "scripts/hq-recovery/worker.mjs",
+      "sha256_raw": "73e3a031c6e4ccd0949c5a2aa4a23c9cdf1cd339283cc0331267caee7eca1e1b",
+      "sha256_utf8_crlf_to_lf": "73e3a031c6e4ccd0949c5a2aa4a23c9cdf1cd339283cc0331267caee7eca1e1b"
+    },
+    {
+      "path": "web_platform/tests/hq-recovery-owner.test.mjs",
+      "sha256_raw": "2b2cdeff57fd5b22c41272fef983fa67ec69b63336a9c02353a3b471b20c1708",
+      "sha256_utf8_crlf_to_lf": "2b2cdeff57fd5b22c41272fef983fa67ec69b63336a9c02353a3b471b20c1708"
+    },
+    {
+      "path": "tools/adminwright/scripts/admin_console_manifest.py",
+      "sha256_raw": "411cc65599134fccf582f707d25fbc0c21281733e9e12434c908531ceb242215",
+      "sha256_utf8_crlf_to_lf": "a571d45b7d4510989e249bc87ff93df9849952daff7e70de8342653e55773c67"
+    }
+  ],
+  "source_assertions": [
+    "All fifteen new remaining errors have individually inspected lexical contexts and are not missing production data handlers.",
+    "The four source-file registry warnings remain true diagnostics; their declarations are not claimed to suppress any scanned manifest field.",
+    "The global regulated release remains failed and prior backlog is preserved; this is context evidence, not acceptance of a release or an authorization exception.",
+    "Both earlier HIGH recovery defects were corrected and independently retested before final source review; no closed HIGH gap is reopened by these lexical contexts."
+  ],
+  "mutations": "Supplemental reviewer evidence and open medium tooling-gap annotation only; no runtime source, test, genuine raw log or validator rule changed or hidden.",
+  "followingGateNote": "Adding a truthful receipt containing exact diagnostic terms to gap evidence can itself produce another strict context diagnostic. Root will rerun and report exact final totals; no target count is forced.",
+  "postAnnotationGate": {
+    "exitCode": 1,
+    "errors": 318,
+    "warnings": 35,
+    "manifestSha256Raw": "f21432e75aec46e6a883de2b07e92b669b6c03e379cb85be632f03fa057a6245",
+    "manifestSha256Utf8CrlfToLf": "f21432e75aec46e6a883de2b07e92b669b6c03e379cb85be632f03fa057a6245",
+    "additionalFindings": [],
+    "evidence": ".admin-console/evidence/hq-recovery-security/gate-after-annotation.json",
+    "note": "Truthful diagnostic receipt is itself retained evidence and receives strict lexical scan; no error was removed by renaming, rewriting tests or bypassing the gate."
+  },
+  "installedComparison": {
+    "path": ".admin-console/evidence/hq-recovery-root/installed-release-comparison.json",
+    "sha256_raw": "50371876b1fa8e9ee0104c266f8702ab9286e70da27dc3675541f1b456af0b0f",
+    "errors": 361,
+    "warnings": 35,
+    "scope": "Root captured installed-script comparison against the same initial recovery manifest; not substituted for the adopted project-local gate.",
+    "installedScriptSha256Raw": "7bf69a8383b32749ad1b855f312e24fad3cb786b5f552f60abb3580ce641d316",
+    "installedScriptUnchanged": true
+  }
+}

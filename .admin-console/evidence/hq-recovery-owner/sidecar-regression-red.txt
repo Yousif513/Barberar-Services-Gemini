@@ -1,0 +1,35 @@
+✖ REC-01/02/04/07/08 complete coherent fixture backup excludes sessions and restores inert exact history (12964.864ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13103.1555
+
+✖ failing tests:
+
+test at web_platform\tests\hq-recovery-owner.test.mjs:12:1
+✖ REC-01/02/04/07/08 complete coherent fixture backup excludes sessions and restores inert exact history (12964.864ms)
+  AssertionError [ERR_ASSERTION]: Successful encrypted package must retain no raw snapshot WAL/SHM
+  + actual - expected
+
+    [
+      'backup.vhq',
+      'journal.json',
+      'receipt.json',
+  +   'snapshot.native-shm',
+  +   'snapshot.native-wal'
+    ]
+
+      at TestContext.<anonymous> (file:///C:/Users/Yousif's%20PC/.codex/worktrees/booking-payment-reconciliation/Barberar%20Services-Gemini/web_platform/tests/hq-recovery-owner.test.mjs:16:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'backup.vhq', 'journal.json', 'receipt.json', 'snapshot.native-shm', 'snapshot.native-wal' ],
+    expected: [ 'backup.vhq', 'journal.json', 'receipt.json' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
