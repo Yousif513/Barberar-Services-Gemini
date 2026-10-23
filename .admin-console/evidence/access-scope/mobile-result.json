@@ -1,0 +1,10 @@
+{
+  "command": [
+    "npm.cmd",
+    "run",
+    "typecheck:mobile"
+  ],
+  "exit_code": 0,
+  "scope": "existing application health check, not HQ-NEXT-04 implementation verification",
+  "hq_local_mode": "disabled"
+}

@@ -1,0 +1,25 @@
+{
+  "item": "HQ-NEXT-04",
+  "scope_only": true,
+  "independent_raw_and_canonical_pins_matched": 24,
+  "manifest_raw_sha256": "f21432e75aec46e6a883de2b07e92b669b6c03e379cb85be632f03fa057a6245",
+  "manifest_unchanged": true,
+  "runtime_source_changes": 0,
+  "real_hq_data_accessed": false,
+  "historical_package_entries": 76,
+  "current_readme_digest": "matched",
+  "gates": {
+    "plan": {
+      "exit_code": 0,
+      "errors": 0,
+      "warnings": 35
+    },
+    "coverage": {
+      "exit_code": 0
+    }
+  },
+  "mobile_exit": 0,
+  "web_build_exit": 0,
+  "last_release": "prior independently verified failed result318errors35warnings; not rerun/waived for this proposal",
+  "notes": "Official phase output is diagnostic only, bounded graph is scope of record. No screens rendered, no implementation tested."
+}

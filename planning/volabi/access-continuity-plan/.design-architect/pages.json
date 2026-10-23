@@ -1,0 +1,34 @@
+{
+  "areas": [
+    "access-continuity"
+  ],
+  "mode": "minimal",
+  "platform": "web",
+  "pages": [
+    {
+      "id": "local-founder-access-and-recovery",
+      "name": "Local Founder Access and Recovery",
+      "route": "/hq/access",
+      "purpose": "",
+      "area": "uncategorized",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:5"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 5,
+          "quote": "/hq/access — Local Founder Access and Recovery"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": []
+    }
+  ]
+}

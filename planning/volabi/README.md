@@ -1,5 +1,7 @@
 # Volabi HQ - approved local development
 
+HQ-NEXT-04 proposal ready for review: [founder-seat continuity and missing-database scope](FOUNDER_CONTINUITY_SCOPE_20261023.md), [bounded access surface map](FOUNDER_CONTINUITY_DOMAIN_GRAPH.json), [source inventory](FOUNDER_CONTINUITY_SOURCES_20261023.json). Scope only; no live-data inspection, account claim, application code or screen rendering.
+
 HQ-NEXT-03 is approved, implemented and independently verified using synthetic fixtures only: [recovery delivery](../../docs/volabi-recovery-delivery.md), [approved scope](RECOVERY_SCOPE_20261023.md), [approval](APPROVAL_RECOVERY_20261023.md), [contract](../../docs/volabi-recovery-contract.md). Three local CLI operations, zero new routes; no real HQ data backup/restore, live replacement or account recovery. All holds retained. [Working preferences](WORKING_PREFERENCES.md) records the CEO request to include model and effort recommendations with every next-step prompt.
 
 HQ-NEXT-02 is approved, implemented and independently accepted locally: [Council delivery](../../docs/volabi-council-delivery.md), [approved scope](COUNCIL_SCOPE_20261023.md), [execution graph](COUNCIL_EXECUTION_GRAPH_20261023.json). Two routes/six editors; all management identities inactive, no live AI attendance, Azure deferred and all holds retained.

@@ -1,0 +1,81 @@
+{
+  "bmad_present": true,
+  "project_root": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\volabi\\access-continuity-plan",
+  "config_path": null,
+  "docs_dir": "docs",
+  "project_name": null,
+  "project_description": null,
+  "prd_path": null,
+  "architecture_path": null,
+  "front_end_spec_path": "docs\\front-end-spec.md",
+  "epic_paths": [],
+  "story_paths": [],
+  "qa_paths": [],
+  "spec_paths": [],
+  "actors": [],
+  "entities": [],
+  "epics": [],
+  "explicit_screens": [
+    {
+      "name": "Local Founder Access and Recovery",
+      "route": "/hq/access",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 5,
+      "raw": "/hq/access — Local Founder Access and Recovery"
+    }
+  ],
+  "story_triggers": [],
+  "spec_snippets": [
+    {
+      "quote": "Custom area access-continuity; one standalone access page, not a full admin dashboard.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 9,
+      "section": "Boundaries"
+    },
+    {
+      "quote": "Three explicit modal contracts: enrollment, rotation, sign-out/revoke confirmation.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 11,
+      "section": "Boundaries"
+    },
+    {
+      "quote": "Recovery staging/confirmation and storage failures are page states, not more pages.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 12,
+      "section": "Boundaries"
+    },
+    {
+      "quote": "No screen render or implementation is approved at this proposal stage.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 14,
+      "section": "Boundaries"
+    }
+  ],
+  "design_md_path": "DESIGN.md",
+  "stitch_metadata_path": null,
+  "site_md_path": null,
+  "brand_hints": {
+    "colors": [
+      "#D1AF47",
+      "#F4E7B6",
+      "#F7F3EA",
+      "#FFFFFF",
+      "#15120D",
+      "#475467",
+      "#D8D1C4",
+      "#10120F",
+      "#B42318",
+      "#067647",
+      "#93370D",
+      "#175CD3"
+    ],
+    "vibe": [
+      "warm"
+    ]
+  },
+  "warnings": []
+}

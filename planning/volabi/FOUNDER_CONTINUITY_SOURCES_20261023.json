@@ -1,0 +1,70 @@
+{
+  "item": "HQ-NEXT-04",
+  "status": "proposed-scope-only",
+  "baseline_commit": "43903db886dff9d32bcf43ad64e8cab1adaac6bd",
+  "hash_convention": "strict UTF8; CRLF pairs to LF; UTF8 SHA256",
+  "real_hq_data_accessed": false,
+  "implementation_or_enrollment_authorized": false,
+  "sources": [
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256_utf8_lf": "bab38d9c4ae5ab65164140668fdd5d953e5381dd32eed33ecaa53648a5e3d687"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256_utf8_lf": "50b6be58de26fefbcab7453bceb318afe6ba11337fcfa36bcc9de87fff79b384"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-boundary.mjs",
+      "sha256_utf8_lf": "4ddcbd4edb283ca5727b513407be4a44d127b2c57502d2e09079e9f89a6debb7"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-context.tsx",
+      "sha256_utf8_lf": "cb8ec502727680f0f5a8186c50e9d8efa9916d9d7640bc892cecf431accb35e2"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-shell.tsx",
+      "sha256_utf8_lf": "a9f202f866735eefd80be58290371d8e503b24f822c2870ca4b1ee123b15d867"
+    },
+    {
+      "path": "web_platform/src/lib/hq/client.ts",
+      "sha256_utf8_lf": "090754fde2b0f4c9aee383c65392cfb76c29d5a722425ae450d487770c40767b"
+    },
+    {
+      "path": "scripts/start-volabi-local.mjs",
+      "sha256_utf8_lf": "39c60dcd00a4326f5f6ab9678066d24d240e3b6bd7cac18041fb50ab14ba6ef6"
+    },
+    {
+      "path": "scripts/hq-recovery/schema.mjs",
+      "sha256_utf8_lf": "e764bc3146637eae4291bc5696ad05675bb67c2461b1c1d42d1a718b0d47ecd7"
+    },
+    {
+      "path": "scripts/hq-recovery/index.mjs",
+      "sha256_utf8_lf": "080bd14815971cdf7d31897d8226dbccf19eaa57e631c5dd2f080f62aa0f9085"
+    },
+    {
+      "path": "docs/volabi-recovery-contract.md",
+      "sha256_utf8_lf": "fb64a368eb646e32b366fea89dcefb89f46077cd57ac8582a08f2a8162e87e20"
+    },
+    {
+      "path": "planning/volabi/DESIGN.md",
+      "sha256_utf8_lf": "94c60ef30df85614adba528553d983323cb36c953392b9dca2e9e5e8d0d7c205"
+    },
+    {
+      "path": "planning/volabi/WORKING_PREFERENCES.md",
+      "sha256_utf8_lf": "42522348f6daba1b8625dfbf17111c9c35fbf81aeed60d3f3aaf9b5a0ecee468"
+    },
+    {
+      "path": "planning/volabi/persona-and-skills/PERSONA_REGISTRY.json",
+      "sha256_utf8_lf": "7bdd8e081a2527f989aedfc668317ead714cdb298c63d6055e201d50f642caf3"
+    },
+    {
+      "path": "planning/volabi/VOICE_ACCENT_REQUIREMENTS.json",
+      "sha256_utf8_lf": "d54fb490edcf0adcd4a7d0165e0c99e2cc3f42a24560c3890d97f0a2555f805b"
+    },
+    {
+      "path": "planning/volabi/voice-auditions/EXECUTION_APPROVAL_20261022.md",
+      "sha256_utf8_lf": "69c0057d215ca513c08539739598ecd4c53a51c083342fe4b0e4fd4c460b4b1d"
+    }
+  ]
+}

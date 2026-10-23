@@ -1,0 +1,17 @@
+{
+  "archive_sha256_raw": "79c2aeb31c951609e2ebcd812e05f98aa22f642ee7fc9dbf5448fcdef290a0c3",
+  "logs": [
+    {
+      "member": "mobile.txt",
+      "raw_sha256": "5ba5f82d500ce735184b16d71fdd8685b8d51c91d3e1e17360c3e21bbaf8beb1",
+      "display_sha256": "700d07d69b099af89cc511d213cdfa7d179577393d8314530ffef5f116b19459",
+      "normalization": "CRLF display pairs, trailing spaces/tabs and blank EOF only; full raw bytes in health-raw.zip"
+    },
+    {
+      "member": "web-build.txt",
+      "raw_sha256": "1c151dfe01a8bef7c80f6112e4d4f82f5daf1195db2850fb8c8af9cd0a90973c",
+      "display_sha256": "c04a70dba79309effeb8a3299b7dcf8de8c7171157502d3af28acda9b8235a70",
+      "normalization": "CRLF display pairs, trailing spaces/tabs and blank EOF only; full raw bytes in health-raw.zip"
+    }
+  ]
+}

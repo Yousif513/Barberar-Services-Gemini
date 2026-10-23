@@ -1,0 +1,45 @@
+{
+  "mode": "planning only; official phase CLIs, no global registry mutation or rendering/seed",
+  "steps": [
+    {
+      "phase": "mine",
+      "exit_code": 0
+    },
+    {
+      "phase": "expand",
+      "exit_code": 0
+    },
+    {
+      "phase": "states",
+      "exit_code": 0
+    },
+    {
+      "phase": "close",
+      "exit_code": 0
+    },
+    {
+      "phase": "census",
+      "exit_code": 0
+    },
+    {
+      "phase": "assets",
+      "exit_code": 0
+    },
+    {
+      "phase": "theme",
+      "exit_code": 0
+    },
+    {
+      "phase": "plan",
+      "exit_code": 0
+    },
+    {
+      "phase": "map",
+      "exit_code": 0
+    },
+    {
+      "phase": "html-map",
+      "exit_code": 0
+    }
+  ]
+}

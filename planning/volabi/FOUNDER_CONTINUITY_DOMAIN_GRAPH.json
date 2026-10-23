@@ -1,0 +1,121 @@
+{
+  "status": "PROPOSED_SCOPE_ONLY",
+  "plan": "planning/volabi/FOUNDER_CONTINUITY_SCOPE_20261023.md",
+  "theme": "existing CEO-approved DESIGN.md; no new theme",
+  "routes": [
+    "/hq/access"
+  ],
+  "overlays": [
+    "access-enrollment",
+    "access-rotation",
+    "access-revocation"
+  ],
+  "reuses": [
+    "existing /hq and validated relative protected routes",
+    "current actor control",
+    "HqSessionBoundary",
+    "existing locale/RTL fields/dialogs",
+    "existing immutable audit viewer after proof"
+  ],
+  "states": [
+    "checking",
+    "signed-out",
+    "authenticated-unenrolled",
+    "authenticated-enrolled",
+    "staged-proof",
+    "confirm-saved-secret",
+    "submitting",
+    "cancelled",
+    "expired",
+    "invalid-proof",
+    "rate-limited",
+    "conflict",
+    "unknown-result",
+    "success",
+    "storage-unavailable",
+    "uninitialized",
+    "legacy-unenrolled",
+    "inert-restore-refused"
+  ],
+  "edges": {
+    "lost-session": [
+      "/hq/access"
+    ],
+    "existing-local-actor-control": [
+      "/hq/access"
+    ],
+    "/hq/access": [
+      "access-enrollment",
+      "access-rotation",
+      "access-revocation",
+      "checking",
+      "staged-proof",
+      "confirm-saved-secret",
+      "success",
+      "storage-unavailable"
+    ],
+    "access-enrollment": [
+      "confirm-saved-secret",
+      "cancelled",
+      "expired",
+      "conflict"
+    ],
+    "access-rotation": [
+      "confirm-saved-secret",
+      "cancelled",
+      "expired",
+      "conflict"
+    ],
+    "access-revocation": [
+      "signed-out",
+      "success",
+      "cancelled"
+    ],
+    "success": [
+      "/hq",
+      "validated-existing-relative-hq-route"
+    ],
+    "storage-unavailable": [
+      "checking",
+      "nonsecret-offline-guidance"
+    ],
+    "every-form": [
+      "submitting",
+      "invalid-proof",
+      "unknown-result",
+      "cancelled"
+    ],
+    "unknown-result": [
+      "scoped-operation-receipt",
+      "new-confirmed-credential-recovery"
+    ],
+    "scoped-operation-receipt": [
+      "/hq/access"
+    ],
+    "new-confirmed-credential-recovery": [
+      "/hq/access"
+    ],
+    "nonsecret-offline-guidance": [
+      "no-browser-initialization"
+    ],
+    "no-browser-initialization": []
+  },
+  "no_public_workspace_listing": true,
+  "no_cross_workspace_transfer": true,
+  "no_secret_urls_or_storage": true,
+  "not_built_or_rendered": true,
+  "existing_preview_untouched": true,
+  "machine_diagnostic": {
+    "path": "planning/volabi/access-continuity-plan/.design-architect/graph.json",
+    "page_count": 4,
+    "plan_generations": 23,
+    "minted_total": 19,
+    "depth": 3,
+    "holes_remaining": 0,
+    "ambiguities": 0,
+    "unmatched_spec_statements": 4,
+    "disposition": "diagnostic only, not an approved render queue; generic chrome/settings/widgets and all19 derived nodes excluded from bounded domain scope",
+    "unmatched_mapped_to": "one access route; three explicit dialogs; recovery/error page states; scope-only approval gate"
+  },
+  "holds": "All existing holds; management inactive; Azure deferred; synthetic acceptance only"
+}
